@@ -1,6 +1,6 @@
 version: '3.8'
 services:
-  accounts-server:
+  inventory-server:
     image: registry.sheba.xyz/${CONTAINER_NAME}:latest
     command: npm run serve:prod
     restart: always
