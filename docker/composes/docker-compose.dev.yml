@@ -1,0 +1,38 @@
+version: '3.8'
+services:
+  accounts-server:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    image: registry.sheba.xyz/${CONTAINER_NAME}:latest
+    restart: always
+    volumes:
+      - ../../:/var/www/html
+      - ../apache.conf:/etc/apache2/sites-available/000-default.conf
+    environment:
+      - VIRTUAL_HOST=${INVENTORY_SERVER_URL}
+      - REDIS_HOST=${REDIS_HOST}
+      - DB_HOST=${MYSQL_DATABASE_HOST}
+      - DB_DATABASE=${MYSQL_DATABASE}
+      - CONTAINER_ROLE=app
+    expose:
+      - ${EXPORTED_PORT}
+    ports:
+      - ${EXPORTED_PORT}:80
+  queue:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    image: registry.sheba.xyz/${QUEUE_CONTAINER_NAME}:latest
+    container_name: ${QUEUE_CONTAINER_NAME}
+    depends_on:
+      - accounts-server
+    volumes:
+      - ../../:/var/www/html
+    environment:
+      - CONTAINER_ROLE=queue
+      - CACHE_DRIVER=${CACHE_DRIVER}
+      - SESSION_DRIVER=${SESSION_DRIVER}
+      - QUEUE_DRIVER=${QUEUE_DRIVER}
+      - REDIS_HOST=${REDIS_HOST}
+

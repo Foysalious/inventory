@@ -1,0 +1,17 @@
+version: '3.8'
+services:
+  accounts-server:
+    image: registry.sheba.xyz/${CONTAINER_NAME}:latest
+    command: npm run serve:prod
+    restart: always
+    environment:
+      - VIRTUAL_HOST=${MARKETPLACE_WEBSITE_URL}
+    expose:
+      - ${EXPORTED_PORT}
+    networks:
+      - development_network
+
+networks:
+  development_network:
+    external:
+      name: ${EXTERNAL_NETWORK}

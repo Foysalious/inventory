@@ -1,0 +1,4 @@
+version: '3.8'
+services:
+  accounts-server:
+    container_name: ${CONTAINER_NAME}
