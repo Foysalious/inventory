@@ -5,8 +5,11 @@ set -e
 role=${CONTAINER_ROLE:-app}
 env=${APP_ENV:-production}
 
-if [ "$role" = "app" ]; then
+composer install --ignore-platform-reqs &
+php artisan config:clear &
+composer du &
 
+if [ "$role" = "app" ]; then
     exec apache2-foreground
 
 elif [ "$role" = "queue" ]; then

@@ -31,6 +31,3 @@ elif [ ${branch} = "master" ]; then
     pull_from_docker_registry
 fi
 
-sudo composer install --ignore-platform-reqs
-sudo php artisan config:clear
-sudo composer du
