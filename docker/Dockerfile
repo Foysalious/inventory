@@ -1,30 +1,51 @@
-FROM php:7.4.11-apache
+FROM php:7.4.11-fpm
 
-COPY start.sh /usr/local/bin/start
-RUN chmod +x /usr/local/bin/start
+# PHP_CPPFLAGS are used by the docker-php-ext-* scripts
+ENV PHP_CPPFLAGS="$PHP_CPPFLAGS -std=c++11"
 
-RUN rm /etc/apt/preferences.d/no-debian-php
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    nginx \
+    libpng-dev \
+    zlib1g-dev \
+    libsasl2-dev \
+    libssl-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    libpng-dev \
+    libxpm-dev \
+    libvpx-dev \
+    libxml2-dev \
+    libicu-dev \
+    libonig-dev \
+    libzip-dev \
+    git
 
-RUN apt-get update \
-    && apt-get install -y libpng-dev zlib1g-dev git\
-    && a2enmod headers \
-    && a2enmod rewrite
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN curl -sS https://getcomposer.org/installer | php \
-        && mv composer.phar /usr/local/bin/ \
-        && ln -s /usr/local/bin/composer.phar /usr/local/bin/composer
+# Install extensions
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg
+RUN docker-php-ext-configure intl
+RUN docker-php-ext-install -j$(nproc) pdo_mysql zip calendar soap gd intl
 
-RUN docker-php-ext-install pdo pdo_mysql calendar
+# Install mongodb extension
+RUN pecl install mongodb && docker-php-ext-enable mongodb
 
-RUN pecl install redis && docker-php-ext-enable redis
+# Make fpm log script executable
+COPY fpm_log_file_created.sh /etc/fpm_log_file_created.sh
+RUN chmod +x /etc/fpm_log_file_created.sh
+RUN /etc/fpm_log_file_created.sh
 
-RUN apt-get install -yqq \
-           libzip-dev zip unzip && \
-           docker-php-ext-configure zip; \
-           docker-php-ext-install zip && \
-           php -m | grep -q 'zip'
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-ENV PATH="~/.composer/vendor/bin:./vendor/bin:${PATH}"
+COPY entrypoint.sh /etc/entrypoint.sh
+RUN chmod +x /etc/entrypoint.sh
 
-CMD ["/usr/local/bin/start"]
+RUN usermod -u 1000 www-data
 
+# Set working directory
+WORKDIR /var/www
+
+EXPOSE 80 443
