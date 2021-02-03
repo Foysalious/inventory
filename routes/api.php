@@ -19,4 +19,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+//test routes
 Route::post('tenant', [TenantController::class, 'store']);
+Route::get('tenant', [TenantController::class, 'get']);
