@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CustomTenantModel;
 use Spatie\Multitenancy\Actions\ForgetCurrentTenantAction;
 use Spatie\Multitenancy\Actions\MakeQueueTenantAwareAction;
 use Spatie\Multitenancy\Actions\MakeTenantCurrentAction;
@@ -38,7 +39,7 @@ return [
      *
      * It must be or extend `Spatie\Multitenancy\Models\Tenant::class`
      */
-    'tenant_model' => Tenant::class,
+    'tenant_model' => CustomTenantModel::class,
 
     /*
      * If there is a current tenant when dispatching a job, the id of the current tenant
