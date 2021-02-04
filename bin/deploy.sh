@@ -1,5 +1,12 @@
 #!/bin/sh
 
+## To commit changes of this file
+# ------------------------------
+# git add deploy.sh
+# git update-index --chmod=+x deploy.sh
+# git commit -m "Make deploy.sh executable."
+# git push
+
 get_git_branch() {
   # shellcheck disable=SC2005
   echo "$(git symbolic-ref --short -q HEAD 2>/dev/null)"
