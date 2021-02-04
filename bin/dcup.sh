@@ -21,4 +21,4 @@ len=${#all_args[@]}
 other_args=${all_args[@]:1:${len}-1}
 compose="$compose $other_args"
 
-echo "${compose}"
+eval "${compose}"
