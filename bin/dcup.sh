@@ -2,7 +2,7 @@
 
 compose_folder="./docker/composes"
 
-compose="docker-compose --env-file=../.env -f $compose_folder/docker-compose.yml"
+compose="docker-compose --env-file=./.env -f $compose_folder/docker-compose.yml"
 
 if [[ $1 = "prod" ]]; then
   extra="-f $compose_folder/docker-compose.prod.yml"
@@ -21,5 +21,4 @@ len=${#all_args[@]}
 other_args=${all_args[@]:1:${len}-1}
 compose="$compose $other_args"
 
-echo "$(./.env)"
 echo "${compose}"
