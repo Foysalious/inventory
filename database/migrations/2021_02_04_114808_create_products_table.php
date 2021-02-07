@@ -15,20 +15,23 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('partner_id')->unsigned();
             $table->bigInteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->string('name');
-            $table->tinyInteger('is_published')->default(1);
-            $table->tinyInteger('is_published_for_shop')->default(0);
+            $table->boolean('is_published')->default(1);
+            $table->boolean('is_published_for_shop')->default(0);
             $table->text('description');
             $table->string('shape');
             $table->tinyInteger('show_image');
-            $table->tinyInteger('warranty');
+            $table->integer('warranty')->default(0);
+            $table->enum('warranty_unit', array_keys(config('pos.warranty_unit')))->default('day');
             $table->decimal('vat_percentage', 5, 2)->default(0);
             $table->enum('portal_name', config('sheba.portals'))->nullable();
             $table->ipAddress('ip')->nullable();
             $table->string('user_agent')->nullable();
+            commonColumns($table);
         });
     }
 

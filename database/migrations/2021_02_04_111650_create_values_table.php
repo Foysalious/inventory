@@ -19,6 +19,7 @@ class CreateValuesTable extends Migration
             $table->foreign('option_id')->references('id')->on('options')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->string('name');
+            commonColumns($table);
         });
     }
 
