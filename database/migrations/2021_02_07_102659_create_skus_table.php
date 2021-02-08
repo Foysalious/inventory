@@ -16,9 +16,9 @@ class CreateSkusTable extends Migration
         Schema::create('skus', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('product_id')->nullable()->unsigned();
             $table->foreign('product_id')->references('id')->on('products')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             $table->decimal('stock', 11, 2)->nullable();
             commonColumns($table);
         });

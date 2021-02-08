@@ -15,9 +15,9 @@ class CreateProductUpdateLogsTable extends Migration
     {
         Schema::create('product_update_logs', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('product_id')->nullable()->unsigned();
             $table->foreign('product_id')->references('id')->on('products')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             $table->json('field_names');
             $table->json('old_value');
             $table->json('new_value');

@@ -15,9 +15,9 @@ class CreateProductOptionsTable extends Migration
     {
         Schema::create('product_options', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('product_id')->nullable()->unsigned();
             $table->foreign('product_id')->references('id')->on('products')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');
             commonColumns($table);
         });

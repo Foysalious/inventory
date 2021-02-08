@@ -15,12 +15,12 @@ class CreateSkuChannelsTable extends Migration
     {
         Schema::create('sku_channels', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->unsigned();
+            $table->bigInteger('product_id')->nullable()->unsigned();
             $table->foreign('product_id')->references('id')->on('products')
-                ->onUpdate('cascade')->onDelete('cascade');
-            $table->bigInteger('channel_id')->unsigned();
+                ->onUpdate('cascade')->onDelete('set null');
+            $table->bigInteger('channel_id')->nullable()->unsigned();
             $table->foreign('channel_id')->references('id')->on('channels')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             $table->decimal('price', 11, 2)->unsigned();
             commonColumns($table);
         });

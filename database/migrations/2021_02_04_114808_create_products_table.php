@@ -16,9 +16,9 @@ class CreateProductsTable extends Migration
         Schema::create('products', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('partner_id')->unsigned();
-            $table->bigInteger('category_id')->unsigned();
+            $table->bigInteger('category_id')->nullable()->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');
             $table->boolean('is_published')->default(1);
             $table->boolean('is_published_for_online')->default(0);

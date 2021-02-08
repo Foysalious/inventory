@@ -15,12 +15,12 @@ class CreateCombinationsTable extends Migration
     {
         Schema::create('combinations', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('sku_id')->unsigned();
+            $table->bigInteger('sku_id')->nullable()->unsigned();
             $table->foreign('sku_id')->references('id')->on('skus')
-                ->onUpdate('cascade')->onDelete('cascade');
-            $table->bigInteger('product_option_value_id')->unsigned();
+                ->onUpdate('cascade')->onDelete('set null');
+            $table->bigInteger('product_option_value_id')->nullable()->unsigned();
             $table->foreign('product_option_value_id')->references('id')->on('product_option_values')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             commonColumns($table);
         });
     }
