@@ -18,7 +18,7 @@ class CreateProductOptionValuesTable extends Migration
             $table->bigInteger('product_option_id')->unsigned();
             $table->foreign('product_option_id')->references('id')->on('product_options')
                 ->onUpdate('cascade')->onDelete('cascade');
-            $table->string('value');
+            $table->string('name');
             commonColumns($table);
         });
     }

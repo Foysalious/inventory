@@ -21,10 +21,11 @@ class CreateProductsTable extends Migration
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->string('name');
             $table->boolean('is_published')->default(1);
-            $table->boolean('is_published_for_shop')->default(0);
-            $table->text('description');
-            $table->string('shape');
-            $table->tinyInteger('show_image');
+            $table->boolean('is_published_for_online')->default(0);
+            $table->text('description')->nullable();
+            $table->string('color')->nullable();
+            $table->string('shape')->nullable();
+            $table->tinyInteger('show_image')->default(1);
             $table->integer('warranty')->default(0);
             $table->enum('warranty_unit', array_keys(config('pos.warranty_unit')))->default('day');
             $table->decimal('vat_percentage', 5, 2)->default(0);
