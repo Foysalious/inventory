@@ -22,11 +22,7 @@ class CreateProductsTable extends Migration
             $table->foreign('category_id')->references('id')->on('categories')
                 ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');
-            $table->boolean('is_published')->default(1);
-            $table->boolean('is_published_for_online')->default(0);
             $table->text('description')->nullable();
-            $table->string('color')->nullable();
-            $table->string('shape')->nullable();
             $table->tinyInteger('show_image')->default(1);
             $table->integer('warranty')->default(0);
             $table->enum('warranty_unit', array_keys(config('pos.warranty_unit')))->default('day');

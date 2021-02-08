@@ -22,6 +22,7 @@ class CreateProductChannelsTable extends Migration
             $table->bigInteger('channel_id')->nullable()->unsigned();
             $table->foreign('channel_id')->references('id')->on('channels')
                 ->onUpdate('cascade')->onDelete('set null');
+            $table->boolean('is_published')->default(1);
             commonColumns($table);
         });
     }
