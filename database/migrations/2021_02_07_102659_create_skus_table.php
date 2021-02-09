@@ -15,11 +15,11 @@ class CreateSkusTable extends Migration
     {
         Schema::create('skus', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('name')->index();
             $table->bigInteger('product_id')->nullable()->unsigned()->index();
             $table->foreign('product_id')->references('id')->on('products')
                 ->onUpdate('cascade')->onDelete('set null');
-            $table->decimal('stock', 11, 2)->nullable();
+            $table->decimal('stock', 11, 2)->nullable()->index();
             commonColumns($table);
         });
     }
