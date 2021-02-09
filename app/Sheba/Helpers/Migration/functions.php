@@ -9,9 +9,7 @@ if (!function_exists('commonColumns')) {
      */
     function commonColumns($table)
     {
-        $table->integer('created_by')->nullable()->unsigned();
         $table->string('created_by_name')->nullable();
-        $table->integer('updated_by')->nullable()->unsigned();
         $table->string('updated_by_name')->nullable();
         $table->timestamps();
     }
@@ -25,9 +23,7 @@ if (!function_exists('dropCommonColumns')) {
      */
     function dropCommonColumns($table)
     {
-        $table->dropColumn('created_by');
         $table->dropColumn('created_by_name');
-        $table->dropColumn('updated_by');
         $table->dropColumn('updated_by_name');
         $table->dropColumn('created_at');
         $table->dropColumn('updated_at');
@@ -42,7 +38,6 @@ if (!function_exists('storeColumns')) {
      */
     function storeColumns($table)
     {
-        $table->integer('created_by')->nullable()->unsigned();
         $table->string('created_by_name')->nullable();
         $table->timestamp('created_at')->nullable();
     }

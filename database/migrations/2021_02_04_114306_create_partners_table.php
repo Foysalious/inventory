@@ -15,7 +15,7 @@ class CreatePartnersTable extends Migration
     {
         Schema::create('partners', function (Blueprint $table) {
             $table->id();
-            $table->string('sub_domain')->nullable();
+            $table->string('sub_domain')->nullable()->index();
             commonColumns($table);
         });
     }

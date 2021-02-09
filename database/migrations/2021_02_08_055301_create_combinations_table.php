@@ -15,10 +15,10 @@ class CreateCombinationsTable extends Migration
     {
         Schema::create('combinations', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('sku_id')->nullable()->unsigned();
+            $table->bigInteger('sku_id')->nullable()->unsigned()->index();
             $table->foreign('sku_id')->references('id')->on('skus')
                 ->onUpdate('cascade')->onDelete('set null');
-            $table->bigInteger('product_option_value_id')->nullable()->unsigned();
+            $table->bigInteger('product_option_value_id')->nullable()->unsigned()->index();
             $table->foreign('product_option_value_id')->references('id')->on('product_option_values')
                 ->onUpdate('cascade')->onDelete('set null');
             commonColumns($table);

@@ -27,7 +27,10 @@ class CreateProductsTable extends Migration
             $table->integer('warranty')->default(0);
             $table->enum('warranty_unit', array_keys(config('pos.warranty_unit')))->default('day');
             $table->decimal('vat_percentage', 5, 2)->default(0);
-            $table->enum('portal_name', config('sheba.portals'))->nullable();
+            $table->bigInteger('unit_id')->unsigned()->nullable();
+            $table->foreign('unit_id')->references('id')->on('units')
+                ->onUpdate('cascade')->onDelete('set null');
+            $table->enum('portal_name', config('sheba.portals'))->nullable()->index();
             $table->ipAddress('ip')->nullable();
             $table->string('user_agent')->nullable();
             commonColumns($table);
