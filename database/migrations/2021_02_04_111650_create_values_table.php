@@ -15,7 +15,7 @@ class CreateValuesTable extends Migration
     {
         Schema::create('values', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('option_id')->nullable()->unsigned();
+            $table->bigInteger('option_id')->nullable()->unsigned()->index();
             $table->foreign('option_id')->references('id')->on('options')
                 ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');

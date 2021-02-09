@@ -15,8 +15,8 @@ class CreateSkuChannelsTable extends Migration
     {
         Schema::create('sku_channels', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->nullable()->unsigned()->index();
-            $table->foreign('product_id')->references('id')->on('products')
+            $table->bigInteger('sku_id')->nullable()->unsigned()->index();
+            $table->foreign('sku_id')->references('id')->on('skus')
                 ->onUpdate('cascade')->onDelete('set null');
             $table->bigInteger('channel_id')->nullable()->unsigned()->index();
             $table->foreign('channel_id')->references('id')->on('channels')
