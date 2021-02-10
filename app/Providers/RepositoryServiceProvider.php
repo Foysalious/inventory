@@ -1,12 +1,10 @@
-<?php
+<?php namespace App\Providers;
 
-namespace App\Providers;
-
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Pagination\Paginator;
+use App\Interfaces\OptionRepositoryInterface;
+use App\Repositories\OptionRepository;
 use Illuminate\Support\ServiceProvider;
 
-class AppServiceProvider extends ServiceProvider
+class RepositoryServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
@@ -25,6 +23,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //JsonResource::withoutWrapping();
+        $this->app->singleton(OptionRepositoryInterface::class, OptionRepository::class);
     }
+
 }
