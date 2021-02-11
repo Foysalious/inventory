@@ -7,4 +7,9 @@ class Option extends BaseModel
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    public function values()
+    {
+        return $this->hasMany(Value::class);
+    }
 }

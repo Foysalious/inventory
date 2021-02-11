@@ -23,7 +23,7 @@ class OptionService
     public function getAll()
     {
         try {
-            $resource = $this->optionRepositoryInterface->getAll();
+            $resource = $this->optionRepositoryInterface->getAllWithOptions();
             $options = OptionResource::collection($resource);
             return $this->success("Successful", $options);
         } catch (\Exception $e) {
@@ -34,6 +34,6 @@ class OptionService
     public function create(Request $request)
     {
         $option = $this->creator->setName($request->name)->create();
-        return $this->success("Option created", $option,201);
+        return $this->success("Successful", $option,201);
     }
 }

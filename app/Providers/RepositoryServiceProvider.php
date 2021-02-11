@@ -1,7 +1,9 @@
 <?php namespace App\Providers;
 
 use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ValueRepositoryInterface;
 use App\Repositories\OptionRepository;
+use App\Repositories\ValueRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -24,6 +26,7 @@ class RepositoryServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->singleton(OptionRepositoryInterface::class, OptionRepository::class);
+        $this->app->singleton(ValueRepositoryInterface::class, ValueRepository::class);
     }
 
 }

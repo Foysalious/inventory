@@ -3,5 +3,5 @@
 
 interface OptionRepositoryInterface extends BaseRepositoryInterface
 {
-
+    public function getAllWithOptions();
 }
