@@ -2,8 +2,7 @@
 
 namespace App\Repositories;
 
-use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
-//use Your Model
+use App\Models\Collection;
 
 /**
  * Class CollectionRepository.
@@ -11,11 +10,11 @@ use JasonGuru\LaravelMakeRepository\Repository\BaseRepository;
 class CollectionRepository extends BaseRepository
 {
     /**
-     * @return string
-     *  Return the model
+     * @param Collection $model
      */
-    public function model()
+
+    public function __construct(Collection $model)
     {
-        //return YourModel::class;
+        parent::__construct($model);
     }
 }

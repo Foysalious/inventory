@@ -1,4 +1,5 @@
-<?php namespace App\Repositories;
+<?php
+namespace App\Repositories;
 
 use App\Interfaces\OptionRepositoryInterface;
 use App\Models\Option;

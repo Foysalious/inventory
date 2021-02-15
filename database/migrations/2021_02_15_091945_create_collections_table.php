@@ -15,6 +15,15 @@ class CreateCollectionsTable extends Migration
     {
         Schema::create('collections', function (Blueprint $table) {
             $table->id();
+
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('thumb');
+            $table->string('banner');
+            $table->string('app_thumb');
+            $table->string('app_banner');
+            $table->integer('is_published')->default(0);
+
             $table->timestamps();
         });
     }
