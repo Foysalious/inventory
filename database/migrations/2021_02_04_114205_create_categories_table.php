@@ -29,6 +29,7 @@ class CreateCategoriesTable extends Migration
             $table->smallInteger('order')->nullable()->unsigned();
             $table->string('icon')->nullable();
             $table->string('icon_png')->nullable();
+            $table->softDeletes();
             commonColumns($table);
         });
 
