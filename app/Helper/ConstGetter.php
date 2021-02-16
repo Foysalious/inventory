@@ -1,4 +1,4 @@
-<?php namespace App\Sheba\Helpers;
+<?php namespace App\Helper;
 
 use ReflectionClass;
 
