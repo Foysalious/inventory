@@ -22,7 +22,7 @@ class CreateCollectionsTable extends Migration
             $table->string('banner')->default( getCollectionDefaultBanner() );
             $table->string('app_thumb')->default( getCollectionDefaultAppThumb() );
             $table->string('app_banner')->default( getCollectionDefaultAppBanner() );
-            $table->integer('is_published')->default(0);
+            $table->integer('is_published')->default(0)->unsigned()->index();
 
             $table->timestamps();
         });
