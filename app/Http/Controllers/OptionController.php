@@ -1,6 +1,8 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Requests\OptionRequest;
 use App\Services\Option\OptionService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class OptionController extends Controller
@@ -13,13 +15,27 @@ class OptionController extends Controller
         $this->optionService = $optionService;
     }
 
+    /**
+     * Display a listing of the resource.
+     * @return JsonResponse
+     */
     public function index()
     {
         return $this->optionService->getAll();
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created resource in storage.
+     * @param OptionRequest $request
+     * @return JsonResponse
+     */
+    public function store(OptionRequest $request)
     {
         return $this->optionService->create($request);
+    }
+
+    public function update(OptionRequest $request, $optionId)
+    {
+        return $this->optionService->update($request, $optionId);
     }
 }

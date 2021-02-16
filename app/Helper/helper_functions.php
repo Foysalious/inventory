@@ -1,8 +1,8 @@
 <?php
 
 $helper_files = [
-    "app/Sheba/Helpers/Migration/functions.php",
-    "app/Sheba/Helpers/String/functions.php",
+    "app/Helper/Migration/functions.php",
+    "app/Helper/String/functions.php",
 ];
 
 foreach ($helper_files as $file) {

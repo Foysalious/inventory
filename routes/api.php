@@ -23,8 +23,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix'=>'v1'], function(){
     Route::group(['prefix'=>'options'], function(){
-        Route::resource('/', OptionController::class);
-        Route::group(['prefix'=>'{options}'], function(){
+        Route::get('/', [OptionController::class, 'index']);
+        Route::post('/', [OptionController::class, 'store']);
+        Route::group(['prefix'=>'{id}'], function(){
+            Route::post('/', [OptionController::class, 'update']);
             Route::post('values', [ValueController::class, 'store']);
         });
     });
@@ -33,4 +35,5 @@ Route::group(['prefix'=>'v1'], function(){
         Route::get('/',[UnitController::class, 'index']);
 
     });
+    Route::post('values/{id}', [ValueController::class, 'update']);
 });

@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Requests\ValueRequest;
 use App\Services\Value\ValueService;
 use Illuminate\Http\Request;
 
@@ -13,8 +14,13 @@ class ValueController extends Controller
         $this->valueService = $valueService;
     }
 
-    public function store(Request $request, $option)
+    public function store(ValueRequest $request, $id)
     {
-        return $this->valueService->create($request, $option);
+        return $this->valueService->create($request, $id);
+    }
+
+    public function update(Request $request, $id)
+    {
+        return $this->valueService->update($request, $id);
     }
 }
