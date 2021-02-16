@@ -14,8 +14,13 @@ class ValueController extends Controller
         $this->valueService = $valueService;
     }
 
-    public function store(ValueRequest $request, $option)
+    public function store(ValueRequest $request, $id)
     {
-        return $this->valueService->create($request, $option);
+        return $this->valueService->create($request, $id);
+    }
+
+    public function update(Request $request, $id)
+    {
+        return $this->valueService->update($request, $id);
     }
 }
