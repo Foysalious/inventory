@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\ValueController;
+use App\Http\Controllers\CollectionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,4 +28,6 @@ Route::group(['prefix'=>'v1'], function(){
             Route::post('values', [ValueController::class, 'store']);
         });
     });
+
+    Route::apiResource('collection', CollectionController::class);
 });

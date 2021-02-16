@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Collection;
+use App\Services\Collection\CollectionService;
 use Illuminate\Http\Request;
 
 class CollectionController extends Controller
@@ -12,9 +13,18 @@ class CollectionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    protected $collectionService;
+
+    public function __construct(CollectionService $collectionService)
+    {
+        $this->collectionService = $collectionService;
+    }
+
+
     public function index()
     {
-        //
+        return $this->collectionService->getAllCollection();
     }
 
     /**

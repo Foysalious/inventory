@@ -18,10 +18,10 @@ class CreateCollectionsTable extends Migration
 
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('thumb');
-            $table->string('banner');
-            $table->string('app_thumb');
-            $table->string('app_banner');
+            $table->string('thumb')->default( getCollectionDefaultThumb() );
+            $table->string('banner')->default( getCollectionDefaultBanner() );
+            $table->string('app_thumb')->default( getCollectionDefaultAppThumb() );
+            $table->string('app_banner')->default( getCollectionDefaultAppBanner() );
             $table->integer('is_published')->default(0);
 
             $table->timestamps();
