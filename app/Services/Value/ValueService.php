@@ -1,8 +1,7 @@
 <?php namespace App\Services\Value;
 
-use App\Http\Resources\ValueResource;
+use App\Http\Requests\ValueRequest;
 use App\Interfaces\ValueRepositoryInterface;
-use App\Models\Option;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
 
@@ -21,9 +20,9 @@ class ValueService
         $this->creator = $creator;
     }
 
-    public function create(Request $request, $option)
+    public function create(ValueRequest $request, $option)
     {
-        $values = $this->creator->setOptionId($option)->setValues(json_decode($request->values))->create();
-        return $this->success("Successful", $values,201);
+        $this->creator->setOptionId($option)->setValues(json_decode($request->values))->create();
+        return $this->success("Successful", null,201);
     }
 }
