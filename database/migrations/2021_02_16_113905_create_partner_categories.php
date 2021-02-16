@@ -16,6 +16,7 @@ class CreatePartnerCategories extends Migration
         Schema::create('partner_categories', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('partner_id')->unsigned();
+            $table->bigInteger('sharding_id')->unsigned()->nullable();
             $table->foreign('partner_id')->references('id')->on('partners')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->bigInteger('category_id')->unsigned();
