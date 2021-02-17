@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CollectionRequest;
 use App\Models\Collection;
 use App\Services\Collection\CollectionService;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class CollectionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(CollectionRequest $request)
     {
         return $this->collectionService->create($request);
     }

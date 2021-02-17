@@ -18,11 +18,15 @@ class CollectionService
 
     protected $collectionRepositoryInterface;
 
-    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface)
+    protected $creator;
+
+    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface, Creator $creator)
     {
         $this->collectionRepository = $collectionRepository;
 
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
+
+        $this->creator = $creator;
     }
 
     public function getAll() : object{
