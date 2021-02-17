@@ -2,8 +2,10 @@
 
 use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
+use App\Interfaces\CollectionRepositoryInterface;
 use App\Repositories\OptionRepository;
 use App\Repositories\ValueRepository;
+use App\Repositories\CollectionRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -27,6 +29,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->singleton(OptionRepositoryInterface::class, OptionRepository::class);
         $this->app->singleton(ValueRepositoryInterface::class, ValueRepository::class);
+        $this->app->singleton(CollectionRepositoryInterface::class, CollectionRepository::class);
     }
 
 }

@@ -22,9 +22,9 @@ class CollectionController extends Controller
     }
 
 
-    public function index()
+    public function index() : object
     {
-        return $this->collectionService->getAllCollection();
+        return $this->collectionService->getAll();
     }
 
     /**
