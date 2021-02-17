@@ -8,6 +8,7 @@ use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
 use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
+use Illuminate\Http\Request;
 
 class CollectionService
 {
@@ -24,7 +25,7 @@ class CollectionService
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
     }
 
-    function getAll() : object{
+    public function getAll() : object{
         try {
 
             $resource = $this->collectionRepositoryInterface->getAllCollection();
@@ -38,5 +39,10 @@ class CollectionService
             return $this->error($exception->getMessage());
 
         }
+    }
+
+    public function create(Request $request)
+    {
+
     }
 }

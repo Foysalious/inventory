@@ -35,7 +35,7 @@ class CollectionController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return $this->collectionService->create($request);
     }
 
     /**
