@@ -10,10 +10,7 @@ trait ModificationFields
 
     public function setModifier($entity)
     {
-        $this->modifierModelName = substr(strrchr(get_class($entity), '\\'), 1);
-        if ($entity == 'Partner') {
-            Session::flash('modifier', $entity);
-        }
+        Session::flash('modifier', $entity);
     }
 
 
@@ -107,22 +104,10 @@ trait ModificationFields
     private function getData(): array
     {
         $this->modifier = Session::get('modifier');
-
-        $id = 0;
-        $name = "";
         $time = Carbon::now();
-
-       if (substr(strrchr(get_class($this->modifier), '\\'), 1) == 'Partner') {
-            $id = $this->modifier->id;
-            $name = $this->modifierModelName . '-' . (($this->modifier instanceof Partner) ? $this->modifier->name : $this->modifier->profile->name);
-        }
-
-        return [$id, $name, $time];
+        $name = $this->modifier;
+        return [$name, $time];
     }
 
-    public function getModifierType(): string
-    {
-        if (!empty(class_basename(Session::get('modifier')))) return "App\\Models\\" . class_basename(Session::get('modifier'));
-    }
 
 }
