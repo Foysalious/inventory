@@ -17,7 +17,7 @@ class CreateCollectionsTable extends Migration
 
             $table->id();
 
-            $table->unsignedBigInteger('sharding_id')->nullable()->index();
+            $table->bigInteger('sharding_id')->nullable()->unsigned()->index();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('thumb')->default( getCollectionDefaultThumb() );
