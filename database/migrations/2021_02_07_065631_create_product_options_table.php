@@ -19,6 +19,7 @@ class CreateProductOptionsTable extends Migration
             $table->foreign('product_id')->references('id')->on('products')
                 ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }

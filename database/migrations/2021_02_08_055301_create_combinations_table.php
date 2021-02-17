@@ -21,6 +21,7 @@ class CreateCombinationsTable extends Migration
             $table->bigInteger('product_option_value_id')->nullable()->unsigned()->index();
             $table->foreign('product_option_value_id')->references('id')->on('product_option_values')
                 ->onUpdate('cascade')->onDelete('set null');
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }
