@@ -6,10 +6,12 @@ use App\Interfaces\UnitRepositoryInterface;
 use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Repositories\CategoryRepository;
+use App\Interfaces\CollectionRepositoryInterface;
 use App\Repositories\OptionRepository;
 use App\Repositories\UnitRepository;
 use App\Repositories\PartnerCategoryRepository;
 use App\Repositories\ValueRepository;
+use App\Repositories\CollectionRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -36,6 +38,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ValueRepositoryInterface::class, ValueRepository::class);
         $this->app->singleton(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->singleton(PartnerCategoryRepositoryInterface::class, PartnerCategoryRepository::class);
+        $this->app->singleton(CollectionRepositoryInterface::class, CollectionRepository::class);
     }
 
 }
