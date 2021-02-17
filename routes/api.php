@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\ValueController;
 use Illuminate\Http\Request;
@@ -21,6 +22,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
+    Route::group(['prefix'=>'categories'], function(){
+        Route::post('/', [CategoryController::class, 'store']);
+    });
+
     Route::group(['prefix'=>'options'], function(){
         Route::resource('/', OptionController::class);
         Route::group(['prefix'=>'{options}'], function(){
