@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ValueController;
@@ -22,6 +23,10 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
+    Route::group(['prefix'=>'categories'], function(){
+        Route::post('/', [CategoryController::class, 'store']);
+    });
+
     Route::group(['prefix'=>'options'], function(){
         Route::get('/', [OptionController::class, 'index']);
         Route::post('/', [OptionController::class, 'store']);
