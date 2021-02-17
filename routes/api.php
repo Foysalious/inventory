@@ -23,8 +23,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
-    Route::group(['prefix'=>'categories'], function(){
-        Route::post('/', [CategoryController::class, 'store']);
+    Route::group(['prefix'=>'partners/{partner_id}'], function() {
+        Route::group(['prefix' => 'categories'], function () {
+            Route::post('/', [CategoryController::class, 'store']);
+            Route::post('{category_id}', [CategoryController::class, 'update']);
+        });
     });
 
     Route::group(['prefix'=>'options'], function(){
