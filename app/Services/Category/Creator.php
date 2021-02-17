@@ -65,7 +65,7 @@ class Creator
             'name' => 'Sub None Category',
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
-        ] + $this->modificationFields(true, false);;
+        ] + $this->modificationFields(true, false);
         return  $this->categoryRepositoryInterface->create($sub_category_data);
 
     }
