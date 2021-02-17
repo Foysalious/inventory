@@ -14,8 +14,10 @@ class CreateCollectionsTable extends Migration
     public function up()
     {
         Schema::create('collections', function (Blueprint $table) {
+
             $table->id();
 
+            $table->unsignedBigInteger('sharding_id')->nullable()->index();
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('thumb')->default( getCollectionDefaultThumb() );
@@ -24,7 +26,12 @@ class CreateCollectionsTable extends Migration
             $table->string('app_banner')->default( getCollectionDefaultAppBanner() );
             $table->integer('is_published')->default(0)->unsigned()->index();
 
-            $table->timestamps();
+            // Foreign key relationship with Partner
+            $table->bigInteger('partner_id')->nullable()->unsigned()->index();
+            $table->foreign('partner_id')->references('id')->on('partners')
+                ->onUpdate('cascade')->onDelete('set null');
+
+            commonColumns($table);
         });
     }
 

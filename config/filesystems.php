@@ -50,6 +50,7 @@ return [
             'bucket' => env('AWS_BUCKET'),
             'url' => env('AWS_URL'),
             'endpoint' => env('AWS_ENDPOINT'),
+            'default_image_path' => env('S3_URL'),
         ],
 
     ],

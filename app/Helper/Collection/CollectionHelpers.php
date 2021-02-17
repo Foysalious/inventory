@@ -9,10 +9,10 @@ if( !function_exists('getCollectionDefaultThumbFolder')) {
      * @return string
      */
 
-    function getCollectionDefaultThumbFolder( $with_base_url = false ) : string {
 
-        $url = '';
-        if ($with_base_url) $url = env('S3_URL');
+    function getCollectionDefaultThumbFolder() : string {
+
+        $url = config('filesystems.disks.s3.default_image_path');
 
         return $url . 'images/categories_images/thumbs/';
 
@@ -29,7 +29,7 @@ if( !function_exists('getCollectionDefaultThumb')) {
      */
     function getCollectionDefaultThumb() : string {
 
-        return getCollectionDefaultThumbFolder( true ) . 'default.jpg';
+        return getCollectionDefaultThumbFolder() . 'default.jpg';
 
     }
 }
@@ -44,10 +44,9 @@ if( !function_exists('getCollectionDefaultAppThumbFolder')) {
      * @return string
      */
 
-    function getCollectionDefaultAppThumbFolder( $with_base_url = false ) : string {
+    function getCollectionDefaultAppThumbFolder() : string {
 
-        $url = '';
-        if ($with_base_url) $url = env('S3_URL');
+        $url = config('filesystems.disks.s3.default_image_path');
 
         return $url . 'images/categories_images/app_thumbs/';
 
@@ -64,7 +63,7 @@ if( !function_exists('getCollectionDefaultAppThumb')) {
      */
     function getCollectionDefaultAppThumb() : string {
 
-        return getCollectionDefaultAppThumbFolder( true ) . 'default.jpg';
+        return getCollectionDefaultAppThumbFolder() . 'default.jpg';
 
     }
 }
@@ -79,10 +78,9 @@ if( !function_exists('getCollectionDefaultBannerFolder')) {
      * @return string
      */
 
-    function getCollectionDefaultBannerFolder( $with_base_url = false ) : string {
+    function getCollectionDefaultBannerFolder() : string {
 
-        $url = '';
-        if ($with_base_url) $url = env('S3_URL');
+        $url = config('filesystems.disks.s3.default_image_path');
 
         return $url . 'images/categories_images/banner/';
 
@@ -99,7 +97,7 @@ if( !function_exists('getCollectionDefaultBanner')) {
      */
     function getCollectionDefaultBanner() : string {
 
-        return getCollectionDefaultBannerFolder( true ) . 'default.jpg';
+        return getCollectionDefaultBannerFolder() . 'default.jpg';
 
     }
 }
@@ -114,10 +112,9 @@ if( !function_exists('getCollectionDefaultAppBannerFolder')) {
      * @return string
      */
 
-    function getCollectionDefaultAppBannerFolder( $with_base_url = false ) : string {
+    function getCollectionDefaultAppBannerFolder() : string {
 
-        $url = '';
-        if ($with_base_url) $url = env('S3_URL');
+        $url = config('filesystems.disks.s3.default_image_path');
 
         return $url . 'images/categories_images/banner/';
 
@@ -134,7 +131,7 @@ if( !function_exists('getCollectionDefaultAppBanner')) {
      */
     function getCollectionDefaultAppBanner() : string {
 
-        return getCollectionDefaultAppBannerFolder( true ) . 'default.jpg';
+        return getCollectionDefaultAppBannerFolder() . 'default.jpg';
 
     }
 }

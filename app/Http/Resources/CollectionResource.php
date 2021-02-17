@@ -18,21 +18,21 @@ class CollectionResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'collection_id' => $this->id,
+            'id' => $this->id,
 
-            'collection_name' => $this->name,
+            'name' => $this->name,
 
-            'collection_description' => $this->description,
+            'description' => $this->description,
 
-            'collection_thumb' => $this->thumb,
+            'thumb' => $this->thumb,
 
-            'collection_banner' => $this->banner,
+            'banner' => $this->banner,
 
-            'collection_app_thumb' => $this->app_thumb,
+            'app_thumb' => $this->app_thumb,
 
-            'collection_app_banner' => $this->app_banner,
+            'app_banner' => $this->app_banner,
 
-            'collection_is_published' => $this->is_published
+            'is_published' => $this->is_published
         ];
     }
 }
