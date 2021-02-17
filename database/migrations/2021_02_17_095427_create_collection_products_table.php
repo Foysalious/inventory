@@ -15,8 +15,6 @@ class CreateCollectionProductsTable extends Migration
     {
         Schema::create('collection_products', function (Blueprint $table) {
 
-            $table->id();
-
             $table->bigInteger('collection_id')->nullable()->unsigned()->index();
             $table->foreign('collection_id')->references('id')->on('collections')
                 ->onUpdate('cascade')->onDelete('set null');
