@@ -19,6 +19,7 @@ class CreateProductOptionValuesTable extends Migration
             $table->foreign('product_option_id')->references('id')->on('product_options')
                 ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }
