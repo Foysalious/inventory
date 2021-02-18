@@ -21,7 +21,10 @@ class CreateSkuChannelsTable extends Migration
             $table->bigInteger('channel_id')->nullable()->unsigned()->index();
             $table->foreign('channel_id')->references('id')->on('channels')
                 ->onUpdate('cascade')->onDelete('set null');
+            $table->decimal('cost', 11, 2)->unsigned();
             $table->decimal('price', 11, 2)->unsigned();
+            $table->decimal('wholesale_price', 11, 2)->unsigned();
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }

@@ -18,6 +18,7 @@ class CreateProductsTable extends Migration
             $table->bigInteger('partner_id')->nullable()->unsigned()->index();
             $table->foreign('partner_id')->references('id')->on('partners')
                 ->onUpdate('cascade')->onDelete('set null');
+            $table->bigInteger('sharding_id')->nullable()->unsigned()->index();
             $table->bigInteger('category_id')->nullable()->unsigned()->index();
             $table->foreign('category_id')->references('id')->on('categories')
                 ->onUpdate('cascade')->onDelete('set null');
@@ -30,9 +31,7 @@ class CreateProductsTable extends Migration
             $table->bigInteger('unit_id')->unsigned()->nullable();
             $table->foreign('unit_id')->references('id')->on('units')
                 ->onUpdate('cascade')->onDelete('set null');
-            $table->enum('portal_name', config('sheba.portals'))->nullable()->index();
-            $table->ipAddress('ip')->nullable()->index();
-            $table->string('user_agent')->nullable();
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }
