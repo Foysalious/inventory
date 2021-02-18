@@ -2,7 +2,9 @@
 
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Traits\ResponseAPI;
 
 class CategoryService
@@ -19,12 +21,48 @@ class CategoryService
      * @var Creator
      */
     private Creator $creator;
+    private $partnerCategoryRepositoryInterface;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, Creator $creator, Updater $updater)
+    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface,PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
+        $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
+    }
+
+    public function getMasterCategories($partner_id)
+    {
+        try {
+            $master_categories = $this->categoryRepositoryInterface->getMasterCategoriesByPartner($partner_id);
+
+            if(!$master_categories)
+                return $this->error("Not found",404);
+
+            $data = $this->makeData($master_categories,$partner_id);
+            return $this->success("Successful", $units);
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage());
+        }
+    }
+
+    public function makeData($master_categories,$partner_id)
+    {
+        $data = [];
+        $data['total_category'] = count($master_categories);
+        $data['categories'] = [];
+        foreach ($master_categories as $category) {
+            $item['id'] = $category->id;
+            $item['name'] = $category->name;
+            $item['is_published_for_sheba'] = $category->is_published_for_sheba;
+            $total_services = 0;
+            $category->children()->get()->each(function ($child) use ($partner_id, &$total_services) {
+                $total_services += $child->products()->where('partner_id', $partner_id)->where('publication_status', 1)->count();
+            });
+            $item['total_items'] = $total_services;
+            array_push($data['categories'], $item);
+        }
+
     }
 
     public function create(CategoryRequest $request)
