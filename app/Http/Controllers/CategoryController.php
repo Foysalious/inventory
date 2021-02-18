@@ -25,10 +25,13 @@ class CategoryController extends Controller
     }
 
 
+    /**
+     * @param $partner_id
+     * @return JsonResponse
+     */
     public function index($partner_id)
     {
-
-        $this->categoryService->getMasterCategories($partner_id);
+        return $this->categoryService->getMasterCategoriesByPartner($partner_id);
     }
 
     /**

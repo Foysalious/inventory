@@ -3,9 +3,10 @@
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Value extends BaseModel
+class Product extends BaseModel
 {
     use HasFactory;
 
     protected $guarded = ['id'];
+    protected $casts = ['vat_percentage' => 'double'];
 }

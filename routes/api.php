@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OptionController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ValueController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -35,9 +36,15 @@ Route::group(['prefix'=>'v1'], function(){
     ]);
 
     Route::group(['prefix'=>'options'], function(){
-        Route::resource('/', OptionController::class);
-        Route::group(['prefix'=>'{options}'], function(){
+        Route::get('/', [OptionController::class, 'index']);
+        Route::post('/', [OptionController::class, 'store']);
+        Route::group(['prefix'=>'{option}'], function(){
+            Route::post('/', [OptionController::class, 'update']);
             Route::post('values', [ValueController::class, 'store']);
         });
     });
+    Route::post('values/{value}', [ValueController::class, 'update']);
+    Route::apiResources([
+        'partners.products' => ProductController::class
+    ]);
 });
