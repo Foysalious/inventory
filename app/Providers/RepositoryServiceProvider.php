@@ -1,8 +1,10 @@
 <?php namespace App\Providers;
 
 use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Repositories\OptionRepository;
+use App\Repositories\ProductRepository;
 use App\Repositories\ValueRepository;
 use Illuminate\Support\ServiceProvider;
 
@@ -27,6 +29,7 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         $this->app->singleton(OptionRepositoryInterface::class, OptionRepository::class);
         $this->app->singleton(ValueRepositoryInterface::class, ValueRepository::class);
+        $this->app->singleton(ProductRepositoryInterface::class, ProductRepository::class);
     }
 
 }
