@@ -5,6 +5,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Services\Category\CategoryService;
 use App\Traits\ModificationFields;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -21,6 +22,16 @@ class CategoryController extends Controller
     public function __construct(CategoryService $categoryService)
     {
         $this->categoryService = $categoryService;
+    }
+
+
+    /**
+     * @param $partner_id
+     * @return JsonResponse
+     */
+    public function index($partner_id)
+    {
+        return $this->categoryService->getMasterCategoriesByPartner($partner_id);
     }
 
     /**

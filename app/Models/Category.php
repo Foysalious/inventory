@@ -35,6 +35,11 @@ class Category extends BaseModel
         $query->where('publication_status', 1);
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
 
 
 }
