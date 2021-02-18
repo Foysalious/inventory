@@ -39,16 +39,6 @@ class Updater
     }
 
     /**
-     * @param mixed $partnerId
-     * @return Updater
-     */
-    public function setPartnerId($partnerId)
-    {
-        $this->partnerId = $partnerId;
-        return $this;
-    }
-
-    /**
      * @param mixed $categoryId
      * @return Updater
      */
@@ -136,7 +126,6 @@ class Updater
     private function makeData()
     {
         $data = [];
-        if (isset($this->partnerId)) $data['partner_id'] = $this->partnerId;
         if (isset($this->categoryId)) $data['category_id'] = $this->categoryId;
         if (isset($this->name)) $data['name'] = $this->name;
         if (isset($this->description)) $data['description'] = $this->description;
@@ -147,9 +136,4 @@ class Updater
         if (isset($this->unitId)) $data['unit_id'] = $this->unitId;
         return $data;
     }
-
-
-
-
-
 }
