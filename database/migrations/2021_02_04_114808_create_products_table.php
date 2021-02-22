@@ -24,7 +24,6 @@ class CreateProductsTable extends Migration
                 ->onUpdate('cascade')->onDelete('set null');
             $table->string('name');
             $table->text('description')->nullable();
-            $table->tinyInteger('show_image')->default(1);
             $table->integer('warranty')->default(0);
             $table->enum('warranty_unit', array_keys(config('pos.warranty_unit')))->default('day');
             $table->decimal('vat_percentage', 5, 2)->default(0);
