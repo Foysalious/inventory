@@ -6,6 +6,7 @@ use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Traits\ResponseAPI;
+use Illuminate\Http\JsonResponse;
 
 class ProductService
 {
@@ -23,6 +24,18 @@ class ProductService
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
+    }
+
+
+    /**
+     * @param $partner
+     * @return JsonResponse
+     */
+    public function getProductList($partner)
+    {
+        $products = $this->productRepositoryInterface->where('partner_id',$partner)->get();
+        $products = ProductResource::collection($products);
+        return $this->success('Successful', $products, 200);
     }
 
     public function getDetails($product)

@@ -19,6 +19,14 @@ class ProductController extends Controller
     }
 
     /**
+     * @param $partner
+     */
+    public function index($partner)
+    {
+        return $this->productService->getProductList($partner);
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param $partner
