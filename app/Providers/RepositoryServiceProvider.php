@@ -40,6 +40,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ValueRepositoryInterface::class, ValueRepository::class);
         $this->app->singleton(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->singleton(CollectionRepositoryInterface::class, CollectionRepository::class);
+        $this->app->singleton(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->singleton(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->singleton(PartnerCategoryRepositoryInterface::class, PartnerCategoryRepository::class);
     }

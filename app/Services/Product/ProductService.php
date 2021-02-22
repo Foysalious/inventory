@@ -2,28 +2,32 @@
 
 
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
-use App\Repositories\ProductRepository;
+use App\Interfaces\ProductRepositoryInterface;
 use App\Traits\ResponseAPI;
 
 class ProductService
 {
     use ResponseAPI;
 
-    /** @var ProductRepository */
-    protected ProductRepository $productRepository;
+    /** @var ProductRepositoryInterface */
+    protected ProductRepositoryInterface $productRepositoryInterface;
     /** @var Creator */
     protected Creator $creator;
+    /** @var Updater */
+    protected Updater $updater;
 
-    public function __construct(ProductRepository $productRepository, Creator $creator)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater)
     {
-        $this->productRepository = $productRepository;
+        $this->productRepositoryInterface = $productRepositoryInterface;
         $this->creator = $creator;
+        $this->updater = $updater;
     }
 
     public function getDetails($product)
     {
-        $resource = $this->productRepository->find($product);
+        $resource = $this->productRepositoryInterface->find($product);
         $product = new ProductResource($resource);
         return $this->success('Successful', $product, 200);
     }
@@ -34,7 +38,6 @@ class ProductService
             ->setCategoryId($request->id)
             ->setName($request->name)
             ->setDescription($request->description)
-            ->setShowImage($request->show_image)
             ->setWarranty($request->warranty)
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
@@ -42,5 +45,20 @@ class ProductService
             ->create();
 
         return $this->success("Successful", $product,201);
+    }
+
+    public function update($productId, ProductUpdateRequest $request)
+    {
+        $product = $this->productRepositoryInterface->find($productId);
+        $this->updater->setProduct($product)
+            ->setCategoryId($request->category_id)
+            ->setName($request->name)
+            ->setDescription($request->description)
+            ->setWarranty($request->warranty)
+            ->setWarrantyUnit($request->warranty_unit)
+            ->setVatPercentage($request->vat_percentage)
+            ->setUnitId($request->unit_id)
+            ->update();
+        return $this->success("Successful", $product,200);
     }
 }

@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Product;
 use App\Services\Product\ProductService;
 use Illuminate\Http\JsonResponse;
@@ -38,5 +39,10 @@ class ProductController extends Controller
     public function show($partner, $product)
     {
         return $this->productService->getDetails($product);
+    }
+
+    public function update($partner, $product, ProductUpdateRequest $request)
+    {
+        return $this->productService->update($product, $request);
     }
 }

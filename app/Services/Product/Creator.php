@@ -10,7 +10,6 @@ class Creator
     protected $categoryId;
     protected $name;
     protected $description;
-    protected $showImage;
     protected $warranty;
     protected $warrantyUnit;
     protected $vatPercentage;
@@ -67,16 +66,6 @@ class Creator
     }
 
     /**
-     * @param mixed $showImage
-     * @return Creator
-     */
-    public function setShowImage($showImage)
-    {
-        $this->showImage = $showImage;
-        return $this;
-    }
-
-    /**
      * @param mixed $warranty
      * @return Creator
      */
@@ -128,7 +117,6 @@ class Creator
             'category_id' => $this->categoryId,
             'name' => $this->name,
             'description' => $this->description,
-            'show_image' => $this->showImage ?: 1,
             'warranty' => $this->warranty ?: 0,
             'warranty_unit' => $this->warrantyUnit ?: 'day',
             'vat_percentage' => $this->vatPercentage ?: 0,

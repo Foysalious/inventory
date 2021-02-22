@@ -13,7 +13,6 @@ class Updater
     protected $categoryId;
     protected $name;
     protected $description;
-    protected $showImage;
     protected $warranty;
     protected $warrantyUnit;
     protected $vatPercentage;
@@ -35,16 +34,6 @@ class Updater
     public function setProduct(Product $product)
     {
         $this->product = $product;
-        return $this;
-    }
-
-    /**
-     * @param mixed $partnerId
-     * @return Updater
-     */
-    public function setPartnerId($partnerId)
-    {
-        $this->partnerId = $partnerId;
         return $this;
     }
 
@@ -75,16 +64,6 @@ class Updater
     public function setDescription($description)
     {
         $this->description = $description;
-        return $this;
-    }
-
-    /**
-     * @param mixed $showImage
-     * @return Updater
-     */
-    public function setShowImage($showImage)
-    {
-        $this->showImage = $showImage;
         return $this;
     }
 
@@ -136,20 +115,13 @@ class Updater
     private function makeData()
     {
         $data = [];
-        if (isset($this->partnerId)) $data['partner_id'] = $this->partnerId;
         if (isset($this->categoryId)) $data['category_id'] = $this->categoryId;
         if (isset($this->name)) $data['name'] = $this->name;
         if (isset($this->description)) $data['description'] = $this->description;
-        if (isset($this->showImage)) $data['show_image'] = $this->showImage;
         if (isset($this->warranty)) $data['warranty'] = $this->warranty;
         if (isset($this->warrantyUnit)) $data['warranty_unit'] = $this->warrantyUnit;
         if (isset($this->vatPercentage)) $data['vat_percentage'] = $this->vatPercentage;
         if (isset($this->unitId)) $data['unit_id'] = $this->unitId;
         return $data;
     }
-
-
-
-
-
 }
