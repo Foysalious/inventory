@@ -14,6 +14,8 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
      * @param Collection $model
      */
 
+    protected $paginate = 15;
+
     public function __construct(Collection $model)
     {
         parent::__construct($model);
@@ -21,6 +23,6 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function getAllCollection()
     {
-        return $this->model->get();
+        return $this->model->latest()->paginate($this->paginate);
     }
 }

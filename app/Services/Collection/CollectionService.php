@@ -4,11 +4,11 @@
 namespace App\Services\Collection;
 
 
+use App\Http\Requests\CollectionRequest;
 use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
 use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
-use Illuminate\Http\Request;
 
 class CollectionService
 {
@@ -45,8 +45,19 @@ class CollectionService
         }
     }
 
-    public function create(Request $request)
+    public function create(CollectionRequest $request)
     {
+        $option = $this->creator->setName($request->name)
+            ->setModifyBy($request->modifier)
+            ->setDescription($request->description)
+            ->setIsPublished($request->is_published)
+            ->setPartnerId($request->partner_id)
+            ->setThumb($request->thumb)
+            ->setBanner($request->banner)
+            ->setAppThumb($request->app_thumb)
+            ->setAppBanner($request->app_banner)
+            ->create();
 
+        return $this->success("Successful", $option,201);
     }
 }
