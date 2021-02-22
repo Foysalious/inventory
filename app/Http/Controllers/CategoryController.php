@@ -29,8 +29,12 @@ class CategoryController extends Controller
      */
     public function store(CategoryRequest $request)
     {
-        $this->setModifier($request->user);
         return $this->categoryService->create($request);
+    }
+
+    public function update(CategoryRequest $request, $category_id)
+    {
+        return $this->categoryService->update($request,$category_id);
     }
 
 

@@ -19,12 +19,11 @@ class CreateCategoriesTable extends Migration
             $table->foreign('parent_id')->references('id')->on('categories')
                 ->onUpdate('cascade')->onDelete('cascade');
             $table->string('name');
-            $table->string('slug');
             $table->string('thumb')->default(getCategoryDefaultThumb())->nullable();
             $table->string('banner')->default(getCategoryDefaultBanner())->nullable();
             $table->string('app_thumb')->default(getCategoryDefaultThumb())->nullable();
             $table->string('app_banner')->default(getCategoryDefaultBanner())->nullable();
-            $table->boolean('publication_status')->default(0);
+            $table->tinyInteger('is_published')->default(0);
             $table->tinyInteger('is_published_for_sheba')->default(1);
             $table->smallInteger('order')->nullable()->unsigned();
             $table->string('icon')->nullable();

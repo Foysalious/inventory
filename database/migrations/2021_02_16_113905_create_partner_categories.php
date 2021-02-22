@@ -15,13 +15,13 @@ class CreatePartnerCategories extends Migration
     {
         Schema::create('partner_categories', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('partner_id')->unsigned();
+            $table->bigInteger('partner_id')->nullable()->unsigned();
             $table->bigInteger('sharding_id')->unsigned()->nullable()->index();
             $table->foreign('partner_id')->references('id')->on('partners')
-                ->onUpdate('cascade')->onDelete('cascade');
-            $table->bigInteger('category_id')->unsigned();
+                ->onUpdate('cascade')->onDelete('set null');
+            $table->bigInteger('category_id')->nullable()->unsigned();
             $table->foreign('category_id')->references('id')->on('categories')
-                ->onUpdate('cascade')->onDelete('cascade');
+                ->onUpdate('cascade')->onDelete('set null');
             $table->unique(['partner_id', 'category_id']);
             $table->softDeletes();
             commonColumns($table);
