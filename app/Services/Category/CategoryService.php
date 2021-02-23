@@ -75,7 +75,23 @@ class CategoryService
         if($category->is_published_for_sheba)
         return $this->error("Not allowed to update this category", 403);
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setName($request->name)->update();
+    }
 
+    public function delete($request)
+    {
+        $category_id = $request->category_id;
+        $category = $this->categoryRepositoryInterface->where('id',$category_id)->with('children')->get();
+        $children = $category->children()->pluck('id');
+        $master_cat_with_children = array_merge($children,[$category->id]);
+        if($category->is_published_for_sheba)
+            return $this->error("Not allowed to delete this category", 403);
+        $partner_category = $this->partnerCategoryRepositoryInterface->where('partner_id',$request->partner_id)->where('category_id', $category_id)->first();
+        if(!$partner_category)
+            return $this->error("Not Found", 404);
+
+        $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
+        $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
+        return $this->success("Successful", null,201);
     }
 
 

@@ -18,6 +18,8 @@ interface BaseRepositoryInterface
 
     public function where($column_name, $value);
 
+    public function whereIn($column_name, $value);
+
     public function builder();
 
     public function paginate($perPage = 15, $columns = ['*']);
