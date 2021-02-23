@@ -45,9 +45,9 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\Response
      */
-    public function show(Collection $collection)
+    public function show($collection)
     {
-        //
+        return $this->collectionService->getDetails($collection);
     }
 
     /**
@@ -66,10 +66,10 @@ class CollectionController extends Controller
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\Collection  $collection
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy(Collection $collection)
+    public function destroy($collection)
     {
-        //
+        return $this->collectionService->delete($collection);
     }
 }

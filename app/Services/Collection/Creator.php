@@ -128,7 +128,7 @@ class Creator
 
     public function create()
     {
-        $this->saveImages();
+        //$this->saveImages();
         $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
     }

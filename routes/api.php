@@ -46,7 +46,7 @@ Route::group(['prefix'=>'v1'], function(){
         });
     });
 
-    Route::apiResource('collection', CollectionController::class);
+//    Route::apiResource('collection', CollectionController::class);
 
     Route::group(['prefix'=>'units'], function(){
         Route::get('/',[UnitController::class, 'index']);

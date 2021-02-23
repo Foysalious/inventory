@@ -8,7 +8,6 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CollectionRepositoryInterface;
-use App\Repositories\CategoryRepository;
 use App\Repositories\OptionRepository;
 use App\Repositories\UnitRepository;
 use App\Repositories\PartnerCategoryRepository;
