@@ -2,6 +2,7 @@
 
 use App\Models\Partner;
 use Carbon\Carbon;
+use Session;
 
 trait ModificationFields
 {
