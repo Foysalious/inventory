@@ -16,7 +16,7 @@ class CreatePartnerPosSettingsTable extends Migration
         Schema::create('partner_pos_settings', function (Blueprint $table) {
             $table->increments('id');
             $table->bigInteger('partner_id')->unsigned();
-            $table->bigInteger('sharding_id')->nullable();
+            $table->bigInteger('sharding_id')->nullable()->unsigned()->index();
             $table->foreign('partner_id')->references('id')->on('partners')->onUpdate('cascade');
             $table->decimal('vat_percentage', 5, 2)->default(0);
             $table->string('printer_model')->nullable();
