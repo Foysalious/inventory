@@ -6,6 +6,7 @@ use App\Interfaces\UnitRepositoryInterface;
 use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
+use App\Repositories\CategoryRepository;
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Repositories\OptionRepository;
@@ -43,6 +44,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->singleton(CategoryRepositoryInterface::class, CategoryRepository::class);
         $this->app->singleton(PartnerCategoryRepositoryInterface::class, PartnerCategoryRepository::class);
+        $this->app->singleton(CollectionRepositoryInterface::class, CollectionRepository::class);
     }
 
 }

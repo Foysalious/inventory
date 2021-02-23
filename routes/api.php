@@ -57,4 +57,6 @@ Route::group(['prefix'=>'v1'], function(){
     Route::apiResources([
         'partners.products' => ProductController::class
     ]);
+
+    Route::apiResource('collection', CollectionController::class);
 });
