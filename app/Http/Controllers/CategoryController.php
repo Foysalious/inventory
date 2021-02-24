@@ -38,17 +38,17 @@ class CategoryController extends Controller
      * @param CategoryRequest $request
      * @return JsonResponse
      */
-    public function store(CategoryRequest $request)
+    public function store($partner,CategoryRequest $request)
     {
         return $this->categoryService->create($request);
     }
 
-    public function update(CategoryRequest $request, $partner_id, $category_id)
+    public function update($partner, $category,CategoryRequest $request)
     {
-        return $this->categoryService->update($request,$partner_id, $category_id);
+        return $this->categoryService->update($request,$partner, $category);
     }
 
-    public function delete(Request $request)
+    public function destroy($partner, $category,Request $request)
     {
         return $this->categoryService->delete($request);
     }
