@@ -5,6 +5,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Services\Category\CategoryService;
 use App\Traits\ModificationFields;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -23,6 +24,16 @@ class CategoryController extends Controller
         $this->categoryService = $categoryService;
     }
 
+
+    /**
+     * @param $partner_id
+     * @return JsonResponse
+     */
+    public function index($partner_id)
+    {
+        return $this->categoryService->getCategoriesByPartner($partner_id);
+    }
+
     /**
      * @param CategoryRequest $request
      * @return JsonResponse
@@ -32,11 +43,13 @@ class CategoryController extends Controller
         return $this->categoryService->create($request);
     }
 
-    public function update(CategoryRequest $request, $category_id)
+    public function update(CategoryRequest $request, $partner_id, $category_id)
     {
-        return $this->categoryService->update($request,$category_id);
+        return $this->categoryService->update($request,$partner_id, $category_id);
     }
 
-
-
+    public function delete(Request $request)
+    {
+        return $this->categoryService->delete($request);
+    }
 }

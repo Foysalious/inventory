@@ -68,7 +68,10 @@ class Handler extends ExceptionHandler
             return $this->error(getValidationErrorMessage($errors), Response::HTTP_UNPROCESSABLE_ENTITY);
         } else if ($e instanceof OptionNotFoundException) {
             return $this->error($e->getMessage(), $e->getCode());
-        } else {
+        } else if ($e instanceof CategoryNotFoundException) {
+            return $this->error($e->getMessage(), $e->getCode());
+        }
+        else {
             return response(['message' => $e->getMessage() ?: 'Something Went Wrong'], $e->getCode() ?: 500);
         }
     }
