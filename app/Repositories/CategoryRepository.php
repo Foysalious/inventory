@@ -17,5 +17,9 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
             ->whereNull('categories.parent_id')->get();
     }
 
+    public function getCategory()
+    {
+        
+    }
 
 }

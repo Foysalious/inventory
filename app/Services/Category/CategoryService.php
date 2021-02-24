@@ -3,6 +3,7 @@
 
 use App\Http\Requests\CategoryRequest;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Repositories\CategoryRepository;
 use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Traits\ResponseAPI;
 
@@ -11,6 +12,7 @@ class CategoryService
     use ResponseAPI;
 
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
+    protected CategoryRepository $categoryRepository;
 
     /**
      * @var Updater
@@ -94,5 +96,7 @@ class CategoryService
         return $this->success("Successful", null,201);
     }
 
-
+    public function getCategory(){
+        return $this->categoryRepository->getCategory();
+    }
 }

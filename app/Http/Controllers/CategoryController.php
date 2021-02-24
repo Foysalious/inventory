@@ -53,6 +53,11 @@ class CategoryController extends Controller
         return $this->categoryService->delete($request);
     }
 
+    public function getMasterSubCat(Request $request)
+    {
+        return $this->categoryService->getCategory($request);
+    }
+
 
 
 }
