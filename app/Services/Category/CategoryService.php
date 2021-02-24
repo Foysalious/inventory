@@ -77,7 +77,7 @@ class CategoryService
      */
     public function create(CategoryRequest $request)
     {
-        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner_id)->setName($request->name)->create();
+        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner)->setName($request->name)->create();
         return $this->success("Successful", $category,201);
     }
 
@@ -87,9 +87,9 @@ class CategoryService
      * @param $category_id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(CategoryRequest $request, $partner_id, $category_id)
+    public function update(CategoryRequest $request, $partner, $category)
     {
-        $category = $this->categoryRepositoryInterface->find($category_id);
+        $category = $this->categoryRepositoryInterface->find($category);
         if(!$category)
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
@@ -104,7 +104,7 @@ class CategoryService
      */
     public function delete($request)
     {
-        $category_id = $request->category_id;
+        $category_id = $request->category;
         $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
             $query->select('id','parent_id');
         }])->select('id')->first();
