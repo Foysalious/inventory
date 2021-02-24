@@ -2,11 +2,9 @@
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Models\Product;
 use App\Services\Product\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class ProductController extends Controller
 {
@@ -20,10 +18,12 @@ class ProductController extends Controller
 
     /**
      * @param $partner
+     * @param Request $request
+     * @return JsonResponse
      */
-    public function index($partner)
+    public function index($partner, Request $request)
     {
-        return $this->productService->getProductList($partner);
+        return $this->productService->getProductList($partner, $request);
     }
 
     /**
