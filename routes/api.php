@@ -24,6 +24,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
+    Route::apiResource('partners.options', OptionController::class);
+    Route::apiResource('partners.options.values', ValueController::class)->shallow();
+    Route::apiResources(['partners.products' => ProductController::class]);
     Route::apiResource('options', OptionController::class);
     Route::apiResource('options.values', ValueController::class)->shallow();
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
@@ -36,7 +39,4 @@ Route::group(['prefix'=>'v1'], function(){
         Route::get('/',[UnitController::class, 'index']);
 
     });
-    Route::apiResources([
-        'partners.products' => ProductController::class
-    ]);
 });
