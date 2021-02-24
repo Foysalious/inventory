@@ -24,27 +24,18 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
+    Route::apiResource('options', OptionController::class);
+    Route::apiResource('options.values', ValueController::class)->shallow();
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::group(['prefix' => 'categories'], function () {
             Route::post('/', [CategoryController::class, 'store']);
             Route::post('{category_id}', [CategoryController::class, 'update']);
         });
     });
-
-    Route::group(['prefix'=>'options'], function(){
-        Route::get('/', [OptionController::class, 'index']);
-        Route::post('/', [OptionController::class, 'store']);
-        Route::group(['prefix'=>'{option}'], function(){
-            Route::post('/', [OptionController::class, 'update']);
-            Route::post('values', [ValueController::class, 'store']);
-        });
-    });
-
     Route::group(['prefix'=>'units'], function(){
         Route::get('/',[UnitController::class, 'index']);
 
     });
-    Route::post('values/{value}', [ValueController::class, 'update']);
     Route::apiResources([
         'partners.products' => ProductController::class
     ]);
