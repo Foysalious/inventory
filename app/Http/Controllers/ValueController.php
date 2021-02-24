@@ -25,9 +25,9 @@ class ValueController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function store(ValueRequest $request, $id)
+    public function store(ValueRequest $request, $partnerId, $optionId)
     {
-        return $this->valueService->create($request, $id);
+        return $this->valueService->create($request, $optionId);
     }
 
     /**
@@ -35,7 +35,7 @@ class ValueController extends Controller
      * @param $id
      * @return JsonResponse
      */
-    public function update(ValueUpdateRequest $request, $id)
+    public function update(ValueUpdateRequest $request, $partnerId, $id)
     {
         return $this->valueService->update($request, $id);
     }
