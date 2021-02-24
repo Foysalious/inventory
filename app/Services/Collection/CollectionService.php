@@ -45,7 +45,8 @@ class CollectionService
     }
 
     public function getAll(Request $request) : object{
-        $resource = $this->collectionRepositoryInterface->getAllCollection($request);
+        list($offset, $limit) = calculatePagination($request);
+        $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit);
         $options = CollectionResource::collection($resource);
         return $this->success("Successful", $options);
     }

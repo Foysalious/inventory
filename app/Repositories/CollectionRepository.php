@@ -16,9 +16,8 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
         parent::__construct($model);
     }
 
-    public function getAllCollection(Request $request)
+    public function getAllCollection($offset, $limit)
     {
-        list($offset, $limit) = calculatePagination($request);
         return $this->model->offset($offset)->limit($limit)->latest()->get();
     }
 }

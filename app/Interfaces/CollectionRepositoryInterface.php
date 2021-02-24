@@ -8,5 +8,5 @@ use Illuminate\Http\Request;
 
 interface CollectionRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getAllCollection(Request $request);
+    public function getAllCollection($offset, $limit);
 }
