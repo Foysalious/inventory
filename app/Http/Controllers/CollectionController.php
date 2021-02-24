@@ -58,9 +58,9 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Collection $collection)
+    public function update(CollectionRequest $request, $collection_id)
     {
-        //
+        return $this->collectionService->update($request, $collection_id);
     }
 
     /**

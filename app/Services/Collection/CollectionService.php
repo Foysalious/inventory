@@ -22,15 +22,14 @@ class CollectionService
 
     protected $collectionRepositoryInterface;
 
-    protected $creator;
+    protected $creator, $updater;
 
-    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface, Creator $creator)
+    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface, Creator $creator, Updater $updater)
     {
         $this->collectionRepository = $collectionRepository;
-
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
-
         $this->creator = $creator;
+        $this->updater = $updater;
     }
 
     public function getDetails($collection)
@@ -45,10 +44,14 @@ class CollectionService
     }
 
     public function getAll(Request $request) : object{
-        list($offset, $limit) = calculatePagination($request);
-        $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit);
-        $options = CollectionResource::collection($resource);
-        return $this->success("Successful", $options);
+        try {
+            list($offset, $limit) = calculatePagination($request);
+            $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit);
+            $options = CollectionResource::collection($resource);
+            return $this->success("Successful", $options, 201);
+        } catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), 500);
+        }
     }
 
     public function create(CollectionRequest $request)
@@ -63,6 +66,24 @@ class CollectionService
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
             ->create();
+
+        return $this->success("Successful", $option,201);
+    }
+
+    public function update(CollectionRequest $request, $collection_id)
+    {
+        $collection = $this->collectionRepositoryInterface->find($collection_id);
+        if(!$collection) return $this->error("Collection not found!", 404);
+
+        $option = $this->updater->setCollection($collection)->setName($request->name)
+            ->setModifyBy($request->modifier)
+            ->setDescription($request->description)
+            ->setPartnerId($request->partner_id)
+            ->setThumb($request->thumb)
+            ->setBanner($request->banner)
+            ->setAppThumb($request->app_thumb)
+            ->setAppBanner($request->app_banner)
+            ->update();
 
         return $this->success("Successful", $option,201);
     }
