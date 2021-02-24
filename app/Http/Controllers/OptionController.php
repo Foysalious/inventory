@@ -36,7 +36,7 @@ class OptionController extends Controller
      * @param OptionRequest $request
      * @return JsonResponse
      */
-    public function store(OptionRequest $request)
+    public function store(OptionRequest $request, $partnerId)
     {
         return $this->optionService->create($request);
     }
@@ -46,7 +46,7 @@ class OptionController extends Controller
      * @param $optionId
      * @return JsonResponse
      */
-    public function update(OptionRequest $request, $optionId)
+    public function update(OptionRequest $request, $partnerId, $optionId)
     {
         return $this->optionService->update($request, $optionId);
     }
