@@ -4,7 +4,9 @@
 namespace App\Interfaces;
 
 
+use Illuminate\Http\Request;
+
 interface CollectionRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getAllCollection();
+    public function getAllCollection(Request $request);
 }

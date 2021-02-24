@@ -10,6 +10,7 @@ use App\Repositories\CollectionRepository;
 use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
 use Illuminate\Container\EntryNotFoundException;
+use Illuminate\Http\Request;
 use Mockery\Exception;
 use Whoops\Exception\ErrorException;
 
@@ -39,20 +40,14 @@ class CollectionService
             $collection = new CollectionResource($resource);
             return $this->success('Successful', $collection, 200);
         } catch(\Exception $exception) {
-            return $this->error($exception->getMessage(), 404);
+            return $this->error($exception->getMessage(), 500);
         }
     }
 
-    public function getAll() : object{
-        try {
-
-            $resource = $this->collectionRepositoryInterface->getAllCollection();
-            $options = CollectionResource::collection($resource);
-            return $this->success("Successful", $options);
-
-        } catch (\Exception $exception) {
-            return $this->error($exception->getMessage());
-        }
+    public function getAll(Request $request) : object{
+        $resource = $this->collectionRepositoryInterface->getAllCollection($request);
+        $options = CollectionResource::collection($resource);
+        return $this->success("Successful", $options);
     }
 
     public function create(CollectionRequest $request)
@@ -77,9 +72,9 @@ class CollectionService
             $collection = $this->collectionRepositoryInterface->find($collection);
             $collection_id = $collection->id;
             $this->collectionRepositoryInterface->where('id', $collection_id)->delete();
-            return $this->success("Successful", null,201);
+            return $this->success("Successful",200);
         } catch (\Exception $exception) {
-            return $this->error($exception->getMessage(), 404);
+            return $this->error($exception->getMessage(), 500);
         }
 
     }

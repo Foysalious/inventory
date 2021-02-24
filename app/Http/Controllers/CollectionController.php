@@ -5,15 +5,12 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CollectionRequest;
 use App\Models\Collection;
 use App\Services\Collection\CollectionService;
+use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
 
 class CollectionController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    use ResponseAPI;
 
     protected $collectionService;
 
@@ -23,9 +20,13 @@ class CollectionController extends Controller
     }
 
 
-    public function index() : object
+    public function index(Request $request) : object
     {
-        return $this->collectionService->getAll();
+        try {
+            return $this->collectionService->getAll($request);
+        } catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), 500);
+        }
     }
 
     /**
