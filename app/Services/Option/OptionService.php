@@ -60,7 +60,6 @@ class OptionService extends Controller
     public function update(OptionRequest $request, $optionId)
     {
         $option = $this->optionRepositoryInterface->findOrFail($optionId);
-        if(!$option) throw new ModelNotFoundException();
         $this->updater->setOption($option)->setName($request->name)->update();
         return $this->success("Successful", $option,200);
     }

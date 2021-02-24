@@ -11,6 +11,10 @@ class OptionController extends Controller
     /** @var OptionService */
     protected OptionService $optionService;
 
+    /**
+     * OptionController constructor.
+     * @param OptionService $optionService
+     */
     public function __construct(OptionService $optionService)
     {
         $this->optionService = $optionService;
@@ -37,6 +41,11 @@ class OptionController extends Controller
         return $this->optionService->create($request);
     }
 
+    /**
+     * @param OptionRequest $request
+     * @param $optionId
+     * @return JsonResponse
+     */
     public function update(OptionRequest $request, $optionId)
     {
         return $this->optionService->update($request, $optionId);
