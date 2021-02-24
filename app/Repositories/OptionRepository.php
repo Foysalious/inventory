@@ -11,10 +11,10 @@ class OptionRepository extends BaseRepository implements OptionRepositoryInterfa
         parent::__construct($model);
     }
 
-    public function getAllWithOptions()
+    public function getAllWithOptions($offset = 0, $limit = 50)
     {
-        return $this->model->with(['values' => function ($q) {
+        return $this->model->with(['values' => function ($q) use($offset, $limit) {
             $q->select('id', 'name', 'option_id');
-        }])->get();
+        }])->skip($offset)->take($limit)->get();
     }
 }

@@ -1,10 +1,12 @@
 <?php namespace App\Services\Category;
 
 
+use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Traits\ResponseAPI;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CategoryService
 {
@@ -30,17 +32,13 @@ class CategoryService
         $this->updater = $updater;
     }
 
-    public function getMasterCategoriesByPartner($partner_id)
+    public function getCategoriesByPartner($partner_id)
     {
-        try {
-            $master_categories = $this->categoryRepositoryInterface->getMasterCategoriesByPartner($partner_id);
-            if(!$master_categories)
-                return $this->error("Not found",404);
+            $master_categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
+            if($master_categories->isEmpty())
+                throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
             $data = $this->makeData($master_categories,$partner_id);
             return $this->success("Successful", $data);
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage());
-        }
     }
 
     public function makeData($master_categories,$partner_id)
@@ -65,33 +63,37 @@ class CategoryService
 
     public function create(CategoryRequest $request)
     {
-        $this->creator->setModifyBy($request->modifier)->setPartner($request->partner_id)->setName($request->name)->create();
-        return $this->success("Successful", null,201);
+        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner_id)->setName($request->name)->create();
+        return $this->success("Successful", $category,201);
     }
 
-    public function update(CategoryRequest $request, $category_id)
+    public function update(CategoryRequest $request, $partner_id, $category_id)
     {
         $category = $this->categoryRepositoryInterface->find($category_id);
+        if(!$category)
+            throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
         return $this->error("Not allowed to update this category", 403);
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setName($request->name)->update();
+        return $this->success("Successful", $category,200);
     }
 
     public function delete($request)
     {
         $category_id = $request->category_id;
-        $category = $this->categoryRepositoryInterface->where('id',$category_id)->with('children')->get();
-        $children = $category->children()->pluck('id');
-        $master_cat_with_children = array_merge($children,[$category->id]);
+        $category = $this->categoryRepositoryInterface->where('id',$category_id)->with('children')->first();
+        if(!$category)
+            return $this->error("Not Found", 404);
         if($category->is_published_for_sheba)
             return $this->error("Not allowed to delete this category", 403);
+        $children = $category->children()->pluck('id')->toArray();
+        $master_cat_with_children = array_merge($children,[$category->id]);
         $partner_category = $this->partnerCategoryRepositoryInterface->where('partner_id',$request->partner_id)->where('category_id', $category_id)->first();
         if(!$partner_category)
             return $this->error("Not Found", 404);
-
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
         $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
-        return $this->success("Successful", null,201);
+        return $this->success("Successful", null,200,false);
     }
 
 
