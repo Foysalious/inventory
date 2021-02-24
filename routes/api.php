@@ -22,7 +22,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
-    Route::apiResource('options', OptionController::class);
-    Route::apiResource('options.values', ValueController::class)->shallow();
+    Route::apiResource('partners.options', OptionController::class);
+    Route::apiResource('partners.options.values', ValueController::class)->shallow();
     Route::apiResources(['partners.products' => ProductController::class]);
 });
