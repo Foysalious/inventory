@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Exceptions\OptionNotFoundException;
 use App\Http\Requests\OptionRequest;
 use App\Services\Option\OptionService;
 use Illuminate\Http\JsonResponse;
@@ -17,11 +18,13 @@ class OptionController extends Controller
 
     /**
      * Display a listing of the resource.
+     * @param Request $request
      * @return JsonResponse
+     * @throws OptionNotFoundException
      */
-    public function index()
+    public function index(Request $request)
     {
-        return $this->optionService->getAll();
+        return $this->optionService->getAll($request);
     }
 
     /**

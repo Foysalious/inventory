@@ -29,12 +29,14 @@ class OptionService extends Controller
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
      * @throws OptionNotFoundException
      */
-    public function getAll()
+    public function getAll(Request $request)
     {
-        $resource = $this->optionRepositoryInterface->getAllWithOptions();
+        list($offset, $limit) = calculatePagination($request);
+        $resource = $this->optionRepositoryInterface->getAllWithOptions($offset, $limit);
         $options = OptionResource::collection($resource);
         if ($options->isEmpty()) throw new OptionNotFoundException('আপনার কোন ভেরিয়েসন এড করা নেই!');
         return $this->success("Successful", $options);

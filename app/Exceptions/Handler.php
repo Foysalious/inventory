@@ -53,7 +53,7 @@ class Handler extends ExceptionHandler
     public function handleException(Throwable $e){
         if ($e instanceof HttpException) {
             $code = $e->getStatusCode();
-            $defaultMessage = \Symfony\Component\HttpFoundation\Response::$statusTexts[$code];
+            $defaultMessage = Response::$statusTexts[$code];
             $message = $e->getMessage() == "" ? $defaultMessage : $e->getMessage();
             return $this->error($message, $code);
         } else if ($e instanceof ModelNotFoundException) {
