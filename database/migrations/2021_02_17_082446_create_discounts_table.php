@@ -19,10 +19,10 @@ class CreateDiscountsTable extends Migration
             $table->integer('type_id')->index();
             $table->enum('type',Types::get())->index();
             $table->decimal('amount');
-            $table->tinyInteger('is_amount_percentage');
-            $table->decimal('cap');
-            $table->date('start_date');
-            $table->date('end_date');
+            $table->tinyInteger('is_amount_percentage')->default(0);
+            $table->decimal('cap')->nullable();
+            $table->dateTime('start_date');
+            $table->dateTime('end_date');
             commonColumns($table);
         });
     }
