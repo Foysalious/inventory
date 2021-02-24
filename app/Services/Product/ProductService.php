@@ -93,4 +93,10 @@ class ProductService
             ->update();
         return $this->success("Successful", $product,200);
     }
+
+    public function delete($productId)
+    {
+        $product = $this->productRepositoryInterface->findOrFail($productId)->delete();
+        return $this->success("Successful", $product,200, false);
+    }
 }

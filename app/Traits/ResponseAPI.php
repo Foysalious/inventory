@@ -37,11 +37,12 @@ trait ResponseAPI
      * @param string $message
      * @param array|object $data
      * @param integer $statusCode
+     * @param bool $isSuccess
      * @return JsonResponse
      */
-    public function success($message, $data, $statusCode = 200)
+    public function success($message, $data, $statusCode = 200, $isSuccess = true)
     {
-        return $this->coreResponse($message, $data, $statusCode);
+        return $this->coreResponse($message, $data, $statusCode, $isSuccess);
     }
 
     /**
