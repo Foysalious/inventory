@@ -34,9 +34,7 @@ Route::group(['prefix'=>'v1'], function(){
             Route::delete('{category_id}', [CategoryController::class, 'delete']);
         });
     });
-   /* Route::apiResources([
-        'partners.categories' => CategoryController::class
-    ]);*/
+
 
     Route::apiResources([
         'partners.products' => ProductController::class
