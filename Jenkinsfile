@@ -28,7 +28,7 @@ pipeline {
                                     makeEmptyDirs: false,
                                     noDefaultExcludes: false,
                                     patternSeparator: '[, ]+',
-                                    remoteDirectory: 'api',
+                                    remoteDirectory: 'inventory',
                                     remoteDirectorySDF: false,
                                     removePrefix: '',
                                     sourceFiles: '**/*.env'
