@@ -10,4 +10,9 @@ class Product extends BaseModel
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];
+
+    public function skus()
+    {
+        return $this->hasMany(Sku::class);
+    }
 }
