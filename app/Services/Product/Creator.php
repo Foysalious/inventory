@@ -4,6 +4,7 @@
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
+use App\Services\ProductImage\Creator as ProductImageCreator;
 use Carbon\Carbon;
 
 class Creator
@@ -19,18 +20,22 @@ class Creator
     protected $vatPercentage;
     protected $unitId;
     protected $discountAmount;
-    protected  $discountEndDate;
-
-
+    protected $discountEndDate;
+    protected $images;
+    /** @var ProductImageCreator */
+    protected ProductImageCreator $productImageCreator;
 
     /**
      * Creator constructor.
      * @param ProductRepositoryInterface $productRepositoryInterface
+     * @param DiscountRepositoryInterface $discountRepositoryInterface
+     * @param ProductImageCreator $productImageCreator
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountRepositoryInterface $discountRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountRepositoryInterface $discountRepositoryInterface, ProductImageCreator $productImageCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->discountRepositoryInterface = $discountRepositoryInterface;
+        $this->productImageCreator = $productImageCreator;
     }
 
 
@@ -126,11 +131,22 @@ class Creator
         return $this;
     }
 
+    /**
+     * @param mixed $images
+     * @return Creator
+     */
+    public function setImages($images)
+    {
+        $this->images = $images;
+        return $this;
+    }
+
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
         if($this->discountAmount)
         $this->discountRepositoryInterface->create($this->makeDiscountData($product->id));
+        if($this->images) $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
         return $product;
     }
 
@@ -157,11 +173,5 @@ class Creator
             'start_date' => Carbon::now(),
             'end_date'   => Carbon::parse($this->discountEndDate . ' 23:59:59')
        ];
-
     }
-
-
-
-
-
 }
