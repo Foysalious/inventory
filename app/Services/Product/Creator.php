@@ -4,6 +4,7 @@
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
+use App\Services\Warranty\Units;
 use Carbon\Carbon;
 use App\Services\Discount\Creator as DiscountCreator;
 
@@ -143,7 +144,7 @@ class Creator
             'name' => $this->name,
             'description' => $this->description,
             'warranty' => $this->warranty ?: 0,
-            'warranty_unit' => $this->warrantyUnit ?: 'day',
+            'warranty_unit' => $this->warrantyUnit ?: Units::DAY['bn'],
             'vat_percentage' => $this->vatPercentage ?: 0,
             'unit_id' => $this->unitId,
         ];
