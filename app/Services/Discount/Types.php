@@ -1,4 +1,6 @@
 <?php namespace App\Services\Discount;
+
+
 use App\Helper\ConstGetter;
 
 class Types
@@ -14,4 +16,3 @@ class Types
 
 
 }
-

@@ -49,8 +49,19 @@ class ProductController extends Controller
         return $this->productService->getDetails($product);
     }
 
+    /**
+     * @param $partner
+     * @param $product
+     * @param ProductUpdateRequest $request
+     * @return JsonResponse
+     */
     public function update($partner, $product, ProductUpdateRequest $request)
     {
         return $this->productService->update($product, $request);
+    }
+
+    public function destroy($partner, $product)
+    {
+        return $this->productService->delete($product);
     }
 }

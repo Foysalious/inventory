@@ -32,6 +32,11 @@ class CategoryService
         $this->updater = $updater;
     }
 
+    /**
+     * @param $partner_id
+     * @return \Illuminate\Http\JsonResponse
+     * @throws CategoryNotFoundException
+     */
     public function getCategoriesByPartner($partner_id)
     {
             $master_categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
@@ -41,7 +46,12 @@ class CategoryService
             return $this->success("Successful", $data);
     }
 
-    public function makeData($master_categories,$partner_id)
+    /**
+     * @param $master_categories
+     * @param $partner_id
+     * @return array
+     */
+    public function makeData($master_categories, $partner_id)
     {
         $data = [];
         $data['total_category'] = count($master_categories);
@@ -61,15 +71,25 @@ class CategoryService
 
     }
 
+    /**
+     * @param CategoryRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function create(CategoryRequest $request)
     {
-        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner_id)->setName($request->name)->create();
+        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner)->setName($request->name)->create();
         return $this->success("Successful", $category,201);
     }
 
-    public function update(CategoryRequest $request, $partner_id, $category_id)
+    /**
+     * @param CategoryRequest $request
+     * @param $partner_id
+     * @param $category_id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(CategoryRequest $request, $partner, $category)
     {
-        $category = $this->categoryRepositoryInterface->find($category_id);
+        $category = $this->categoryRepositoryInterface->find($category);
         if(!$category)
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
@@ -78,19 +98,22 @@ class CategoryService
         return $this->success("Successful", $category,200);
     }
 
+    /**
+     * @param $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function delete($request)
     {
-        $category_id = $request->category_id;
-        $category = $this->categoryRepositoryInterface->where('id',$category_id)->with('children')->first();
+        $category_id = $request->category;
+        $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
+            $query->select('id','parent_id');
+        }])->select('id')->first();
         if(!$category)
             return $this->error("Not Found", 404);
         if($category->is_published_for_sheba)
             return $this->error("Not allowed to delete this category", 403);
-        $children = $category->children()->pluck('id')->toArray();
+        $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children,[$category->id]);
-        $partner_category = $this->partnerCategoryRepositoryInterface->where('partner_id',$request->partner_id)->where('category_id', $category_id)->first();
-        if(!$partner_category)
-            return $this->error("Not Found", 404);
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
         $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
         return $this->success("Successful", null,200,false);

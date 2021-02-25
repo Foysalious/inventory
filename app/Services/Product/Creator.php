@@ -1,11 +1,15 @@
 <?php namespace App\Services\Product;
 
 
+use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Services\Discount\Types;
+use Carbon\Carbon;
 
 class Creator
 {
     protected ProductRepositoryInterface $productRepositoryInterface;
+    protected DiscountRepositoryInterface $discountRepositoryInterface;
     protected $partnerId;
     protected $categoryId;
     protected $name;
@@ -14,14 +18,19 @@ class Creator
     protected $warrantyUnit;
     protected $vatPercentage;
     protected $unitId;
+    protected $discountAmount;
+    protected  $discountEndDate;
+
+
 
     /**
      * Creator constructor.
      * @param ProductRepositoryInterface $productRepositoryInterface
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountRepositoryInterface $discountRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->discountRepositoryInterface = $discountRepositoryInterface;
     }
 
 
@@ -105,9 +114,24 @@ class Creator
         return $this;
     }
 
+    public function setDiscount($discount_amount)
+    {
+        $this->discountAmount = $discount_amount;
+        return $this;
+    }
+
+    public function setDiscountEndDate($discount_end_date)
+    {
+        $this->discountEndDate = $discount_end_date;
+        return $this;
+    }
+
     public function create()
     {
-        return $this->productRepositoryInterface->create($this->makeData());
+        $product =  $this->productRepositoryInterface->create($this->makeData());
+        if($this->discountAmount)
+        $this->discountRepositoryInterface->create($this->makeDiscountData($product->id));
+        return $product;
     }
 
     private function makeData()
@@ -123,6 +147,21 @@ class Creator
             'unit_id' => $this->unitId,
         ];
     }
+
+    private function makeDiscountData($product_id)
+    {
+       return [
+            'type_id' => $product_id,
+            'discount_type' => Types::PRODUCT,
+            'amount' => $this->discountAmount,
+            'start_date' => Carbon::now(),
+            'end_date'   => Carbon::parse($this->discountEndDate . ' 23:59:59')
+       ];
+
+    }
+
+
+
 
 
 }
