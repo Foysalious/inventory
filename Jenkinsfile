@@ -36,7 +36,7 @@ pipeline {
                                 sshTransfer(
                                     cleanRemote: false,
                                     excludes: '',
-                                    execCommand: 'cd /var/www/inventory && mv development.env .env && ./bin/deploy.sh development',
+                                    execCommand: 'cd /var/www/inventory && ./bin/deploy.sh development',
                                     execTimeout: 120000,
                                     flatten: false,
                                     makeEmptyDirs: false,
