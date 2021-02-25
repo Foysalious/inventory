@@ -48,7 +48,9 @@ class CollectionService
             list($offset, $limit) = calculatePagination($request);
             $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit);
             $options = CollectionResource::collection($resource);
-            return $this->success("Successful", $options, 201);
+            if(!$options) return $this->error("Collection not found!", 404);
+
+            return $this->success("Successful", $options, 200);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
