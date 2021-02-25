@@ -5,9 +5,8 @@ class Units
 {
     use ConstGetter;
 
-    const DAY = ['bn' => 'দিন', 'en' => 'day'];
-    const WEEK = ['bn' => 'সপ্তাহ', 'en' => 'week'];
-    const MONTH = ['bn' => 'মাস', 'en' => 'month'];
-    const YEAR = ['bn' => 'বছর', 'en' => 'year'];
-
+    const DAY = 'day';
+    const WEEK = 'week';
+    const MONTH = 'month';
+    const YEAR = 'year';
 }
