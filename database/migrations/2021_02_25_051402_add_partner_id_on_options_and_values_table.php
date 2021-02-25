@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPartnerIdOnOptionsTable extends Migration
+class AddPartnerIdOnOptionsAndValuesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,6 +14,12 @@ class AddPartnerIdOnOptionsTable extends Migration
     public function up()
     {
         Schema::table('options', function (Blueprint $table) {
+            $table->bigInteger('partner_id')->after('name')->nullable()->unsigned()->index();
+            $table->foreign('partner_id')->references('id')->on('partners')
+                ->onUpdate('cascade')->onDelete('set null');
+        });
+
+        Schema::table('values', function (Blueprint $table) {
             $table->bigInteger('partner_id')->after('name')->nullable()->unsigned()->index();
             $table->foreign('partner_id')->references('id')->on('partners')
                 ->onUpdate('cascade')->onDelete('set null');
@@ -28,6 +34,11 @@ class AddPartnerIdOnOptionsTable extends Migration
     public function down()
     {
         Schema::table('options', function (Blueprint $table) {
+            $table->dropForeign(['partner_id']);
+            $table->dropColumn('partner_id');
+        });
+
+        Schema::table('values', function (Blueprint $table) {
             $table->dropForeign(['partner_id']);
             $table->dropColumn('partner_id');
         });
