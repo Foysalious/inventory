@@ -10,6 +10,8 @@ interface BaseRepositoryInterface
 
     public function find($id);
 
+    public function findOrFail($id);
+
     public function getAll();
 
     public function update(BaseModel $model, $data);

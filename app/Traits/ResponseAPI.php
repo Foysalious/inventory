@@ -20,6 +20,7 @@ trait ResponseAPI
 
         // Send the response
         if($isSuccess) {
+
             return response()->json([
                 'message' => $message,
                 'data' => $data
@@ -29,19 +30,20 @@ trait ResponseAPI
                 'message' => $message,
             ], $statusCode);
         }
+
     }
 
+
     /**
-     * Send any success response
-     *
-     * @param string $message
-     * @param array|object $data
-     * @param integer $statusCode
+     * @param $message
+     * @param $data
+     * @param int $statusCode
+     * @param bool $isSuccess
      * @return JsonResponse
      */
-    public function success($message, $data, $statusCode = 200)
+    public function success($message, $data, $statusCode = 200, $isSuccess = true)
     {
-        return $this->coreResponse($message, $data, $statusCode);
+        return $this->coreResponse($message, $data, $statusCode,$isSuccess);
     }
 
     /**

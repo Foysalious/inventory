@@ -51,6 +51,10 @@ Route::group(['prefix'=>'v1'], function(){
     });
     Route::post('values/{value}', [ValueController::class, 'update']);
 
+    Route::apiResource('options', OptionController::class);
+    Route::apiResource('options.values', ValueController::class)->shallow();
+    Route::apiResource('partners.products', ProductController::class);
+    Route::apiResource('partners.categories', CategoryController::class);
     Route::apiResources([
         'partners.products' => ProductController::class
     ]);
