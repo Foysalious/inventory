@@ -71,6 +71,7 @@ class ProductService
             ->setUnitId($request->unit_id)
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
+            ->setImages($request->images)
             ->create();
 
         return $this->success("Successful", $product,201);
