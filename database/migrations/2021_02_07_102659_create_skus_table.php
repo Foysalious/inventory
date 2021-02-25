@@ -20,6 +20,7 @@ class CreateSkusTable extends Migration
             $table->foreign('product_id')->references('id')->on('products')
                 ->onUpdate('cascade')->onDelete('set null');
             $table->decimal('stock', 11, 2)->nullable()->index();
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }

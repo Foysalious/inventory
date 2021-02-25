@@ -15,7 +15,9 @@ class CreatePartnersTable extends Migration
     {
         Schema::create('partners', function (Blueprint $table) {
             $table->id();
+            $table->bigInteger('sharding_id')->nullable()->unsigned()->index();
             $table->string('sub_domain')->nullable()->index();
+            $table->softDeletes('deleted_at', 0);
             commonColumns($table);
         });
     }
