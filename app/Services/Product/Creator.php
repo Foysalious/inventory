@@ -148,6 +148,10 @@ class Creator
         ];
     }
 
+    /**
+     * @param $product_id
+     * @return array
+     */
     private function makeDiscountData($product_id)
     {
        return [
