@@ -1,9 +1,11 @@
 <?php namespace App\Providers;
 
+use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\ProductImageRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
+use App\Repositories\DiscountRepository;
 use App\Repositories\OptionRepository;
 use App\Repositories\ProductImageRepository;
 use App\Repositories\ProductRepository;
@@ -33,6 +35,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ValueRepositoryInterface::class, ValueRepository::class);
         $this->app->singleton(ProductRepositoryInterface::class, ProductRepository::class);
         $this->app->singleton(ProductImageRepositoryInterface::class, ProductImageRepository::class);
+        $this->app->singleton(DiscountRepositoryInterface::class, DiscountRepository::class);
     }
 
 }

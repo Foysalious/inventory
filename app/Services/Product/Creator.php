@@ -5,7 +5,9 @@ use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
+use App\Services\Warranty\Units;
 use Carbon\Carbon;
+use App\Services\Discount\Creator as DiscountCreator;
 
 class Creator
 {
@@ -24,18 +26,20 @@ class Creator
     protected $images;
     /** @var ProductImageCreator */
     protected ProductImageCreator $productImageCreator;
+    /** @var DiscountCreator */
+    protected DiscountCreator $discountCreator;
 
     /**
      * Creator constructor.
      * @param ProductRepositoryInterface $productRepositoryInterface
-     * @param DiscountRepositoryInterface $discountRepositoryInterface
+     * @param DiscountCreator $discountCreator
      * @param ProductImageCreator $productImageCreator
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountRepositoryInterface $discountRepositoryInterface, ProductImageCreator $productImageCreator)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
-        $this->discountRepositoryInterface = $discountRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
+        $this->discountCreator = $discountCreator;
     }
 
 
@@ -145,7 +149,7 @@ class Creator
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
         if($this->discountAmount)
-        $this->discountRepositoryInterface->create($this->makeDiscountData($product->id));
+        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
         if($this->images) $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
         return $product;
     }
@@ -158,20 +162,9 @@ class Creator
             'name' => $this->name,
             'description' => $this->description,
             'warranty' => $this->warranty ?: 0,
-            'warranty_unit' => $this->warrantyUnit ?: 'day',
+            'warranty_unit' => $this->warrantyUnit ?: Units::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
             'unit_id' => $this->unitId,
         ];
-    }
-
-    private function makeDiscountData($product_id)
-    {
-       return [
-            'type_id' => $product_id,
-            'discount_type' => Types::PRODUCT,
-            'amount' => $this->discountAmount,
-            'start_date' => Carbon::now(),
-            'end_date'   => Carbon::parse($this->discountEndDate . ' 23:59:59')
-       ];
     }
 }
