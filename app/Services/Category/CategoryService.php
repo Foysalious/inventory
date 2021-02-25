@@ -98,6 +98,7 @@ class CategoryService
     }
 
     public function getCategory(){
-        return $this->categoryRepositoryInterface->getCategory();
+        $category= $this->categoryRepositoryInterface->getCategory();
+        return $this->success("Successful", $category,201);
     }
 }
