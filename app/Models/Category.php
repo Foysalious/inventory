@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends BaseModel
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -41,6 +41,8 @@ class Category extends BaseModel
         return $this->hasMany(Product::class);
     }
 
-
-
+    public function partners()
+    {
+        return $this->belongsToMany(Partner::class);
+    }
 }

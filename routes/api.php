@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
@@ -24,7 +25,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix'=>'v1'], function(){
+Route::group(['prefix' => 'v1'], function () {
 
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
@@ -34,10 +35,11 @@ Route::group(['prefix'=>'v1'], function(){
     Route::apiResource('options.values', ValueController::class)->shallow();
     Route::apiResource('partners.products', ProductController::class);
     Route::apiResource('partners.categories', CategoryController::class);
-    Route::group(['prefix'=>'units'], function(){
-        Route::get('/',[UnitController::class, 'index']);
+    Route::group(['prefix' => 'units'], function () {
+        Route::get('/', [UnitController::class, 'index']);
 
     });
+    Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
     Route::post('values/{id}', [ValueController::class, 'update']);
     Route::post('values/{value}', [ValueController::class, 'update']);
 
