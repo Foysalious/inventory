@@ -5,6 +5,7 @@ use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
 use Carbon\Carbon;
+use App\Services\Discount\Creator as DiscountCreator;
 
 class Creator
 {
@@ -22,15 +23,15 @@ class Creator
     protected  $discountEndDate;
 
 
-
     /**
      * Creator constructor.
      * @param ProductRepositoryInterface $productRepositoryInterface
+     * @param DiscountCreator $discountCreator
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountRepositoryInterface $discountRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
-        $this->discountRepositoryInterface = $discountRepositoryInterface;
+        $this->discountCreator = $discountCreator;
     }
 
 
@@ -130,7 +131,7 @@ class Creator
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
         if($this->discountAmount)
-        $this->discountRepositoryInterface->create($this->makeDiscountData($product->id));
+        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
         return $product;
     }
 
@@ -147,25 +148,4 @@ class Creator
             'unit_id' => $this->unitId,
         ];
     }
-
-    /**
-     * @param $product_id
-     * @return array
-     */
-    private function makeDiscountData($product_id)
-    {
-       return [
-            'type_id' => $product_id,
-            'discount_type' => Types::PRODUCT,
-            'amount' => $this->discountAmount,
-            'start_date' => Carbon::now(),
-            'end_date'   => Carbon::parse($this->discountEndDate . ' 23:59:59')
-       ];
-
-    }
-
-
-
-
-
 }
