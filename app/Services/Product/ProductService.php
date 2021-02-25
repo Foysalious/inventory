@@ -69,6 +69,8 @@ class ProductService
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
             ->setUnitId($request->unit_id)
+            ->setDiscount($request->discount_amount)
+            ->setDiscountEndDate($request->discount_end_date)
             ->create();
 
         return $this->success("Successful", $product,201);
