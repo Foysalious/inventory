@@ -25,9 +25,7 @@ class CategoryProductService
 
     public function getProducts($partner_id, Request $request)
     {
-        dd(Category::whereHas('partners', function (Builder $query) use ($partner_id) {
-//            $query->where('id', 37900);
-        })->get());
+        dd(Category::builder()->partners()->where('id',$partner_id)->get());
 //        $this->partnerCategoryRepository->where('partner_id', $partner_id)->select('id', 'category_id')->get();
     }
 }
