@@ -1,7 +1,7 @@
-<?php
+<?php namespace App\Models;
 
 
-namespace App\Models;
+
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 
@@ -18,5 +18,3 @@ class Discount extends BaseModel
 {
     protected $guarded = ['id'];
 }
-
-

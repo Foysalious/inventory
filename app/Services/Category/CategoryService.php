@@ -3,6 +3,7 @@
 
 use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Traits\ResponseAPI;
@@ -39,37 +40,17 @@ class CategoryService
      */
     public function getCategoriesByPartner($partner_id)
     {
-            $master_categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
-            if($master_categories->isEmpty())
-                throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
-            $data = $this->makeData($master_categories,$partner_id);
-            return $this->success("Successful", $data);
-    }
-
-    /**
-     * @param $master_categories
-     * @param $partner_id
-     * @return array
-     */
-    public function makeData($master_categories, $partner_id)
-    {
+        $master_categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
+        if ($master_categories->isEmpty())
+            throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
+        $resource = CategoryResource::collection($master_categories, $partner_id);
         $data = [];
         $data['total_category'] = count($master_categories);
-        $data['categories'] = [];
-        foreach ($master_categories as $category) {
-            $item['id'] = $category->id;
-            $item['name'] = $category->name;
-            $item['is_published_for_sheba'] = $category->is_published_for_sheba;
-            $total_services = 0;
-            $category->children()->get()->each(function ($child) use ($partner_id, &$total_services) {
-                $total_services += $child->products()->where('partner_id', $partner_id)->count();
-            });
-            $item['total_items'] = $total_services;
-            array_push($data['categories'], $item);
-        }
-        return $data;
+        $data['categories'] = $resource;
 
+        return $this->success("Successful", $data);
     }
+
 
     /**
      * @param CategoryRequest $request

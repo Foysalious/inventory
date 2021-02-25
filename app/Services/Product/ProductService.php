@@ -69,6 +69,9 @@ class ProductService
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
             ->setUnitId($request->unit_id)
+            ->setDiscount($request->discount_amount)
+            ->setDiscountEndDate($request->discount_end_date)
+            ->setImages($request->images)
             ->create();
 
         return $this->success("Successful", $product,201);
@@ -92,5 +95,11 @@ class ProductService
             ->setUnitId($request->unit_id)
             ->update();
         return $this->success("Successful", $product,200);
+    }
+
+    public function delete($productId)
+    {
+        $product = $this->productRepositoryInterface->findOrFail($productId)->delete();
+        return $this->success("Successful", $product,200, false);
     }
 }

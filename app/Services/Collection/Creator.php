@@ -5,15 +5,12 @@ namespace App\Services\Collection;
 
 
 use App\Interfaces\CollectionRepositoryInterface;
-use App\Sheba\FileManagers\FileManager;
 use App\Traits\ModificationFields;
 use Illuminate\Http\UploadedFile;
-use Intervention\Image\Image;
-use App\Sheba\FileManagers\CdnFileManager;
 
 class Creator
 {
-    use ModificationFields, FileManager, CdnFileManager;
+    use ModificationFields;
 
     protected $collectionRepositoryInterface;
 
@@ -128,28 +125,8 @@ class Creator
 
     public function create()
     {
-        //$this->saveImages();
         $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
-    }
-
-    private function saveImages()
-    {
-        if($this->hasFile('thumb'))
-        {
-            $this->data['thumb'] = $this->saveCollectionThumbImage();
-        }
-    }
-
-    private function saveCollectionThumbImage()
-    {
-        list($avatar, $avatar_filename) = $this->makeCollectionThumb($this->data['thumb'], $this->data['name']);
-        return $this->saveImageToCDN($avatar, getCollectionDefaultThumbFolder(), $avatar_filename);
-    }
-
-    private function hasFile($fileName)
-    {
-        return array_key_exists($fileName, $this->data) && ($this->data[$fileName] instanceof Image || ($this->data[$fileName] instanceof UploadedFile && $this->data[$fileName]->getPath() != ''));
     }
 
     public function makeDataForInsert() : array

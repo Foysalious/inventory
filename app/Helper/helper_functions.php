@@ -5,6 +5,7 @@ $helper_files = [
     "app/Helper/String/functions.php",
     "app/Helper/Collection/CollectionHelpers.php",
     "app/Helper/Http/functions.php",
+    "app/Helper/FileManager/functions.php",
 ];
 
 foreach ($helper_files as $file) {
