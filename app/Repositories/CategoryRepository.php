@@ -19,26 +19,17 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
 
     public function getCategory()
     {
-        $parents = Category::where('parent_id', NULL)->get();
+        $childCategory=array();
+        $parents = $this->model->where('parent_id', NULL)->get();
         foreach ($parents as $parent) {
-            $childs = Category::where('parent_id', $parent->id)->get();
-            if (count($childs) > 0) {
+            $childs = $this->model->select('name')->where('parent_id', $parent->id)->get();
 
-                $category[$parent->name] = array();
-                foreach ($childs as $i => $child) {
-                    $subchilds = Category::where('parent_id', $child->id)->get();
-                    if (count($subchilds) > 0) {
-
-                        $category[$parent->name][$child->name] = array();
-
-
-                    }
-                }
-
-            }
+            $childCategory[$parent->name] = $childs;
         }
-        return $category;
-        }
+         return $childCategory;
+
+
+    }
 
 
 }

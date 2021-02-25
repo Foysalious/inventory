@@ -24,12 +24,13 @@ class CategoryService
     private Creator $creator;
     private $partnerCategoryRepositoryInterface;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface,PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater)
+    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
+        $this->categoryRepository = $categoryRepository;
     }
 
     public function getMasterCategoriesByPartner($partner_id)
@@ -97,6 +98,6 @@ class CategoryService
     }
 
     public function getCategory(){
-        return $this->categoryRepository->getCategory();
+        return $this->categoryRepositoryInterface->getCategory();
     }
 }

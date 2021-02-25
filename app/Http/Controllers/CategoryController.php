@@ -2,6 +2,7 @@
 
 
 use App\Http\Requests\CategoryRequest;
+use App\Models\Category;
 use App\Services\Category\CategoryService;
 use App\Traits\ModificationFields;
 use Illuminate\Http\JsonResponse;
@@ -55,7 +56,9 @@ class CategoryController extends Controller
 
     public function getMasterSubCat(Request $request)
     {
-        return $this->categoryService->getCategory($request);
+
+        return $this->categoryService->getCategory();
+
     }
 
 

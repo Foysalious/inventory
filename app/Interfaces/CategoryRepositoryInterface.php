@@ -5,5 +5,5 @@ interface CategoryRepositoryInterface extends BaseRepositoryInterface
 {
 public function getMasterCategoriesByPartner($partner_id);
 
-
+public function getCategory();
 }
