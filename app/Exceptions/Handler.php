@@ -50,7 +50,8 @@ class Handler extends ExceptionHandler
         });
     }
 
-    public function handleException(Throwable $e){
+    public function handleException(Throwable $e)
+    {
         if ($e instanceof HttpException) {
             $code = $e->getStatusCode();
             $defaultMessage = Response::$statusTexts[$code];
@@ -70,9 +71,22 @@ class Handler extends ExceptionHandler
             return $this->error($e->getMessage(), $e->getCode());
         } else if ($e instanceof CategoryNotFoundException) {
             return $this->error($e->getMessage(), $e->getCode());
+        } else {
+            $response = [];
+            $response['message'] = $e->getMessage();
+            if ($this->wantsTrace()) {
+                $response['exception'] = [
+                    'message' => $e->getMessage(),
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ];
+            }
+            return response($response, 500);
         }
-        else {
-            return response(['message' => $e->getMessage() ?: 'Something Went Wrong'], $e->getCode() ?: 500);
-        }
+    }
+
+    private function wantsTrace(): bool
+    {
+        return config('app.env') != 'production';
     }
 }
