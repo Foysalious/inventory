@@ -1,6 +1,8 @@
 <?php namespace App\Services\CategoryProduct;
 
 
+use App\Http\Resources\CategoryProductResource;
+use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -27,8 +29,14 @@ class CategoryProductService
     {
 
         $products = $this->productRepository->where('partner_id', $partner_id)->get();
-        $category = $this->categoryRepository->builder()->whereHas('children', function ($q) use ($products) {
+        $master_categories = $this->categoryRepository->builder()->whereHas('children', function ($q) use ($products) {
             $q->whereIn('id', $products->pluck('category_id')->unique()->toArray());
         })->get();
+
+        $resource = CategoryProductResource::collection($master_categories);
+        $data = [];
+        $data['categories'] = $resource;
+
+        return $this->success("Successful", $data);
     }
 }

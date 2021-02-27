@@ -10,6 +10,6 @@ class CategoryProductController extends Controller
 
     public function getProducts($partner, Request $request,CategoryProductService $categoryProductService)
     {
-        $categoryProductService->getProducts($partner, $request);
+       return $categoryProductService->getProducts($partner, $request);
     }
 }
