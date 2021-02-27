@@ -31,6 +31,11 @@ class Category extends BaseModel
         $query->where('parent_id', '<>', null);
     }
 
+    public function scopeParent($query)
+    {
+        $query->where('parent_id', null);
+    }
+
     public function scopePublished($query)
     {
         $query->where('publication_status', 1);
