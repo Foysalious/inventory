@@ -26,7 +26,7 @@ class CategorySeeder extends Seeder
             'parent_id' => Category::where('parent_id', null)->first()->id
         ]);
 
-        DB::table('partner_categories')->insert([
+        DB::table('category_partner')->insert([
             'category_id' => Category::where('parent_id', '<>', null)->first()->id,
             'partner_id' => Partner::where('id', '<>', null)->first()->id
         ]);

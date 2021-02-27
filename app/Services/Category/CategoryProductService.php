@@ -2,7 +2,7 @@
 
 
 use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\PartnerCategoryRepositoryInterface;
+use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Models\Category;
 use App\Traits\ModificationFields;
 use App\Traits\ResponseAPI;
@@ -14,18 +14,17 @@ class CategoryProductService
     use ResponseAPI;
 
     private CategoryRepositoryInterface $categoryRepository;
-    private PartnerCategoryRepositoryInterface $partnerCategoryRepository;
+    private CategoryPartnerRepositoryInterface $categoryPartnerRepository;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepository, PartnerCategoryRepositoryInterface $partnerCategoryRepository)
+    public function __construct(CategoryRepositoryInterface $categoryRepository, CategoryPartnerRepositoryInterface $partnerCategoryRepository)
     {
         $this->categoryRepository = $categoryRepository;
-        $this->partnerCategoryRepository = $partnerCategoryRepository;
+        $this->categoryPartnerRepository = $partnerCategoryRepository;
     }
 
 
     public function getProducts($partner_id, Request $request)
     {
-        dd(Category::find(3)->partners);
-//        $this->partnerCategoryRepository->where('partner_id', $partner_id)->select('id', 'category_id')->get();
+        dd($this->categoryPartnerRepository->where('partner_id', $partner_id)->select('id', 'category_id')->get());
     }
 }

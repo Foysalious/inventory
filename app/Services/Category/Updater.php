@@ -2,7 +2,7 @@
 
 
 use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\PartnerCategoryRepositoryInterface;
+use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Models\Category;
 use App\Traits\ModificationFields;
 
@@ -14,9 +14,9 @@ class Updater
      */
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
     /**
-     * @var PartnerCategoryRepositoryInterface
+     * @var CategoryPartnerRepositoryInterface
      */
-    protected PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface;
+    protected CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface;
     protected $name;
     /**
      * @var Category
@@ -24,7 +24,7 @@ class Updater
     protected Category $category;
     protected $modifyBy;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface)
+    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
