@@ -12,8 +12,8 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     }
     public function getCategoriesByPartner($partner_id)
     {
-        return $this->model->leftJoin('category_partners', 'categories.id', '=', 'category_partners.category_id')
-            ->where('category_partners.partner_id',$partner_id)
+        return $this->model->leftJoin('category_partner', 'categories.id', '=', 'category_partner.category_id')
+            ->where('category_partner.partner_id',$partner_id)
             ->whereNull('categories.parent_id')->get();
     }
 
