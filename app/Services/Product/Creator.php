@@ -24,6 +24,11 @@ class Creator
     protected $discountAmount;
     protected $discountEndDate;
     protected $images;
+    protected $wholesalePrice;
+    protected $cost;
+    protected $price;
+    protected $stock;
+    protected $channelId;
     /** @var ProductImageCreator */
     protected ProductImageCreator $productImageCreator;
     /** @var DiscountCreator */
@@ -145,9 +150,77 @@ class Creator
         return $this;
     }
 
+    /**
+     * @param ProductRepositoryInterface $productRepositoryInterface
+     * @return Creator
+     */
+    public function setProductRepositoryInterface(ProductRepositoryInterface $productRepositoryInterface): Creator
+    {
+        $this->productRepositoryInterface = $productRepositoryInterface;
+        return $this;
+    }
+
+    /**
+     * @param mixed $wholesalePrice
+     * @return Creator
+     */
+    public function setWholesalePrice($wholesalePrice)
+    {
+        $this->wholesalePrice = $wholesalePrice;
+        return $this;
+    }
+
+    /**
+     * @param mixed $cost
+     * @return Creator
+     */
+    public function setCost($cost)
+    {
+        $this->cost = $cost;
+        return $this;
+    }
+
+    /**
+     * @param mixed $price
+     * @return Creator
+     */
+    public function setPrice($price)
+    {
+        $this->price = $price;
+        return $this;
+    }
+
+    /**
+     * @param mixed $stock
+     * @return Creator
+     */
+    public function setStock($stock)
+    {
+        $this->stock = $stock;
+        return $this;
+    }
+
+    /**
+     * @param mixed $channelId
+     * @return Creator
+     */
+    public function setChannelId($channelId)
+    {
+        $this->channelId = $channelId;
+        return $this;
+    }
+
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
+        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $this->stock ?: 0]);
+        $sku->skuChannels()->create([
+            "sku_id" => $sku->id,
+            "channel_id" => $this->channelId,
+            "cost" => $this->cost ?: 0,
+            "price" => $this->price ?: 0,
+            "wholesale_price" => $this->wholesalePrice ?: 0
+        ]);
         if($this->discountAmount)
         $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
         if($this->images) $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
