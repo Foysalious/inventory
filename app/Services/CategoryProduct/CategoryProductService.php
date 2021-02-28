@@ -34,9 +34,7 @@ class CategoryProductService
         })->get();
 
         $resource = CategoryProductResource::collection($master_categories);
-        $data = [];
-        $data['categories'] = $resource;
 
-        return $this->success("Successful", $data);
+        return $this->success("Successful", $resource);
     }
 }

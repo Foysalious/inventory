@@ -1,19 +1,12 @@
 <?php namespace App\Http\Resources;
 
 
-use Illuminate\Database\Eloquent\Collection;
+use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class CategoryProductResource extends JsonResource
 {
-    private $categoryProducts;
-
-    public function setProducts($categoryProducts)
-    {
-        $this->categoryProducts = $categoryProducts;
-        return $this;
-    }
 
     /**
      * Transform the resource into an array.
@@ -26,7 +19,7 @@ class CategoryProductResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'products' => ProductResource::collection($this->categoryProducts),
+            'products' => ProductResource::collection(app(ProductRepositoryInterface::class)->where('partner_id', $request->partner)->get()),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
