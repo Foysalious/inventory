@@ -19,17 +19,28 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+
+
+
+
+
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 Route::group(['prefix'=>'v1'], function(){
+
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::group(['prefix' => 'categories'], function () {
+            Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);
             Route::post('{category_id}', [CategoryController::class, 'update']);
+            Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
         });
     });
+   /* Route::apiResources([
+        'partners.categories' => CategoryController::class
+    ]);*/
 
     Route::group(['prefix'=>'options'], function(){
         Route::get('/', [OptionController::class, 'index']);
@@ -45,7 +56,14 @@ Route::group(['prefix'=>'v1'], function(){
 
     });
     Route::post('values/{value}', [ValueController::class, 'update']);
+
+    Route::apiResource('options', OptionController::class);
+    Route::apiResource('options.values', ValueController::class)->shallow();
+    Route::apiResource('partners.products', ProductController::class);
+    Route::apiResource('partners.categories', CategoryController::class);
     Route::apiResources([
         'partners.products' => ProductController::class
     ]);
+
+
 });

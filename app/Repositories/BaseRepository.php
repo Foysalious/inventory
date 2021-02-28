@@ -38,6 +38,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return $this->model->find($id);
     }
 
+    public function findOrFail($id)
+    {
+        return $this->model->findOrFail($id);
+    }
+
     public function getAll()
     {
         return $this->model->get();
@@ -71,6 +76,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
     public function where($column_name, $value)
     {
         return $this->model->where($column_name, $value);
+    }
+
+    public function whereIn($column_name, $value)
+    {
+        return $this->model->whereIn($column_name, $value);
     }
 
     public function builder()

@@ -2,10 +2,11 @@
 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PartnerCategory extends BaseModel
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $guarded = ['id'];
 

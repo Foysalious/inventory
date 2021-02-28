@@ -2,10 +2,11 @@
 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends BaseModel
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $guarded = ['id'];
 
@@ -33,6 +34,11 @@ class Category extends BaseModel
     public function scopePublished($query)
     {
         $query->where('publication_status', 1);
+    }
+
+    public function products()
+    {
+        return $this->hasMany(Product::class);
     }
 
 

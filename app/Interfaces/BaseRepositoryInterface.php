@@ -10,6 +10,8 @@ interface BaseRepositoryInterface
 
     public function find($id);
 
+    public function findOrFail($id);
+
     public function getAll();
 
     public function update(BaseModel $model, $data);
@@ -17,6 +19,8 @@ interface BaseRepositoryInterface
     public function delete(BaseModel $model);
 
     public function where($column_name, $value);
+
+    public function whereIn($column_name, $value);
 
     public function builder();
 
