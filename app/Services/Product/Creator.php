@@ -1,11 +1,18 @@
 <?php namespace App\Services\Product;
 
 
+use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Services\Discount\Types;
+use App\Services\ProductImage\Creator as ProductImageCreator;
+use App\Services\Warranty\Units;
+use Carbon\Carbon;
+use App\Services\Discount\Creator as DiscountCreator;
 
 class Creator
 {
     protected ProductRepositoryInterface $productRepositoryInterface;
+    protected DiscountRepositoryInterface $discountRepositoryInterface;
     protected $partnerId;
     protected $categoryId;
     protected $name;
@@ -14,14 +21,25 @@ class Creator
     protected $warrantyUnit;
     protected $vatPercentage;
     protected $unitId;
+    protected $discountAmount;
+    protected $discountEndDate;
+    protected $images;
+    /** @var ProductImageCreator */
+    protected ProductImageCreator $productImageCreator;
+    /** @var DiscountCreator */
+    protected DiscountCreator $discountCreator;
 
     /**
      * Creator constructor.
      * @param ProductRepositoryInterface $productRepositoryInterface
+     * @param DiscountCreator $discountCreator
+     * @param ProductImageCreator $productImageCreator
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->productImageCreator = $productImageCreator;
+        $this->discountCreator = $discountCreator;
     }
 
 
@@ -105,9 +123,35 @@ class Creator
         return $this;
     }
 
+    public function setDiscount($discount_amount)
+    {
+        $this->discountAmount = $discount_amount;
+        return $this;
+    }
+
+    public function setDiscountEndDate($discount_end_date)
+    {
+        $this->discountEndDate = $discount_end_date;
+        return $this;
+    }
+
+    /**
+     * @param mixed $images
+     * @return Creator
+     */
+    public function setImages($images)
+    {
+        $this->images = $images;
+        return $this;
+    }
+
     public function create()
     {
-        return $this->productRepositoryInterface->create($this->makeData());
+        $product =  $this->productRepositoryInterface->create($this->makeData());
+        if($this->discountAmount)
+        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
+        if($this->images) $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
+        return $product;
     }
 
     private function makeData()
@@ -118,11 +162,9 @@ class Creator
             'name' => $this->name,
             'description' => $this->description,
             'warranty' => $this->warranty ?: 0,
-            'warranty_unit' => $this->warrantyUnit ?: 'day',
+            'warranty_unit' => $this->warrantyUnit ?: Units::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
             'unit_id' => $this->unitId,
         ];
     }
-
-
 }

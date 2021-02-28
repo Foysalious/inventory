@@ -15,7 +15,7 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "ext-json": "*",
-        "ext-http": "*"
+        "intervention/image": "^2.4"
     },
     "require-dev": {
         "facade/ignition": "^2.5",
@@ -42,7 +42,8 @@
             "Database\\Seeders\\": "database/seeders/"
         },
         "files": [
-            "app/Helper/helper_functions.php"
+            "app/Helper/helper_functions.php",
+            "app/Sheba/Helpers/HTTP/functions.php"
         ]
     },
     "autoload-dev": {

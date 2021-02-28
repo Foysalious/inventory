@@ -7,6 +7,7 @@ use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\PartnerCategoryRepositoryInterface;
+use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Traits\ResponseAPI;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -15,7 +16,6 @@ class CategoryService
     use ResponseAPI;
 
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
-    protected CategoryRepository $categoryRepository;
 
     /**
      * @var Updater
@@ -103,8 +103,5 @@ class CategoryService
         return $this->success("Successful", null,200,false);
     }
 
-    public function getCategory(){
-        $category= $this->categoryRepositoryInterface->getCategory();
-        return $this->success("Successful", $category,201);
-    }
+
 }

@@ -13,7 +13,7 @@ class CreatePartnerCategories extends Migration
      */
     public function up()
     {
-        Schema::create('partner_categories', function (Blueprint $table) {
+        Schema::create('category_partner', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('partner_id')->nullable()->unsigned();
             $table->bigInteger('sharding_id')->unsigned()->nullable()->index();
@@ -36,6 +36,6 @@ class CreatePartnerCategories extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('partner_categories');
+        Schema::dropIfExists('category_partner');
     }
 }

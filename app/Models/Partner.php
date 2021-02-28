@@ -10,7 +10,7 @@ class Partner extends BaseModel
 
     public function categories()
     {
-        return $this->hasMany(PartnerCategory::class);
+        return $this->hasMany(CategoryPartner::class);
 
     }
 

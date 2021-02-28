@@ -2,7 +2,8 @@
 
 use App\Models\Partner;
 use Carbon\Carbon;
-use Session;
+use Illuminate\Support\Facades\Session;
+
 
 trait ModificationFields
 {

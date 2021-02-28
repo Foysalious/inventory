@@ -1,19 +1,19 @@
 <?php namespace App\Services\Category;
 
 use App\Interfaces\CategoryRepositoryInterface;
-use App\Interfaces\PartnerCategoryRepositoryInterface;
+use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Traits\ModificationFields;
 
 class Creator
 {
     use ModificationFields;
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
-    protected PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface;
+    protected CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface;
     protected string $categoryName;
     protected int $partnerId;
     protected $modifyBy;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface)
+    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
