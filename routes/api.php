@@ -40,26 +40,6 @@ Route::group(['prefix'=>'v1'], function(){
             Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
         });
     });
-   /* Route::apiResources([
-        'partners.categories' => CategoryController::class
-    ]);*/
-
-    Route::group(['prefix'=>'options'], function(){
-        Route::get('/', [OptionController::class, 'index']);
-        Route::post('/', [OptionController::class, 'store']);
-        Route::group(['prefix'=>'{option}'], function(){
-            Route::post('/', [OptionController::class, 'update']);
-            Route::post('values', [ValueController::class, 'store']);
-        });
-    });
-Route::group(['prefix' => 'v1'], function () {
-
-    Route::group(['prefix'=>'units'], function(){
-        Route::get('/',[UnitController::class, 'index']);
-
-    });
-    Route::post('values/{value}', [ValueController::class, 'update']);
-
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
     Route::apiResource('partners.values', ValueController::class)->only('update');
@@ -68,19 +48,10 @@ Route::group(['prefix' => 'v1'], function () {
     Route::apiResource('options.values', ValueController::class)->shallow();
     Route::apiResource('partners.products', ProductController::class);
     Route::apiResource('partners.categories', CategoryController::class);
-    Route::apiResources([
-        'partners.products' => ProductController::class
-    ]);
-
-
     Route::group(['prefix' => 'units'], function () {
         Route::get('/', [UnitController::class, 'index']);
-
     });
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
-    Route::post('values/{id}', [ValueController::class, 'update']);
-    Route::post('values/{value}', [ValueController::class, 'update']);
-
     Route::apiResource('collection', CollectionController::class);
 
 });
