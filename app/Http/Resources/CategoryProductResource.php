@@ -19,7 +19,7 @@ class CategoryProductResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'products' => ProductResource::collection(app(ProductRepositoryInterface::class)->where('partner_id', $request->partner)->get()),
+            'products' => ProductResource::collection($request->products),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

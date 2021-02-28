@@ -1,6 +1,7 @@
 <?php namespace App\Services\CategoryProduct;
 
 
+use App\Exceptions\OptionNotFoundException;
 use App\Http\Resources\CategoryProductResource;
 use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
@@ -8,6 +9,8 @@ use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
+use Intervention\Image\Exception\NotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CategoryProductService
 {
@@ -32,9 +35,9 @@ class CategoryProductService
         $master_categories = $this->categoryRepository->builder()->whereHas('children', function ($q) use ($products) {
             $q->whereIn('id', $products->pluck('category_id')->unique()->toArray());
         })->get();
-
+        $request->merge(['products' => $products]);
         $resource = CategoryProductResource::collection($master_categories);
-
-        return $this->success("Successful", $resource);
+        if (count($resource) > 0) return $this->success("Successful", $resource);
+        throw new NotFoundHttpException("Not found");
     }
 }
