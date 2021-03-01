@@ -103,5 +103,10 @@ class CategoryService extends BaseService
         return $this->success("Successful", null,200,false);
     }
 
+    public function getCategory(){
+        $category= $this->categoryRepositoryInterface->getCategory();
+        return $this->success("Successful", $category,201);
+    }
+
 
 }
