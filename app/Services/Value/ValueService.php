@@ -3,14 +3,11 @@
 use App\Http\Requests\ValueRequest;
 use App\Http\Requests\ValueUpdateRequest;
 use App\Interfaces\ValueRepositoryInterface;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
-class ValueService
+class ValueService extends BaseService
 {
-    use ResponseAPI;
-
     /** @var ValueRepositoryInterface */
     protected ValueRepositoryInterface $valueRepositoryInterface;
     /** @var Creator */

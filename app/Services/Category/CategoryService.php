@@ -7,13 +7,11 @@ use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class CategoryService
+class CategoryService extends BaseService
 {
-    use ResponseAPI;
-
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
 
     /**

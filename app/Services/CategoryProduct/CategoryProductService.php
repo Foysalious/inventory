@@ -1,21 +1,16 @@
 <?php namespace App\Services\CategoryProduct;
 
 
-use App\Exceptions\OptionNotFoundException;
 use App\Http\Resources\CategoryProductResource;
-use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use Illuminate\Http\Request;
-use Intervention\Image\Exception\NotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class CategoryProductService
+class CategoryProductService extends BaseService
 {
-    use ResponseAPI;
-
     private CategoryRepositoryInterface $categoryRepository;
     private CategoryPartnerRepositoryInterface $categoryPartnerRepository;
     private ProductRepositoryInterface $productRepository;

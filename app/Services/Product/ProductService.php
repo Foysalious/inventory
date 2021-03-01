@@ -6,14 +6,12 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\ProductRepositoryInterface;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class ProductService
+class ProductService extends BaseService
 {
-    use ResponseAPI;
-
     /** @var ProductRepositoryInterface */
     protected ProductRepositoryInterface $productRepositoryInterface;
     /** @var Creator */

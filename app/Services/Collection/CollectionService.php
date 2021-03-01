@@ -1,20 +1,15 @@
-<?php
-
-
-namespace App\Services\Collection;
+<?php namespace App\Services\Collection;
 
 
 use App\Http\Requests\CollectionRequest;
 use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
+use App\Services\BaseService;
 use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
-use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Http\Request;
-use Mockery\Exception;
-use Whoops\Exception\ErrorException;
 
-class CollectionService
+class CollectionService extends BaseService
 {
     use ResponseAPI;
 
