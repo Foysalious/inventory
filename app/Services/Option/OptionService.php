@@ -1,16 +1,17 @@
 <?php namespace App\Services\Option;
 
+use App\Exceptions\OptionNotFoundException;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\OptionRequest;
 use App\Http\Resources\OptionResource;
 use App\Interfaces\OptionRepositoryInterface;
-use App\Traits\ResponseAPI;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class OptionService
+class OptionService extends Controller
 {
-    use ResponseAPI;
-
     /** @var OptionRepositoryInterface */
     protected OptionRepositoryInterface $optionRepositoryInterface;
     /**  @var Creator */
@@ -28,17 +29,17 @@ class OptionService
     }
 
     /**
+     * @param Request $request
      * @return JsonResponse
+     * @throws OptionNotFoundException
      */
-    public function getAll()
+    public function getAll(Request $request)
     {
-        try {
-            $resource = $this->optionRepositoryInterface->getAllWithOptions();
-            $options = OptionResource::collection($resource);
-            return $this->success("Successful", $options);
-        } catch (\Exception $e) {
-            return $this->error($e->getMessage());
-        }
+        list($offset, $limit) = calculatePagination($request);
+        $resource = $this->optionRepositoryInterface->getAllWithOptions($offset, $limit);
+        $options = OptionResource::collection($resource);
+        if ($options->isEmpty()) throw new OptionNotFoundException('আপনার কোন ভেরিয়েসন এড করা নেই!');
+        return $this->success("Successful", $options);
     }
 
     /**
@@ -58,7 +59,7 @@ class OptionService
      */
     public function update(OptionRequest $request, $optionId)
     {
-        $option = $this->optionRepositoryInterface->find($optionId);
+        $option = $this->optionRepositoryInterface->findOrFail($optionId);
         $this->updater->setOption($option)->setName($request->name)->update();
         return $this->success("Successful", $option,200);
     }

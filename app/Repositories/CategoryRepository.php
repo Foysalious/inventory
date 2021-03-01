@@ -10,11 +10,25 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     {
         parent::__construct($model);
     }
-    public function getMasterCategoriesByPartner($partner_id)
+    public function getCategoriesByPartner($partner_id)
     {
-        return $this->model->leftJoin('partner_categories', 'categories.id', '=', 'partner_categories.category_id')
-            ->where('partner_categories.partner_id',$partner_id)
+        return $this->model->leftJoin('category_partner', 'categories.id', '=', 'category_partner.category_id')
+            ->where('category_partner.partner_id',$partner_id)
             ->whereNull('categories.parent_id')->get();
+    }
+
+    public function getCategory()
+    {
+        $childCategory=array();
+        $parents = $this->model->where('parent_id', NULL)->get();
+        foreach ($parents as $parent) {
+            $childs = $this->model->select('name')->where('parent_id', $parent->id)->get();
+
+            $childCategory[$parent->name] = $childs;
+        }
+         return $childCategory;
+
+
     }
 
 
