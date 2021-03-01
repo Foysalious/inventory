@@ -53,7 +53,7 @@ class OptionController extends Controller
 
     public function destroy(OptionRequest $request, $optionId)
     {
-        return $this->optionRepositoryInterface->delete($request,$optionId);
+        return $this->optionService->delete($request,$optionId);
 
     }
 }

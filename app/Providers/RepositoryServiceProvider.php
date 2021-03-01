@@ -5,7 +5,7 @@ use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\UnitRepositoryInterface;
-use App\Interfaces\PartnerCategoryRepositoryInterface;
+
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductImageRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -16,7 +16,7 @@ use App\Interfaces\CollectionRepositoryInterface;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OptionRepository;
 use App\Repositories\UnitRepository;
-use App\Repositories\PartnerCategoryRepository;
+
 use App\Repositories\CategoryPartnerRepository;
 use App\Repositories\ProductImageRepository;
 use App\Repositories\ProductRepository;
