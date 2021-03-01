@@ -51,9 +51,9 @@ class OptionController extends Controller
         return $this->optionService->update($request, $optionId);
     }
 
-    public function destroy(OptionRequest $request, $optionId)
+    public function destroy($optionId)
     {
-        return $this->optionService->delete($request,$optionId);
+        return $this->optionService->delete($optionId);
 
     }
 }

@@ -66,8 +66,16 @@ class OptionService extends Controller
 
     public function  delete($optionId)
     {
-        $option = $this->optionRepositoryInterface->findOrFail($optionId)->delete();
-        return $this->success("Successful", $option,200, false);
+        try {
+            $option = $this->optionRepositoryInterface->findOrFail($optionId);
+            $option_id=$option->id;
+            $this->optionRepositoryInterface->where('id', $option_id)->delete();
+            return $this->success("Successful", $option,200, false);
+        }
+        catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), 500);
+        }
+
     }
 
 
