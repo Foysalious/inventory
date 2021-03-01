@@ -5,7 +5,7 @@ use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use Throwable;
 
-class OptionNotFoundException extends Exception
+class OptionNotFoundException extends BaseException
 {
     public function __construct($message = 'Option Not Found', $code = Response::HTTP_NOT_FOUND, Throwable $previous = null)
     {

@@ -67,9 +67,7 @@ class Handler extends ExceptionHandler
         } else if ($e instanceof ValidationException) {
             $errors = $e->validator->errors()->all();
             return $this->error(getValidationErrorMessage($errors), Response::HTTP_UNPROCESSABLE_ENTITY);
-        } else if ($e instanceof OptionNotFoundException) {
-            return $this->error($e->getMessage(), $e->getCode());
-        } else if ($e instanceof CategoryNotFoundException) {
+        } else if ($e instanceof BaseException) {
             return $this->error($e->getMessage(), $e->getCode());
         } else {
             $response = [];
