@@ -36,7 +36,7 @@ class OptionService extends Controller
     public function getAll(Request $request)
     {
         list($offset, $limit) = calculatePagination($request);
-        $resource = $this->optionRepositoryInterface->getAllWithOptions($offset, $limit);
+        $resource = $this->optionRepositoryInterface->getAllWithOptions($request->partner,$offset, $limit);
         $options = OptionResource::collection($resource);
         if ($options->isEmpty()) throw new OptionNotFoundException('আপনার কোন ভেরিয়েসন এড করা নেই!');
         return $this->success("Successful", $options);
