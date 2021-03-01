@@ -50,4 +50,10 @@ class OptionController extends Controller
     {
         return $this->optionService->update($request, $optionId);
     }
+
+    public function destroy(OptionRequest $request, $optionId)
+    {
+        return $this->optionRepositoryInterface->delete($request,$optionId);
+
+    }
 }
