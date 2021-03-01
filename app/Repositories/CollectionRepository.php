@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Models\Collection;
-use Illuminate\Http\Request;
 
 /**
  * Class CollectionRepository.

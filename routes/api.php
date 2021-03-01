@@ -21,11 +21,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-
-
-
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
@@ -46,7 +41,6 @@ Route::group(['prefix'=>'v1'], function(){
     Route::apiResource('partners.products', ProductController::class);
     Route::apiResource('options', OptionController::class);
     Route::apiResource('options.values', ValueController::class)->shallow();
-    Route::apiResource('partners.products', ProductController::class);
     Route::apiResource('partners.categories', CategoryController::class);
     Route::group(['prefix' => 'units'], function () {
         Route::get('/', [UnitController::class, 'index']);
