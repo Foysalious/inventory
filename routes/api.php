@@ -7,6 +7,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\ChannelController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -53,5 +54,5 @@ Route::group(['prefix'=>'v1'], function(){
     });
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
     Route::apiResource('collection', CollectionController::class);
-
+    Route::get('/channels', [ChannelController::class, 'index']);
 });
