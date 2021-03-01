@@ -5,14 +5,11 @@ use App\Http\Requests\CollectionRequest;
 use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
 use App\Services\BaseService;
-use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
 use Illuminate\Http\Request;
 
 class CollectionService extends BaseService
 {
-    use ResponseAPI;
-
     protected $collectionRepository;
 
     protected $collectionRepositoryInterface;
