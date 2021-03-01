@@ -6,7 +6,6 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
-use App\Interfaces\PartnerCategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Traits\ResponseAPI;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -25,12 +24,15 @@ class CategoryService
      * @var Creator
      */
     private Creator $creator;
-    private $partnerCategoryRepositoryInterface;
+    /**
+     * @var CategoryPartnerRepositoryInterface
+     */
+    private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,PartnerCategoryRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater)
+    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, Creator $creator, Updater $updater)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
-        $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
+        $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->categoryRepository = $categoryRepository;
@@ -99,7 +101,7 @@ class CategoryService
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children,[$category->id]);
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
-        $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
+        $this->categoryPartnerRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
         return $this->success("Successful", null,200,false);
     }
 
