@@ -29,7 +29,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
 Route::group(['prefix'=>'v1'], function(){
 
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
