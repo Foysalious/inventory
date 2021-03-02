@@ -2,7 +2,6 @@
 
 
 use App\Http\Requests\CategoryRequest;
-use App\Models\Category;
 use App\Services\Category\CategoryService;
 use App\Traits\ModificationFields;
 use Illuminate\Http\JsonResponse;

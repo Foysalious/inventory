@@ -74,6 +74,7 @@ class ProductService extends BaseService
             ->setCost($request->cost)
             ->setPrice($request->price)
             ->setStock($request->stock)
+            ->setProductDetails($request->product_details)
             ->setChannelId($request->channel_id)
             ->create();
 

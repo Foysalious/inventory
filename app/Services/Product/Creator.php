@@ -2,7 +2,11 @@
 
 
 use App\Interfaces\DiscountRepositoryInterface;
+use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ProductOptionRepositoryInterface;
+use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\ValueRepositoryInterface;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Warranty\Units;
@@ -28,11 +32,17 @@ class Creator
     protected $cost;
     protected $price;
     protected $stock;
-    protected $channelId;
+    protected $channelIds;
     /** @var ProductImageCreator */
     protected ProductImageCreator $productImageCreator;
     /** @var DiscountCreator */
     protected DiscountCreator $discountCreator;
+    protected $hasVariant;
+    protected $productDetails;
+    protected $optionRepositoryInterface;
+    protected $valueRepositoryInterface;
+    protected $productOptionRepositoryInterface;
+    protected $productOptionValueRepositoryInterface;
 
     /**
      * Creator constructor.
@@ -40,11 +50,14 @@ class Creator
      * @param DiscountCreator $discountCreator
      * @param ProductImageCreator $productImageCreator
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
+    OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
         $this->discountCreator = $discountCreator;
+        $this->optionRepositoryInterface = $optionRepositoryInterface;
+        $this->valueRepositoryInterface = $valueRepositoryInterface;
     }
 
 
@@ -210,21 +223,106 @@ class Creator
         return $this;
     }
 
+    public function setProductDetails($productDetails)
+    {
+      $this->productDetails = json_decode($productDetails);
+      return $this;
+    }
+
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
-        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $this->stock ?: 0]);
-        $sku->skuChannels()->create([
-            "sku_id" => $sku->id,
-            "channel_id" => $this->channelId,
-            "cost" => $this->cost ?: 0,
-            "price" => $this->price ?: 0,
-            "wholesale_price" => $this->wholesalePrice ?: 0
-        ]);
-        if($this->discountAmount)
-        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
-        if($this->images) $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
+        is_null($this->productDetails[0]['channel_id']) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
+
+        if ($this->discountAmount)
+            $this->createProductDiscount($product);
+        if ($this->images)
+            $this->createImageGallery($product);
+
         return $product;
+    }
+
+    private function createVariantsSKUAndSKUChannels($product)
+    {
+        foreach($this->productDetails as $productDetail)
+        {
+            $option_name = $this->optionRepositoryInterface->find($productDetail['option_id'])->name;
+            $product_option = $this->createProductOptions($product->id,$option_name);
+            $value_name = $this->productOptionRepositoryInterface->find($productDetail['value_id'])->name;
+            $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
+            $sku_data = [
+              'name' =>   $option_name.'-'.$value_name,
+                'product_id' => $product->id,
+                'stock' => $productDetail['stock'],
+            ];
+
+            $sku = $product->skus()->create($sku_data);
+
+            array_push($this->skus,$sku->id);
+            $skuChannelsData = $this->makeSKUChannelData($sku);
+            $sku->skuChannels()->insert($skuChannelsData);
+
+
+
+        }
+
+    }
+
+    private function createProductOptionValues($product_option_id, $value_name)
+    {
+        $data = [
+            'product_option_id' => $product_option_id,
+            'name' => $value_name
+        ];
+        return $this->productOptionValueRepositoryInterface->create($data);
+    }
+
+    private function createProductOptions($product_id,$option_name)
+    {
+        $data = [
+          'prodcut_id' => $product_id,
+          'name' => $option_name
+        ];
+       return $this->productOptionRepositoryInterface->create($data);
+    }
+
+    private function createSKUAndSKUChannels($product)
+    {
+        $stock = $this->productDetails[0]['stock'] > 0 ?: 0;
+        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
+        $skuChannelsData = $this->makeSKUChannelsData($sku);
+        $sku->skuChannels()->insert($skuChannelsData);
+    }
+
+    private function makeSKUChannelData($productDetail)
+    {
+
+    }
+
+    private function makeSKUChannelsData($sku)
+    {
+        $data = [];
+        foreach($this->productDetails as $productDetail)
+        {
+            $temp['sku_id'] = $sku->id;
+            $temp['channel_id'] = $productDetail['channel_id'];
+            $temp['cost'] = $productDetail['cost'] ? : 0;
+            $temp['price'] = $productDetail['cost'] ? : 0;
+            $temp['wholesale_price'] = $productDetail['wholesale_price'] ? : 0;
+            array_push($data,$temp);
+        }
+
+        return $data;
+    }
+
+    private function createProductDiscount($product)
+    {
+        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
+    }
+
+    private function createImageGallery($product)
+    {
+        $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
     }
 
     private function makeData()
