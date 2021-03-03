@@ -14,7 +14,7 @@ class CreateProductsTable extends Migration
     public function up()
     {
         Schema::create('products', function (Blueprint $table) {
-            $table->id();
+            $table->id()->startingValue(config('migration.starting_ids.products'));
             $table->bigInteger('partner_id')->nullable()->unsigned()->index();
             $table->foreign('partner_id')->references('id')->on('partners')
                 ->onUpdate('cascade')->onDelete('set null');

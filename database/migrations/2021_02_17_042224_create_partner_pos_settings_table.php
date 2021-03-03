@@ -14,7 +14,7 @@ class CreatePartnerPosSettingsTable extends Migration
     public function up()
     {
         Schema::create('partner_pos_settings', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->startingValue(config('migration.starting_ids.partner_pos_settings'));
             $table->bigInteger('partner_id')->unsigned();
             $table->bigInteger('sharding_id')->nullable()->unsigned()->index();
             $table->foreign('partner_id')->references('id')->on('partners')->onUpdate('cascade');

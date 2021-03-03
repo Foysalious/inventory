@@ -15,7 +15,7 @@ class CreateDiscountsTable extends Migration
     public function up()
     {
         Schema::create('discounts', function (Blueprint $table) {
-            $table->increments('id');
+            $table->increments('id')->startingValue(config('migration.starting_ids.discounts'));
             $table->integer('type_id')->index();
             $table->enum('type',Types::get())->index();
             $table->decimal('amount');

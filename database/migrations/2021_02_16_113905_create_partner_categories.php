@@ -14,7 +14,7 @@ class CreatePartnerCategories extends Migration
     public function up()
     {
         Schema::create('category_partner', function (Blueprint $table) {
-            $table->id();
+            $table->id()->startingValue(config('migration.starting_ids.category_partner'));
             $table->bigInteger('partner_id')->nullable()->unsigned();
             $table->bigInteger('sharding_id')->unsigned()->nullable()->index();
             $table->foreign('partner_id')->references('id')->on('partners')
