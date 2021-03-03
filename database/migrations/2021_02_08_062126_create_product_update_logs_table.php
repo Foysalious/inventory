@@ -14,7 +14,7 @@ class CreateProductUpdateLogsTable extends Migration
     public function up()
     {
         Schema::create('product_update_logs', function (Blueprint $table) {
-            $table->id()->startingValue(config('migration.starting_ids.product_update_logs'));
+            $table->id();
             $table->bigInteger('product_id')->nullable()->unsigned()->index();
             $table->foreign('product_id')->references('id')->on('products')
                 ->onUpdate('cascade')->onDelete('set null');
