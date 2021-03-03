@@ -43,6 +43,7 @@ class Creator
     protected $valueRepositoryInterface;
     protected $productOptionRepositoryInterface;
     protected $productOptionValueRepositoryInterface;
+    protected $createdSKUS;
 
     /**
      * Creator constructor.
@@ -251,19 +252,19 @@ class Creator
             $value_name = $this->productOptionRepositoryInterface->find($productDetail['value_id'])->name;
             $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
             $sku_data = [
-              'name' =>   $option_name.'-'.$value_name,
+                'name' => $option_name . '-' . $value_name,
                 'product_id' => $product->id,
                 'stock' => $productDetail['stock'],
             ];
 
-            $sku = $product->skus()->create($sku_data);
-
-            array_push($this->skus,$sku->id);
-            $skuChannelsData = $this->makeSKUChannelData($sku);
-            $sku->skuChannels()->insert($skuChannelsData);
-
-
-
+            $sku = $product->skus()->firstOrcreate($sku_data);
+            $sku_channel = $sku->skuChannels()->firstOrCreate([
+                'sku_id' => $sku->id,
+                'channel_id' => $productDetail->channel_id,
+                'cost' =>  $productDetail->cost ?: 0,
+                'price' => $productDetail->price ?: 0,
+                'wholesale_price' => $productDetail->wholesale_price ? : null
+            ]);
         }
 
     }
@@ -294,10 +295,6 @@ class Creator
         $sku->skuChannels()->insert($skuChannelsData);
     }
 
-    private function makeSKUChannelData($productDetail)
-    {
-
-    }
 
     private function makeSKUChannelsData($sku)
     {
@@ -307,8 +304,8 @@ class Creator
             $temp['sku_id'] = $sku->id;
             $temp['channel_id'] = $productDetail['channel_id'];
             $temp['cost'] = $productDetail['cost'] ? : 0;
-            $temp['price'] = $productDetail['cost'] ? : 0;
-            $temp['wholesale_price'] = $productDetail['wholesale_price'] ? : 0;
+            $temp['price'] = $productDetail['price'] ? : 0;
+            $temp['wholesale_price'] = $productDetail['wholesale_price'] ? : null;
             array_push($data,$temp);
         }
 
