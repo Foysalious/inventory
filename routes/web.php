@@ -19,4 +19,13 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('search', function() {
+    $query = 'm'; // <-- Change the query for testing.
+
+    $articles = App\Models\Product::search($query)->get();
+
+    return $articles;
+});
+
+
 

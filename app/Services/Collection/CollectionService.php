@@ -9,10 +9,7 @@ use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
 use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
-use Illuminate\Container\EntryNotFoundException;
 use Illuminate\Http\Request;
-use Mockery\Exception;
-use Whoops\Exception\ErrorException;
 
 class CollectionService
 {
@@ -32,7 +29,7 @@ class CollectionService
         $this->updater = $updater;
     }
 
-    public function getDetails($collection)
+    public function getDetails($partner, $collection)
     {
         try {
             $resource = $this->collectionRepositoryInterface->find($collection);
@@ -67,6 +64,7 @@ class CollectionService
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
+            ->setShardingId($request->sharding_id)
             ->create();
 
         return $this->success("Successful", $option,201);
@@ -85,6 +83,7 @@ class CollectionService
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
+            ->setShardingId($request->sharding_id)
             ->update();
 
         return $this->success("Successful", $option,201);

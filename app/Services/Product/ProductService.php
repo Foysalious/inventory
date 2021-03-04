@@ -4,6 +4,7 @@
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Http\Resources\ProductChannelPriceResource;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Traits\ResponseAPI;
@@ -50,8 +51,13 @@ class ProductService
     public function getDetails($product)
     {
         $resource = $this->productRepositoryInterface->findOrFail($product);
+        $product_channel_price = ProductChannelPriceResource::collection($this->productRepositoryInterface->productChannelPrice($product)[0]);
+        if(empty($product_channel_price))
+            return $this->error('Product has no variant', 404);
         $product = new ProductResource($resource);
-        return $this->success('Successful', $product, 200);
+        $data['product'] = $product;
+        $data['sku_channel_price'] = $product_channel_price;
+        return $this->success('Successful', $data, 200);
     }
 
     /**

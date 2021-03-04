@@ -13,7 +13,8 @@ class Updater
 
     protected $collectionRepositoryInterface;
 
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
+
 
     private $data = [];
 
@@ -131,6 +132,16 @@ class Updater
     public function setModifyBy($modify_by)
     {
         $this->modify_by = $modify_by;
+        return $this;
+    }
+
+    /**
+     * @param mixed $sharding_id
+     * @return Updater
+     */
+    public function setShardingId($sharding_id)
+    {
+        $this->sharding_id = $sharding_id;
         return $this;
     }
 
