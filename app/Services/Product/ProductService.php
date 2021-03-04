@@ -70,12 +70,7 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-            ->setWholesalePrice($request->wholesale_price)
-            ->setCost($request->cost)
-            ->setPrice($request->price)
-            ->setStock($request->stock)
             ->setProductDetails($request->product_details)
-            ->setChannelId($request->channel_id)
             ->create();
 
         return $this->success("Successful", $product,201);

@@ -12,6 +12,4 @@ class ProductOptionRepository extends BaseRepository implements ProductOptionRep
     {
         parent::__construct($model);
     }
-
-
 }

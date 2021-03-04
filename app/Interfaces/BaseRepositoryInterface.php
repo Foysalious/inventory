@@ -6,6 +6,8 @@ interface BaseRepositoryInterface
 {
     public function create($data);
 
+    public function firstOrCreate($data);
+
     public function insert(array $data);
 
     public function find($id);
