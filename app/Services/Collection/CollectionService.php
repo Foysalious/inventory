@@ -1,20 +1,15 @@
-<?php
-
-
-namespace App\Services\Collection;
+<?php namespace App\Services\Collection;
 
 
 use App\Http\Requests\CollectionRequest;
 use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
 use Illuminate\Http\Request;
 
-class CollectionService
+class CollectionService extends BaseService
 {
-    use ResponseAPI;
-
     protected $collectionRepository;
 
     protected $collectionRepositoryInterface;

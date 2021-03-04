@@ -1,16 +1,16 @@
 <?php namespace App\Services\Option;
 
 use App\Exceptions\OptionNotFoundException;
-use App\Http\Controllers\Controller;
 use App\Http\Requests\OptionRequest;
 use App\Http\Resources\OptionResource;
 use App\Interfaces\OptionRepositoryInterface;
+use App\Services\BaseService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class OptionService extends Controller
+class OptionService extends BaseService
 {
     /** @var OptionRepositoryInterface */
     protected OptionRepositoryInterface $optionRepositoryInterface;
@@ -36,7 +36,7 @@ class OptionService extends Controller
     public function getAll(Request $request)
     {
         list($offset, $limit) = calculatePagination($request);
-        $resource = $this->optionRepositoryInterface->getAllWithOptions($offset, $limit);
+        $resource = $this->optionRepositoryInterface->getAllWithOptions($request->partner,$offset, $limit);
         $options = OptionResource::collection($resource);
         if ($options->isEmpty()) throw new OptionNotFoundException('আপনার কোন ভেরিয়েসন এড করা নেই!');
         return $this->success("Successful", $options);

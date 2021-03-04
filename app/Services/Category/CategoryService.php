@@ -7,13 +7,11 @@ use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class CategoryService
+class CategoryService extends BaseService
 {
-    use ResponseAPI;
-
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
 
     /**
@@ -103,6 +101,11 @@ class CategoryService
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
         $this->categoryPartnerRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
         return $this->success("Successful", null,200,false);
+    }
+
+    public function getCategory(){
+        $category= $this->categoryRepositoryInterface->getCategory();
+        return $this->success("Successful", $category,201);
     }
 
 
