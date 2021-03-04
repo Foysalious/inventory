@@ -44,11 +44,11 @@ class CollectionController extends Controller
      * Display the specified resource.
      *
      * @param  \App\Models\Collection  $collection
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($collection)
+    public function show($partner_id, $collection_id)
     {
-        return $this->collectionService->getDetails($collection);
+        return $this->collectionService->getDetails($partner_id, $collection_id);
     }
 
     /**
@@ -56,7 +56,7 @@ class CollectionController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Collection  $collection
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(CollectionRequest $request, $collection_id)
     {
@@ -69,8 +69,8 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($collection)
+    public function destroy($partner_id, $collection_id)
     {
-        return $this->collectionService->delete($collection);
+        return $this->collectionService->delete($collection_id);
     }
 }

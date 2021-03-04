@@ -24,7 +24,7 @@ class CollectionService extends BaseService
         $this->updater = $updater;
     }
 
-    public function getDetails($collection)
+    public function getDetails($partner, $collection)
     {
         try {
             $resource = $this->collectionRepositoryInterface->find($collection);
@@ -59,6 +59,7 @@ class CollectionService extends BaseService
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
+            ->setShardingId($request->sharding_id)
             ->create();
 
         return $this->success("Successful", $option,201);
@@ -77,6 +78,7 @@ class CollectionService extends BaseService
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
+            ->setShardingId($request->sharding_id)
             ->update();
 
         return $this->success("Successful", $option,201);

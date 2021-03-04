@@ -20,10 +20,10 @@ class CreateCollectionsTable extends Migration
             $table->bigInteger('sharding_id')->nullable()->unsigned()->index();
             $table->string('name');
             $table->text('description')->nullable();
-            $table->string('thumb')->default( getCollectionDefaultThumb() );
-            $table->string('banner')->default( getCollectionDefaultBanner() );
-            $table->string('app_thumb')->default( getCollectionDefaultAppThumb() );
-            $table->string('app_banner')->default( getCollectionDefaultAppBanner() );
+            $table->string('thumb')->default( getCollectionDefaultThumb() )->nullable();
+            $table->string('banner')->default( getCollectionDefaultBanner() )->nullable();
+            $table->string('app_thumb')->default( getCollectionDefaultAppThumb() )->nullable();
+            $table->string('app_banner')->default( getCollectionDefaultAppBanner() )->nullable();
             $table->integer('is_published')->default(0)->unsigned()->index();
 
             // Foreign key relationship with Partner

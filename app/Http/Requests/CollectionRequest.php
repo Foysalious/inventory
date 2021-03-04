@@ -21,10 +21,6 @@ class CollectionRequest extends FormRequest
     {
         return [
             'name'          => 'required|string',
-            'thumb'         => 'required|mimes:jpg,jpeg,png',
-            'banner'        => 'required|mimes:jpg,jpeg,png',
-            'app_thumb'     => 'required|mimes:jpg,jpeg,png',
-            'app_banner'    => 'required|mimes:jpg,jpeg,png',
             'is_published'  => 'required',
             'partner_id'    => 'required'
         ];

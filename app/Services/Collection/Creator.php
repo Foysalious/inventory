@@ -14,7 +14,13 @@ class Creator
 
     protected $collectionRepositoryInterface;
 
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
+
+    /**
+     * @param mixed $sharding_id
+     * @return Creator
+     */
+
 
     private $data = [];
 
@@ -123,6 +129,12 @@ class Creator
         return $this;
     }
 
+    public function setShardingId($sharding_id)
+    {
+        $this->sharding_id = $sharding_id;
+        return $this;
+    }
+
     public function create()
     {
         $this->setModifier($this->modify_by);
@@ -139,7 +151,8 @@ class Creator
             'app_thumb' => $this->app_thumb,
             'app_banner' => $this->app_banner,
             'partner_id' => $this->partner_id,
-            'is_published' => $this->is_published
+            'is_published' => $this->is_published,
+            'sharding_id' => $this->sharding_id
         ] + $this->modificationFields(true, false);
     }
 
