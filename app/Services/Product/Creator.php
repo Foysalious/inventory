@@ -248,8 +248,7 @@ class Creator
     {
 
         $product =  $this->productRepositoryInterface->create($this->makeData());
-
-        is_null($this->productDetails[0]->channel_id) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
+        is_null($this->productDetails[0]->combination[0]->option_id) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
 
         if ($this->discountAmount)
             $this->createProductDiscount($product);
@@ -263,36 +262,74 @@ class Creator
     {
         foreach($this->productDetails as $productDetail)
         {
-            $option_name = $this->optionRepositoryInterface->find($productDetail->option_id)->name;
-            $product_option = $this->createProductOptions($product->id,$option_name);
-            $value_name = $this->valueRepositoryInterface->find($productDetail->value_id)->name;
-            $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
+            $combinations = $productDetail->combination;
+            $product_option_value_ids = [];
+            $values = [];
+            foreach($combinations as $combination)
+            {
+                $option_name = $this->optionRepositoryInterface->find($combination->option_id)->name;
+                $product_option = $this->createProductOptions($product->id,$option_name);
+                $value_name = $this->valueRepositoryInterface->find($combination->value_id)->name;
+                $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
+                array_push($product_option_value_ids,$product_option_value->id);
+                array_push($values,$value_name);
+            }
+
             $sku_data = [
-                'name' => $option_name . '-' . $value_name,
+                'name' => implode("-",$values) ,
                 'product_id' => $product->id,
                 'stock' => $productDetail->stock,
             ];
+            $sku = $product->skus()->create($sku_data);
 
-            $sku = $product->skus()->firstOrCreate($sku_data);
-            $sku->skuChannels()->create([
-                'sku_id' => $sku->id,
-                'channel_id' => $productDetail->channel_id,
-                'cost' =>  $productDetail->cost ?: 0,
-                'price' => $productDetail->price ?: 0,
-                'wholesale_price' => $productDetail->wholesale_price ?: null
-            ]);
-
-            $this->combinationRepositoryInterface->firstOrCreate([
-                'sku_id' => $sku->id,
-                'product_option_value_id' => $product_option_value->id
-            ]);
-
-            $this->productChannelRepositoryInterface->firstOrCreate([
-                'product_id' => $product->id,
-                'channel_id' => $productDetail->channel_id
-            ]);
+            $sku_channels = $this->createSkuChannelsData($sku,$productDetail->channel_data);
+            $sku->skuChannels()->insert($sku_channels);
+            $combinations = $this->createCombinationData($sku->id,$product_option_value_ids);
+            $this->combinationRepositoryInterface->insert($combinations->toArray());
+            $product_channels = $this->makeProductChannelData($productDetail->channel_data,$product->id);
+            $this->productChannelRepositoryInterface->insert($product_channels->toArray());
 
         }
+    }
+
+    private function makeProductChannelData($channels, $product_id)
+    {
+       return  collect($channels)->map(function($channel) use($product_id) {
+            return [
+                'product_id' => $product_id,
+                'channel_id' =>   $channel->channel_id,
+            ];
+        });
+    }
+
+    private function createCombinationData($sku_id,$product_option_value_ids)
+    {
+       return  collect($product_option_value_ids)->map(function($product_option_value_id) use($sku_id){
+            return [
+               'product_option_value_id' => $product_option_value_id,
+                'sku_id' => $sku_id
+           ] ;
+
+        });
+
+    }
+
+    private function createSkuChannelsData($sku,$channel_data)
+    {
+
+        $data = [];
+        foreach($channel_data as $channel)
+        {
+           array_push($data,[
+               'sku_id' => $sku->id,
+               'channel_id' => $channel->channel_id,
+               'cost' =>  $channel->cost ?: 0,
+               'price' => $channel->price ?: 0,
+               'wholesale_price' => $channel->wholesale_price ?: null
+           ]);
+        }
+
+        return $data;
     }
 
     private function createProductOptionValues($product_option_id, $value_name)
