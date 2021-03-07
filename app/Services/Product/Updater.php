@@ -17,6 +17,7 @@ class Updater
     protected $warrantyUnit;
     protected $vatPercentage;
     protected $unitId;
+    protected $productDetails;
 
     /**
      * Updater constructor.
@@ -107,9 +108,16 @@ class Updater
         return $this;
     }
 
+    public function setProductDetails($productDetails)
+    {
+        $this->productDetails = $productDetails;
+    }
+
     public function update()
     {
-        return $this->productRepositoryInterface->update($this->product, $this->makeData());
+        $product =  $this->productRepositoryInterface->update($this->product, $this->makeData());
+
+
     }
 
     private function makeData()

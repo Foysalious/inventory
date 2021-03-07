@@ -92,6 +92,7 @@ class ProductService extends BaseService
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
             ->setUnitId($request->unit_id)
+            ->setProductDetails($request->product_details)
             ->update();
         return $this->success("Successful", $product,200);
     }

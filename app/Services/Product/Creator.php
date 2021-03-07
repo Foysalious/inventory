@@ -248,7 +248,7 @@ class Creator
     {
 
         $product =  $this->productRepositoryInterface->create($this->makeData());
-        is_null($this->productDetails[0]->combination[0]->option_id) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
+        is_null($this->productDetails[0]->combination) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
 
         if ($this->discountAmount)
             $this->createProductDiscount($product);
@@ -352,23 +352,28 @@ class Creator
 
     private function createSKUAndSKUChannels($product)
     {
-        $stock = $this->productDetails[0]['stock'] > 0 ?: 0;
+        $stock = $this->productDetails[0]->stock > 0 ?: 0;
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
         $skuChannelsData = $this->makeSKUChannelsData($sku);
         $sku->skuChannels()->insert($skuChannelsData);
+
+        $product_channels = $this->makeProductChannelData($this->productDetails[0]->channel_data,$product->id);
+        $this->productChannelRepositoryInterface->insert($product_channels->toArray());
+
     }
 
 
     private function makeSKUChannelsData($sku)
     {
         $data = [];
-        foreach($this->productDetails as $productDetail)
+        $channels = $this->productDetails[0]->channel_data;
+        foreach($channels as $channel)
         {
             $temp['sku_id'] = $sku->id;
-            $temp['channel_id'] = $productDetail->channel_id;
-            $temp['cost'] = $productDetail->cost? : 0;
-            $temp['price'] = $productDetail->price ? : 0;
-            $temp['wholesale_price'] = $productDetail->wholesale_price ? : null;
+            $temp['channel_id'] = $channel->channel_id;
+            $temp['cost'] = $channel->cost? : 0;
+            $temp['price'] = $channel->price ? : 0;
+            $temp['wholesale_price'] = $channel->wholesale_price ? : null;
             array_push($data,$temp);
         }
 
