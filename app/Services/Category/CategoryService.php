@@ -59,9 +59,10 @@ class CategoryService extends BaseService
      * @param CategoryRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CategoryRequest $request)
+    public function create(CategoryRequest $request,$partner_id)
     {
-        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner)->setName($request->name)->create();
+
+        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($partner_id)->setName($request->name)->create();
         return $this->success("Successful", $category,201);
     }
 

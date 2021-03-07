@@ -41,7 +41,7 @@ class CategoryController extends Controller
      */
     public function store($partner,CategoryRequest $request)
     {
-        return $this->categoryService->create($request);
+        return $this->categoryService->create($request,$partner);
     }
 
     public function update($partner, $category,CategoryRequest $request)
