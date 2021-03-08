@@ -28,7 +28,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
 Route::group(['prefix'=>'v1'], function(){
 
-    Route::apiResource('collection', CollectionController::class);
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::group(['prefix' => 'categories'], function () {
             Route::get('/', [CategoryController::class, 'index']);
