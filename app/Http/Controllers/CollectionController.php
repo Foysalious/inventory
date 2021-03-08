@@ -47,7 +47,7 @@ class CollectionController extends Controller
      */
     public function show($partner_id, $collection_id)
     {
-        return $this->collectionService->getDetails($collection_id);
+        return $this->collectionService->getDetails($partner_id, $collection_id);
     }
 
     /**
@@ -68,7 +68,7 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($collection_id)
+    public function destroy($partner_id, $collection_id)
     {
         return $this->collectionService->delete($partner_id, $collection_id);
     }
