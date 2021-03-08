@@ -24,7 +24,7 @@ class CollectionService extends BaseService
         $this->updater = $updater;
     }
 
-    public function getDetails($partner, $collection)
+    public function getDetails($collection)
     {
         try {
             $resource = $this->collectionRepositoryInterface->find($collection);
