@@ -57,9 +57,9 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(CollectionRequest $request, $collection_id)
+    public function update(CollectionRequest $request, $partner_id, $collection_id)
     {
-        return $this->collectionService->update($request, $collection_id);
+        return $this->collectionService->update($request, $partner_id, $collection_id);
     }
 
     /**
@@ -70,6 +70,6 @@ class CollectionController extends Controller
      */
     public function destroy($collection_id)
     {
-        return $this->collectionService->delete($collection_id);
+        return $this->collectionService->delete($partner_id, $collection_id);
     }
 }

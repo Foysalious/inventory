@@ -8,7 +8,7 @@ use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
 use Illuminate\Http\Request;
 
-class CollectionService extends BaseService
+class CollectionService
 {
     use ResponseAPI;
 
@@ -67,7 +67,7 @@ class CollectionService extends BaseService
         return $this->success("Successful", $option,201);
     }
 
-    public function update(CollectionRequest $request, $collection_id)
+    public function update(CollectionRequest $request, $partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
@@ -75,7 +75,7 @@ class CollectionService extends BaseService
         $option = $this->updater->setCollection($collection)->setName($request->name)
             ->setModifyBy($request->modifier)
             ->setDescription($request->description)
-            ->setPartnerId($request->partner_id)
+            ->setPartnerId($partner_id)
             ->setThumb($request->thumb)
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)
@@ -86,7 +86,7 @@ class CollectionService extends BaseService
         return $this->success("Successful", $option,201);
     }
 
-    public function delete($collection)
+    public function delete($partner_id, $collection)
     {
         try {
             $collection = $this->collectionRepositoryInterface->find($collection);
