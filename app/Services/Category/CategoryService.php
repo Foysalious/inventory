@@ -4,8 +4,10 @@
 use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
+use App\Http\Resources\CategorySubResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
+
 
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Traits\ResponseAPI;
@@ -102,6 +104,18 @@ class CategoryService
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
         $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
         return $this->success("Successful", null,200,false);
+    }
+
+    public function getCategory($partner_id){
+        $master_categories = $this->categoryRepositoryInterface->getCategory($partner_id);
+        if ($master_categories->isEmpty())
+            throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
+        $resource = CategorySubResource::collection($master_categories, $partner_id);
+        $data = [];
+
+        $data['categories'] = $resource;
+
+        return $this->success("Successful", $data);
     }
 
 

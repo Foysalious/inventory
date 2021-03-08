@@ -17,17 +17,9 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
             ->whereNull('categories.parent_id')->get();
     }
 
-    public function getCategory()
+    public function getCategory($partner_id)
     {
-        $childCategory=array();
-        $parents = $this->model->where('parent_id', NULL)->get();
-        foreach ($parents as $parent) {
-            $childs = $this->model->select('name')->where('parent_id', $parent->id)->get();
-
-            $childCategory[$parent->name] = $childs;
-        }
-         return $childCategory;
-
+        return $this->model->with('children')->where('parent_id',NULL)->get();
 
     }
 
