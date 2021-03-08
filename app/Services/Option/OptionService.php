@@ -63,4 +63,20 @@ class OptionService extends BaseService
         $this->updater->setOption($option)->setName($request->name)->update();
         return $this->success("Successful", $option,200);
     }
+
+    public function  delete($optionId)
+    {
+        try {
+            $option = $this->optionRepositoryInterface->findOrFail($optionId);
+            $option_id=$option->id;
+            $this->optionRepositoryInterface->where('id', $option_id)->delete();
+            return $this->success("Successful", $option,200, false);
+        }
+        catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), 500);
+        }
+
+    }
+
+
 }

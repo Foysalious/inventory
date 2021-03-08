@@ -6,12 +6,15 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\CategoryRepository;
+
 use App\Interfaces\CategoryPartnerRepositoryInterface;
-use App\Services\BaseService;
+use App\Traits\ResponseAPI;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class CategoryService extends BaseService
+class CategoryService
 {
+    use ResponseAPI;
+
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
 
     /**
@@ -22,15 +25,12 @@ class CategoryService extends BaseService
      * @var Creator
      */
     private Creator $creator;
-    /**
-     * @var CategoryPartnerRepositoryInterface
-     */
-    private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
+    private $partnerCategoryRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, Creator $creator, Updater $updater)
+    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
-        $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
+        $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->categoryRepository = $categoryRepository;
@@ -59,9 +59,10 @@ class CategoryService extends BaseService
      * @param CategoryRequest $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function create(CategoryRequest $request)
+    public function create(CategoryRequest $request,$partner_id)
     {
-        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($request->partner)->setName($request->name)->create();
+
+        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($partner_id)->setName($request->name)->create();
         return $this->success("Successful", $category,201);
     }
 
@@ -99,13 +100,8 @@ class CategoryService extends BaseService
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children,[$category->id]);
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
-        $this->categoryPartnerRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
+        $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
         return $this->success("Successful", null,200,false);
-    }
-
-    public function getCategory(){
-        $category= $this->categoryRepositoryInterface->getCategory();
-        return $this->success("Successful", $category,201);
     }
 
 

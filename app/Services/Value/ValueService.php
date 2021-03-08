@@ -50,4 +50,18 @@ class ValueService extends BaseService
         $this->updater->setValue($value)->setName($request->name)->update();
         return $this->success("Successful", $value,200);
     }
+
+    public function  delete($id)
+    {
+        try {
+            $value = $this->valueRepositoryInterface->findOrFail($id);
+            $value_id=$value->id;
+            $this->valueRepositoryInterface->where('id', $value_id)->delete();
+            return $this->success("Successful", $value,200, false);
+        }
+        catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), 500);
+        }
+
+    }
 }

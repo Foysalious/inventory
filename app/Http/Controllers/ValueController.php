@@ -39,4 +39,10 @@ class ValueController extends Controller
     {
         return $this->valueService->update($request, $id);
     }
+
+    public function destroy($id)
+    {
+        return $this->valueService->delete($id);
+
+    }
 }
