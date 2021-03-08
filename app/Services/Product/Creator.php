@@ -311,12 +311,10 @@ class Creator
            ] ;
 
         });
-
     }
 
     private function createSkuChannelsData($sku,$channel_data)
     {
-
         $data = [];
         foreach($channel_data as $channel)
         {
@@ -328,7 +326,6 @@ class Creator
                'wholesale_price' => $channel->wholesale_price ?: null
            ]);
         }
-
         return $data;
     }
 

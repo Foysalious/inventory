@@ -48,8 +48,19 @@ class ProductService extends BaseService
     public function getDetails($product)
     {
         $resource = $this->productRepositoryInterface->findOrFail($product);
+        $this->getCombinationData($resource);
         $product = new ProductResource($resource);
         return $this->success('Successful', $product, 200);
+    }
+
+    private function getCombinationData($product)
+    {
+        $skus = $this->skuRepositoryInterface->where('product_id',$product->id)->with('combinations')->get();
+        foreach($skus as $sku)
+        {
+            $p_o_v_s = $sku->combinations->pluck('product_option_value_id');
+            $p_o_v = $this->productOptionValueRepositoryInterface->whereIn('id',$p_o_v_s)->select('product_option_id','name')->get();
+        }
     }
 
     /**
@@ -72,7 +83,6 @@ class ProductService extends BaseService
             ->setImages($request->images)
             ->setProductDetails($request->product_details)
             ->create();
-
         return $this->success("Successful", $product,201);
     }
 

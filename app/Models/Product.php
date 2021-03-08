@@ -15,4 +15,9 @@ class Product extends BaseModel
     {
         return $this->hasMany(Sku::class);
     }
+
+    public function productOptions()
+    {
+        return $this->hasMany(ProductOption::class,'product_id');
+    }
 }
