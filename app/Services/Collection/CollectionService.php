@@ -1,7 +1,4 @@
-<?php
-
-
-namespace App\Services\Collection;
+<?php namespace App\Services\Collection;
 
 
 use App\Http\Requests\CollectionRequest;
@@ -11,7 +8,7 @@ use App\Traits\ResponseAPI;
 use App\Interfaces\CollectionRepositoryInterface;
 use Illuminate\Http\Request;
 
-class CollectionService
+class CollectionService extends BaseService
 {
     use ResponseAPI;
 
@@ -29,7 +26,7 @@ class CollectionService
         $this->updater = $updater;
     }
 
-    public function getDetails($partner, $collection)
+    public function getDetails($partnerId, $collection)
     {
         try {
             $resource = $this->collectionRepositoryInterface->find($collection);

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CollectionRequest;
-use App\Models\Collection;
 use App\Services\Collection\CollectionService;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
@@ -20,7 +19,7 @@ class CollectionController extends Controller
     }
 
 
-    public function index(Request $request) : object
+    public function index(Request $request, $partner_id) : object
     {
         try {
             return $this->collectionService->getAll($request);
