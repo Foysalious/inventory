@@ -6,9 +6,10 @@ use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
 use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
 
-class CollectionService
+class CollectionService extends BaseService
 {
     use ResponseAPI;
 
