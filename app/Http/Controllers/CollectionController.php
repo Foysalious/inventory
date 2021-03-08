@@ -45,7 +45,7 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($collection_id)
+    public function show($partner_id, $collection_id)
     {
         return $this->collectionService->getDetails($collection_id);
     }
