@@ -24,7 +24,7 @@ class ChannelService
         try {
             $resource = $this->channelRepositoryInterface->getAll();
             if ($resource->isEmpty()){
-                return $this->error("There is no Channel", 403);
+                return $this->error("There is no Channel", 404);
             }
                 $channels = ChannelResource::collection($resource);
             return $this->success("Successful", $channels);
