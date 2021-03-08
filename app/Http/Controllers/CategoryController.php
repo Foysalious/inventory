@@ -54,10 +54,10 @@ class CategoryController extends Controller
         return $this->categoryService->delete($request);
     }
 
-    public function getMasterSubCat(Request $request)
+    public function getMasterSubCat($partner_id)
     {
 
-        return $this->categoryService->getCategory();
+        return $this->categoryService->getCategory($partner_id);
 
     }
 
