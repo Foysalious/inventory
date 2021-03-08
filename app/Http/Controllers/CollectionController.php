@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CollectionRequest;
-use App\Models\Collection;
 use App\Services\Collection\CollectionService;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
@@ -20,7 +19,7 @@ class CollectionController extends Controller
     }
 
 
-    public function index(Request $request) : object
+    public function index(Request $request, $partner_id) : object
     {
         try {
             return $this->collectionService->getAll($request);
@@ -46,9 +45,9 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function show($partner_id, $collection_id)
+    public function show($collection_id)
     {
-        return $this->collectionService->getDetails($partner_id, $collection_id);
+        return $this->collectionService->getDetails($collection_id);
     }
 
     /**
@@ -69,7 +68,7 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($partner_id, $collection_id)
+    public function destroy($collection_id)
     {
         return $this->collectionService->delete($collection_id);
     }

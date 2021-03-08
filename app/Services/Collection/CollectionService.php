@@ -10,6 +10,8 @@ use Illuminate\Http\Request;
 
 class CollectionService extends BaseService
 {
+    use ResponseAPI;
+
     protected $collectionRepository;
 
     protected $collectionRepositoryInterface;
@@ -24,7 +26,7 @@ class CollectionService extends BaseService
         $this->updater = $updater;
     }
 
-    public function getDetails($partner, $collection)
+    public function getDetails($partnerId, $collection)
     {
         try {
             $resource = $this->collectionRepositoryInterface->find($collection);
