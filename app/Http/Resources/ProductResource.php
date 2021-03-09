@@ -22,6 +22,7 @@ class ProductResource extends JsonResource
             'warranty_unit' => $this->warranty_unit,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
+            'combinations' => $this->combinations,
         ];
     }
 }

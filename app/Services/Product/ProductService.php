@@ -5,8 +5,17 @@ use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
+use App\Interfaces\CombinationRepositoryInterface;
+use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ProductChannelRepositoryInterface;
+use App\Interfaces\ProductOptionRepositoryInterface;
+use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\SkuRepositoryInterface;
+use App\Interfaces\ValueRepositoryInterface;
 use App\Services\BaseService;
+use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\ProductImage\Creator as ProductImageCreator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -19,11 +28,22 @@ class ProductService extends BaseService
     /** @var Updater */
     protected Updater $updater;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater)
+    protected $optionRepositoryInterface;
+    protected $valueRepositoryInterface;
+    protected $productOptionRepositoryInterface;
+    protected $productOptionValueRepositoryInterface;
+    protected $combinationRepositoryInterface;
+    protected $productChannelRepositoryInterface;
+    protected $skuRepositoryInterface;
+
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
+                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
+                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface, ProductChannelRepositoryInterface $productChannelRepositoryInterface,SkuRepositoryInterface $skuRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
+        $this->skuRepositoryInterface = $skuRepositoryInterface;
     }
 
     /**
@@ -47,20 +67,48 @@ class ProductService extends BaseService
      */
     public function getDetails($product)
     {
-        $resource = $this->productRepositoryInterface->findOrFail($product);
-        $this->getCombinationData($resource);
-        $product = new ProductResource($resource);
+        $general_details = $this->productRepositoryInterface->findOrFail($product);
+        $combinations = $this->getCombinationData($general_details);
+        $general_details->combinations = collect($combinations);
+        $product = new ProductResource($general_details);
         return $this->success('Successful', $product, 200);
     }
 
     private function getCombinationData($product)
     {
-        $skus = $this->skuRepositoryInterface->where('product_id',$product->id)->with('combinations')->get();
-        foreach($skus as $sku)
-        {
-            $p_o_v_s = $sku->combinations->pluck('product_option_value_id');
-            $p_o_v = $this->productOptionValueRepositoryInterface->whereIn('id',$p_o_v_s)->select('product_option_id','name')->get();
+
+        $skus = $this->skuRepositoryInterface->where('product_id', $product->id)->with('combinations')->get();
+        $data = [];
+        foreach ($skus as $sku) {
+            $sku_data = [];
+            $temp = [];
+            $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
+                $product_option_value = $combination->productOptionValue;
+                $value = $product_option_value->name;
+                $option = $product_option_value->productOption->name;
+                array_push($temp, [
+                    'option' => $option,
+                    'value' => $value,
+                ]);
+            });
+            if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
+            $sku_data['combination'] = $temp;
+            if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
+            $sku_data['stock'] = $sku->stock;
+            $temp = [];
+            $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                array_push($temp, [
+                    "channel_id" => $sku_channel->channel_id,
+                    "cost" => $sku_channel->cost,
+                    "price" => $sku_channel->price,
+                    "wholesale_price" => $sku_channel->wholesale_price
+                ]);
+            });
+            if (!isset($sku_data['channel_data'])) $sku_data['channel_data'] = [];
+            $sku_data['channel_data'] = $temp;
+            array_push($data, $sku_data);
         }
+        return $data;
     }
 
     /**
