@@ -27,17 +27,6 @@ class CollectionService extends BaseService
         $this->updater = $updater;
     }
 
-    public function getDetails($partnerId, $collection)
-    {
-        try {
-            $resource = $this->collectionRepositoryInterface->find($collection);
-            $collection = new CollectionResource($resource);
-            return $this->success('Successful', $collection, 200);
-        } catch(\Exception $exception) {
-            return $this->error($exception->getMessage(), 500);
-        }
-    }
-
     public function getAll(Request $request) : object{
         try {
             list($offset, $limit) = calculatePagination($request);
@@ -47,6 +36,17 @@ class CollectionService extends BaseService
 
             return $this->success("Successful", $options, 200);
         } catch (\Exception $exception) {
+            return $this->error($exception->getMessage(), 500);
+        }
+    }
+
+    public function getDetails($partnerId, $collection)
+    {
+        try {
+            $resource = $this->collectionRepositoryInterface->find($collection);
+            $collection = new CollectionResource($resource);
+            return $this->success('Successful', $collection, 200);
+        } catch(\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
     }
