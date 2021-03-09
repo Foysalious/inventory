@@ -22,24 +22,20 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-
-
-
-
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+Route::get('tree/{partner_id}', [CategoryController::class, 'getMasterSubCat']);
 Route::group(['prefix'=>'v1'], function(){
-    Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
+
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::group(['prefix' => 'categories'], function () {
             Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);
             Route::post('{category_id}', [CategoryController::class, 'update']);
-
+            Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
         });
+        Route::apiResource('collection', CollectionController::class);
     });
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
@@ -47,7 +43,6 @@ Route::group(['prefix'=>'v1'], function(){
     Route::apiResource('partners.products', ProductController::class);
     Route::apiResource('options', OptionController::class);
     Route::apiResource('options.values', ValueController::class)->shallow();
-    Route::apiResource('partners.products', ProductController::class);
     Route::apiResource('partners.categories', CategoryController::class);
     Route::group(['prefix' => 'units'], function () {
         Route::get('/', [UnitController::class, 'index']);
