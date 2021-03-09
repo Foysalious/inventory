@@ -41,7 +41,7 @@ return [
     |
     */
 
-    'queue' => env('SCOUT_QUEUE', true),
+    'queue' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -112,8 +112,8 @@ return [
     */
 
     'algolia' => [
-        'id' => env('ALGOLIA_APP_ID', ''),
-        'secret' => env('ALGOLIA_SECRET', ''),
+        'id' => env('ALGOLIA_APP_ID', '702AV46024'),
+        'secret' => env('ALGOLIA_SECRET', 'a4e4a5e6014219a65c32fc8b8a22cda5'),
     ],
 
 ];
