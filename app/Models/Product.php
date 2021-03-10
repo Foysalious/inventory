@@ -6,7 +6,7 @@ use Laravel\Scout\Searchable;
 
 class Product extends BaseModel
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, Searchable;
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];
