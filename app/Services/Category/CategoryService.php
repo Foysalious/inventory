@@ -37,7 +37,7 @@ class CategoryService
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
     private $productRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface,CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, Creator $creator, Updater $updater,ProductRepositoryInterface $productRepositoryInterface)
+    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater,ProductRepositoryInterface $productRepositoryInterface)
 
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
@@ -113,7 +113,7 @@ class CategoryService
         $master_cat_with_children = array_merge($children,[$category->id]);
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
 
-        $this->categoryPartnerRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
+        $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
         $this->productRepositoryInterface->whereIn('category_id',$children)->delete();
 
         return $this->success("Successful", null,200,false);
