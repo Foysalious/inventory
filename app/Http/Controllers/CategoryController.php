@@ -35,6 +35,13 @@ class CategoryController extends Controller
         return $this->categoryService->getCategoriesByPartner($partner_id);
     }
 
+    public function getMasterSubCat($partner_id)
+    {
+
+        return $this->categoryService->getCategory($partner_id);
+
+    }
+
     /**
      * @param CategoryRequest $request
      * @return JsonResponse
@@ -54,11 +61,8 @@ class CategoryController extends Controller
         return $this->categoryService->delete($request);
     }
 
-    public function getMasterSubCat($partner_id)
-    {
-        return $this->categoryService->getCategory($partner_id);
 
-    }
+
 
 
 
