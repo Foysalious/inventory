@@ -6,7 +6,6 @@ namespace App\Services\Collection;
 
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Traits\ModificationFields;
-use Illuminate\Http\UploadedFile;
 
 class Creator
 {
@@ -137,6 +136,7 @@ class Creator
 
     public function create()
     {
+        $this->saveImages();
         $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
     }
