@@ -9,6 +9,7 @@ class Category extends BaseModel
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
+
 //    protected $visible = ['id', 'name'];
     public function parent()
     {
@@ -48,5 +49,10 @@ class Category extends BaseModel
     public function partners()
     {
         return $this->belongsToMany(Partner::class);
+    }
+
+    public function categoryPartner()
+    {
+        return $this->hasMany(CategoryPartner::class, 'category_id');
     }
 }
