@@ -34,9 +34,9 @@ class CollectionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function store(CollectionRequest $request)
+    public function store($partner_id, CollectionRequest $request)
     {
-        return $this->collectionService->create($request);
+        return $this->collectionService->create($partner_id, $request);
     }
 
     /**
