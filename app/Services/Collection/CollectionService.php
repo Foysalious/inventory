@@ -50,13 +50,13 @@ class CollectionService
         }
     }
 
-    public function create(CollectionRequest $request)
+    public function create($partner_id, CollectionRequest $request)
     {
         $option = $this->creator->setName($request->name)
             ->setModifyBy($request->modifier)
             ->setDescription($request->description)
             ->setIsPublished($request->is_published)
-            ->setPartnerId($request->partner_id)
+            ->setPartnerId($partner_id)
             ->setThumb($request->thumb)
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)

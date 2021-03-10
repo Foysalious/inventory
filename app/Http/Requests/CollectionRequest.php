@@ -21,8 +21,7 @@ class CollectionRequest extends FormRequest
     {
         return [
             'name'          => 'required|string',
-            'is_published'  => 'required',
-            'partner_id'    => 'required'
+            'is_published'  => 'required'
         ];
     }
 }
