@@ -5,6 +5,7 @@ use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Services\BaseService;
@@ -26,14 +27,16 @@ class CategoryService extends BaseService
      * @var CategoryPartnerRepositoryInterface
      */
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
+    private $productRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, Creator $creator, Updater $updater)
+    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, Creator $creator, Updater $updater,ProductRepositoryInterface $productRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->categoryRepository = $categoryRepository;
+        $this->productRepositoryInterface = $productRepositoryInterface;
     }
 
     /**
@@ -101,6 +104,7 @@ class CategoryService extends BaseService
         $master_cat_with_children = array_merge($children,[$category->id]);
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
         $this->categoryPartnerRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
+        $this->productRepositoryInterface->whereIn('category_id',$children)->delete();
         return $this->success("Successful", null,200,false);
     }
 
