@@ -34,7 +34,7 @@ Route::group(['prefix'=>'v1'], function(){
             Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);
             Route::post('{category_id}', [CategoryController::class, 'update']);
-            Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
+
         });
         Route::apiResource('collection', CollectionController::class);
     });
