@@ -3,5 +3,4 @@
 
 interface CategoryPartnerRepositoryInterface extends BaseRepositoryInterface
 {
-
 }

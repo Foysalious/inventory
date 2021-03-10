@@ -46,7 +46,7 @@ class CategoryService extends BaseService
         $master_categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
         if ($master_categories->isEmpty())
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
-        $resource = CategoryResource::collection($master_categories, $partner_id);
+        $resource = CategoryResource::collection($master_categories);
         $data = [];
         $data['total_category'] = count($master_categories);
         $data['categories'] = $resource;
