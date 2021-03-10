@@ -5,13 +5,19 @@ namespace App\Services\Collection;
 
 
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Services\FileManagers\CdnFileManager;
+use App\Services\FileManagers\FileManager;
 use App\Traits\ModificationFields;
 
 class Creator
 {
-    use ModificationFields;
+    use ModificationFields, FileManager, CdnFileManager;
+
+    protected $collection_image_links = array();
 
     protected $collectionRepositoryInterface;
+
+    protected $image_creator;
 
     protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
 
@@ -23,9 +29,10 @@ class Creator
 
     private $data = [];
 
-    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface)
+    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface, ImageCreator $image_creator)
     {
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
+        $this->image_creator = $image_creator;
     }
 
     /**
@@ -136,7 +143,7 @@ class Creator
 
     public function create()
     {
-        $this->saveImages();
+        $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
         $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
     }
@@ -146,10 +153,10 @@ class Creator
         return [
             'name' => $this->name,
             'description' => $this->description,
-            'thumb' => $this->thumb,
-            'banner' => $this->banner,
-            'app_thumb' => $this->app_thumb,
-            'app_banner' => $this->app_banner,
+            'thumb' => $this->collection_image_links['thumb_link'] ?? '',
+            'banner' => $this->collection_image_links['banner_link'] ?? '',
+            'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? '',
+            'app_banner' => $this->collection_image_links['app_banner_link'] ?? '',
             'partner_id' => $this->partner_id,
             'is_published' => $this->is_published,
             'sharding_id' => $this->sharding_id
