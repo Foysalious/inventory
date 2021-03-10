@@ -15,4 +15,19 @@ class Product extends BaseModel
     {
         return $this->hasMany(Sku::class);
     }
+
+    public function toSearchableArray()
+    {
+        $array = $this->toArray();
+
+        $data = [
+            'id' => $array['id'],
+            'name' => $array['name'],
+            'description' => $array['description'],
+            'partner_id' => $array['partner_id'],
+            'warranty_unit' => $array['warranty_unit']
+        ];
+
+        return $data;
+    }
 }

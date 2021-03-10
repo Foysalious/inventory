@@ -16,10 +16,7 @@ return [
     |
     */
 
-    'searchableAttributes' => [
-        'name',
-        'description',
-    ],
+    'searchableAttributes' => ['id', 'name', 'description', 'partner_id', 'warranty_unit'],
 
     /*
     |--------------------------------------------------------------------------
@@ -35,7 +32,7 @@ return [
     |
     */
 
-    'customRanking' => ['desc(deleted_at)', 'desc(created_at)', 'desc(updated_at)'],
+    'customRanking' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -82,7 +79,7 @@ return [
     |
     */
 
-    'attributesForFaceting' => ['category_id'],
+    'attributesForFaceting' => null,
 
     /*
     |--------------------------------------------------------------------------
@@ -158,4 +155,5 @@ return [
     | configuration, just use the command `scout:sync` to get remote settings in this file.
     |
     */
+    'attributesToRetrieve' => ['id', 'name', 'description', 'partner_id', 'warranty_unit'],
 ];
