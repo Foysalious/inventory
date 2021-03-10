@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
     use ModificationFields;
+
     /**
      * @var CategoryService
      */
@@ -46,24 +47,20 @@ class CategoryController extends Controller
      * @param CategoryRequest $request
      * @return JsonResponse
      */
-    public function store($partner,CategoryRequest $request)
+    public function store($partner, CategoryRequest $request)
     {
-        return $this->categoryService->create($request,$partner);
+        return $this->categoryService->create($request, $partner);
     }
 
-    public function update($partner, $category,CategoryRequest $request)
+    public function update($partner, $category, CategoryRequest $request)
     {
-        return $this->categoryService->update($request,$partner, $category);
+        return $this->categoryService->update($request, $partner, $category);
     }
 
-    public function destroy($partner, $category,Request $request)
+    public function destroy($partner, $category, Request $request)
     {
         return $this->categoryService->delete($request);
     }
-
-
-
-
 
 
 }

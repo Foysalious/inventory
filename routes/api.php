@@ -25,10 +25,11 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('tree/{partner_id}', [CategoryController::class, 'getMasterSubCat']);
+
 Route::group(['prefix'=>'v1'], function(){
 
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
+        Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
         Route::group(['prefix' => 'categories'], function () {
             Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);
