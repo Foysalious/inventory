@@ -6,10 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class CategoryResource extends JsonResource
 {
     private $partnerId;
-    public function __construct($resource, $partnerId) {
-        parent::__construct($resource);
-        $this->partnerId = $partnerId;
-    }
+
 
     public function toArray($request)
     {
