@@ -14,14 +14,13 @@ class CategorySubResource extends JsonResource
     public function toArray($request)
     {
 
-
         $partner_id = $this->partner_id;
 
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'sub_cat' => $this->children
 
-            'sub_cat' => [$this->children->pluck('name')]
         ];
     }
 
