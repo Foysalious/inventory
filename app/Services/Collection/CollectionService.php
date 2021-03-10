@@ -73,6 +73,7 @@ class CollectionService
         if(!$collection) return $this->error("Collection not found!", 404);
 
         $option = $this->updater->setCollection($collection)->setName($request->name)
+            ->setCollectionId($collection_id)
             ->setModifyBy($request->modifier)
             ->setDescription($request->description)
             ->setPartnerId($partner_id)
