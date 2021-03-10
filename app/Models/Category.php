@@ -9,8 +9,7 @@ class Category extends BaseModel
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
-
-
+    protected $visible = ['id', 'name'];
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
