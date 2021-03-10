@@ -128,7 +128,7 @@ class CategoryService
 
         $data['categories'] = $resource;
 
-        return $this->success("Successful", $data);
+        return $this->success("Successful", $resource);
     }
 
 
