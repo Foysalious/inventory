@@ -33,6 +33,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return $this->model->insert($insert_data);
     }
 
+    public function insertOrIgnore(array $data)
+    {
+        return $this->model->insertOrIgnore($data);
+    }
+
     public function find($id)
     {
         return $this->model->find($id);
