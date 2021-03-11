@@ -15,14 +15,30 @@ class Updater
 
     protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
 
+    protected $collection_id;
+
+    protected $collection_updated_image_links = array();
+
+    protected $collection_image_updater;
 
     private $data = [];
 
     protected Collection $collection;
 
-    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface)
+    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface, ImageUpdater $updater)
     {
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
+        $this->collection_image_updater = $updater;
+    }
+
+    /**
+     * @param mixed $collection_id
+     * @return Updater
+     */
+    public function setCollectionId($collection_id)
+    {
+        $this->collection_id = $collection_id;
+        return $this;
     }
 
     /**
@@ -147,6 +163,7 @@ class Updater
 
     public function update()
     {
+        $this->collection_updated_image_links = $this->collection_image_updater->updateImages($this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
         $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate());
     }
@@ -156,10 +173,10 @@ class Updater
         return [
                 'name' => $this->name,
                 'description' => $this->description,
-                'thumb' => $this->thumb,
-                'banner' => $this->banner,
-                'app_thumb' => $this->app_thumb,
-                'app_banner' => $this->app_banner,
+                'thumb' => $this->collection_updated_image_links['thumb_link'] ?? $this->thumb,
+                'banner' => $this->collection_updated_image_links['banner_link'] ?? $this->banner,
+                'app_thumb' => $this->collection_updated_image_links['app_thumb_link'] ?? $this->app_thumb,
+                'app_banner' => $this->collection_updated_image_links['app_banner_link'] ?? $this->app_banner,
                 'partner_id' => $this->partner_id,
                 'is_published' => $this->is_published
             ] + $this->modificationFields(false, true);
