@@ -14,8 +14,6 @@ class ProductDetailsObject
         return $this;
     }
 
-
-
     public function build()
     {
         $this->setCombination();
@@ -55,11 +53,5 @@ class ProductDetailsObject
     {
         return $this->channelData;
     }
-
-
-
-
-
-
 
 }
