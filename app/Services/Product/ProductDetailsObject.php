@@ -28,12 +28,15 @@ class ProductDetailsObject
         {
             $this->hasVariant = false;
         }
+
+        $this->createData();
     }
 
-    public function validate()
+/*    public function createData()
     {
+        if(!$this->hasVariant)
 
-    }
+    }*/
 
 
 
