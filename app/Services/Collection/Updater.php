@@ -164,7 +164,6 @@ class Updater
     public function update()
     {
         $this->collection_updated_image_links = $this->collection_image_updater->updateImages($this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate());
     }
 
