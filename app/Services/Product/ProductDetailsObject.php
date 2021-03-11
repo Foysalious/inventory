@@ -3,40 +3,60 @@
 
 class ProductDetailsObject
 {
-    private $productDetails;
-    private $hasVariant = true;
+    private $productDetail;
+    private $combination;
+    private $stock;
+    private $channelData;
 
-    public function setProductDetails($productDetails)
+    public function setProductDetail($productDetail)
     {
-        $this->productDetails =  json_decode($productDetails);
+        $this->productDetail =  $productDetail;
         return $this;
     }
 
-    public function getProductDetails()
-    {
-        return $this->productDetails;
-    }
 
-    public function hasVariants()
-    {
-        return $this->hasVariant;
-    }
 
     public function build()
     {
-        if(is_null($this->productDetails[0]->combination))
-        {
-            $this->hasVariant = false;
-        }
-
-        $this->createData();
+        $this->setCombination();
+        $this->setStock();
+        $this->setChannelData();
+        return $this;
     }
 
-/*    public function createData()
+    public function setCombination()
     {
-        if(!$this->hasVariant)
+         $this->combination = $this->productDetail->combination;
+         return $this;
+    }
 
-    }*/
+    public function getCombination()
+    {
+        return $this->combination;
+    }
+
+    public function setStock()
+    {
+        $this->stock = $this->productDetail->stock;
+        return $this;
+    }
+
+    public function getStock()
+    {
+        return $this->stock;
+    }
+    public function setChannelData()
+    {
+        $this->channelData = $this->productDetail->channel_data;
+        return $this;
+    }
+
+    public function getChannelData()
+    {
+        return $this->channelData;
+    }
+
+
 
 
 

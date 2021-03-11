@@ -113,13 +113,14 @@ class ProductService extends BaseService
 
     /**
      * @param $partnerId
-     * @param ProductRequest $request
+     * @param ProductCreateRequest $request
      * @return JsonResponse
      */
     public function create($partnerId, ProductRequest $request)
     {
+        /** @var ProductDetailsObject[] $product_create_requests */
+       list($has_variant,$product_create_request_objs) =  app(ProductCreateRequest::class)->setProductDetails($request->product_details)->get();
 
-        $productRequestObject = app(ProductDetailsObject::class)->setProductDetails($request->product_details)->build();
 
         $product = $this->creator->setPartnerId($partnerId)
             ->setCategoryId($request->category_id)
@@ -132,7 +133,8 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-            ->setProductRequestObject($productRequestObject)
+            ->setProductRequestObjects($product_create_request_objs)
+            ->setHasVariant($has_variant)
             ->create();
         return $this->success("Successful", $product,201);
     }
