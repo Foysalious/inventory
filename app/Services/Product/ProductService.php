@@ -118,6 +118,9 @@ class ProductService extends BaseService
      */
     public function create($partnerId, ProductRequest $request)
     {
+
+        $productRequestObject = app(ProductDetailsObject::class)->setProductDetails($request->product_details)->build();
+
         $product = $this->creator->setPartnerId($partnerId)
             ->setCategoryId($request->category_id)
             ->setName($request->name)
@@ -129,7 +132,7 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-            ->setProductDetails($request->product_details)
+            ->setProductRequestObject($productRequestObject)
             ->create();
         return $this->success("Successful", $product,201);
     }

@@ -37,6 +37,7 @@ class Creator
     private $productOptionValueCreator;
     private $combinationCreator;
     private $productChannelCreator;
+    private $productRequestObject;
 
 
 
@@ -220,9 +221,9 @@ class Creator
      * @param $productDetails
      * @return $this
      */
-    public function setProductDetails($productDetails)
+    public function setProductRequestObject($productRequestObject)
     {
-      $this->productDetails = json_decode($productDetails);
+      $this->productRequestObject = $productRequestObject;
       return $this;
     }
 
@@ -232,7 +233,7 @@ class Creator
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
-        is_null($this->productDetails[0]->combination) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
+        $this->productRequestObject->hasVariant() ? $this->createVariantsSKUAndSKUChannels($product) : $this->createSKUAndSKUChannels($product);
 
         if ($this->discountAmount)
             $this->createProductDiscount($product);
@@ -247,7 +248,7 @@ class Creator
      */
     private function createVariantsSKUAndSKUChannels($product)
     {
-        foreach($this->productDetails as $productDetail)
+        foreach($this->productRequestObject->getProductDetails() as $productDetail)
         {
             $combinations = $productDetail->combination;
             $product_option_value_ids = [];
@@ -367,7 +368,7 @@ class Creator
      */
     private function createSKUAndSKUChannels($product)
     {
-        $stock = $this->productDetails[0]->stock > 0 ?: 0;
+        $stock = $this->productRequestObject->getProductDetails()[0]->stock > 0 ?: 0;
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
         $this->createSKUChannels($sku,$this->productDetails[0]->channel_data);
         $this->createProductChannel($this->productDetails[0]->channel_data,$product->id);
