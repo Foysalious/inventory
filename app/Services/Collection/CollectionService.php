@@ -66,7 +66,7 @@ class CollectionService extends BaseService
         return $this->success("Successful", $option,201);
     }
 
-    public function update(CollectionRequest $request, $partner_id, $collection_id)
+    public function update($request, $partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
@@ -79,6 +79,7 @@ class CollectionService extends BaseService
             ->setBanner($request['banner'])
             ->setAppThumb($request['app_thumb'])
             ->setAppBanner($request['app_banner'])
+            ->setIsPublished($request['is_published'])
             ->update();
 
         return $this->success("Successful", $option,201);
