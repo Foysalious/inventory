@@ -2,11 +2,10 @@
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Scout\Searchable;
 
 class Product extends BaseModel
 {
-    use HasFactory, SoftDeletes, Searchable;
+    use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];
@@ -29,5 +28,10 @@ class Product extends BaseModel
         ];
 
         return $data;
+    }
+
+    public function productOptions()
+    {
+        return $this->hasMany(ProductOption::class,'product_id');
     }
 }

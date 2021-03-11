@@ -6,6 +6,7 @@ use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CategorySubResource;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 use App\Repositories\CategoryRepository;
 
 
@@ -27,15 +28,24 @@ class CategoryService
      * @var Creator
      */
     private Creator $creator;
+
     private $partnerCategoryRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater)
+    /**
+     * @var CategoryPartnerRepositoryInterface
+     */
+    private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
+    private $productRepositoryInterface;
+
+    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater,ProductRepositoryInterface $productRepositoryInterface)
+
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->partnerCategoryRepositoryInterface = $partnerCategoryRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->categoryRepository = $categoryRepository;
+        $this->productRepositoryInterface = $productRepositoryInterface;
     }
 
     /**
@@ -102,7 +112,10 @@ class CategoryService
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children,[$category->id]);
         $this->categoryRepositoryInterface->whereIn('id',$master_cat_with_children)->delete();
+
         $this->partnerCategoryRepositoryInterface->whereIn('category_id',$master_cat_with_children)->delete();
+        $this->productRepositoryInterface->whereIn('category_id',$children)->delete();
+
         return $this->success("Successful", null,200,false);
     }
 
@@ -115,9 +128,8 @@ class CategoryService
 
         $data['categories'] = $resource;
 
-        return $this->success("Successful", $data);
+        return $this->success("Successful", $resource);
     }
-
 
 
 }

@@ -48,7 +48,8 @@ class CategoryController extends Controller
      */
     public function store($partner,CategoryRequest $request)
     {
-        return $this->categoryService->create($request,$partner);
+        return $this->categoryService->create($request, $partner);
+
     }
 
     public function update($partner, $category,CategoryRequest $request)
@@ -60,10 +61,6 @@ class CategoryController extends Controller
     {
         return $this->categoryService->delete($request);
     }
-
-
-
-
 
 
 }

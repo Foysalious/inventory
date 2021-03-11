@@ -10,6 +10,11 @@ class Sku extends BaseModel
 
     public function skuChannels()
     {
-        return $this->hasMany(SkuChannel::class);
+        return $this->hasMany(SkuChannel::class,'sku_id');
+    }
+
+    public function combinations()
+    {
+        return $this->hasMany(Combination::class,'sku_id');
     }
 }
