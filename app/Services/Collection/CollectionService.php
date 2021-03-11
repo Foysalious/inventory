@@ -61,7 +61,6 @@ class CollectionService
             ->setBanner($request->banner)
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
-            ->setShardingId($request->sharding_id)
             ->create();
 
         return $this->success("Successful", $option,201);

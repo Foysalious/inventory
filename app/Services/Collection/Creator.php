@@ -135,12 +135,6 @@ class Creator
         return $this;
     }
 
-    public function setShardingId($sharding_id)
-    {
-        $this->sharding_id = $sharding_id;
-        return $this;
-    }
-
     public function create()
     {
         $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);

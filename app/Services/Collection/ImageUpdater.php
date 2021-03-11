@@ -41,19 +41,19 @@ class ImageUpdater
         }
 
         if(($banner)) {
-            $this->removeCollectionImageFromCDN($partner_id, $collection_id, 'banner');
+            $this->deleteCollectionImageFromCDN($partner_id, $collection_id, 'banner');
             list($file, $fileName) = $this->updateCollectionImage($banner, '_' . getFileName($banner) . '_collection_banner');
             $collection_images['banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultBannerFolder(), $fileName);
         }
 
         if(($app_thumb)) {
-            $this->removeCollectionImageFromCDN($partner_id, $collection_id, 'app_thumb');
+            $this->deleteCollectionImageFromCDN($partner_id, $collection_id, 'app_thumb');
             list($file, $fileName) = $this->updateCollectionImage($app_thumb, '_' . getFileName($app_thumb) . '_collection_app_thumb');
             $collection_images['app_thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultAppThumbFolder(), $fileName);
         }
 
         if(($app_banner)) {
-            $this->removeCollectionImageFromCDN($partner_id, $collection_id, 'app_banner');
+            $this->deleteCollectionImageFromCDN($partner_id, $collection_id, 'app_banner');
             list($file, $fileName) = $this->updateCollectionImage($app_banner, '_' . getFileName($app_banner) . '_collection_app_banner');
             $collection_images['app_banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
         }
