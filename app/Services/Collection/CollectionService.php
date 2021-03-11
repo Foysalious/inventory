@@ -50,17 +50,16 @@ class CollectionService
         }
     }
 
-    public function create($partner_id, CollectionRequest $request)
+    public function create($partner_id, $request)
     {
-        $option = $this->creator->setName($request->name)
-            ->setModifyBy($request->modifier)
-            ->setDescription($request->description)
-            ->setIsPublished($request->is_published)
+        $option = $this->creator->setName($request['name'])
+            ->setDescription($request['description'])
+            ->setIsPublished($request['is_published'])
             ->setPartnerId($partner_id)
-            ->setThumb($request->thumb)
-            ->setBanner($request->banner)
-            ->setAppThumb($request->app_thumb)
-            ->setAppBanner($request->app_banner)
+            ->setThumb($request['thumb'])
+            ->setBanner($request['banner'])
+            ->setAppThumb($request['app_thumb'])
+            ->setAppBanner($request['app_banner'])
             ->create();
 
         return $this->success("Successful", $option,201);
@@ -71,16 +70,14 @@ class CollectionService
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
 
-        $option = $this->updater->setCollection($collection)->setName($request->name)
+        $option = $this->updater->setCollection($collection)->setName($request['name'])
             ->setCollectionId($collection_id)
-            ->setModifyBy($request->modifier)
-            ->setDescription($request->description)
+            ->setDescription($request['description'])
             ->setPartnerId($partner_id)
-            ->setThumb($request->thumb)
-            ->setBanner($request->banner)
-            ->setAppThumb($request->app_thumb)
-            ->setAppBanner($request->app_banner)
-            ->setShardingId($request->sharding_id)
+            ->setThumb($request['thumb'])
+            ->setBanner($request['banner'])
+            ->setAppThumb($request['app_thumb'])
+            ->setAppBanner($request['app_banner'])
             ->update();
 
         return $this->success("Successful", $option,201);

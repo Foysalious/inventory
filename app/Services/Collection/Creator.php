@@ -120,20 +120,10 @@ class Creator
         return $this;
     }
 
-    /**
-     * @param mixed $modify_by
-     * @return Creator
-     */
-    public function setModifyBy($modify_by)
-    {
-        $this->modify_by = $modify_by;
-        return $this;
-    }
 
     public function create()
     {
         $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        $this->setModifier($this->modify_by);
         return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
     }
 
