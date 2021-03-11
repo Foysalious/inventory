@@ -20,7 +20,8 @@ class Creator
 
     protected $image_creator;
 
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
+
 
     private $data = [];
 
