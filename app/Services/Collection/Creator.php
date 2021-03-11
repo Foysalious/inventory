@@ -8,6 +8,7 @@ use App\Interfaces\CollectionRepositoryInterface;
 use App\Services\FileManagers\CdnFileManager;
 use App\Services\FileManagers\FileManager;
 use App\Traits\ModificationFields;
+use App\Services\Collection\ImageCreator;
 
 class Creator
 {
