@@ -3,6 +3,7 @@
 
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ProductUpdateLogRepositoryInterface;
@@ -24,6 +25,9 @@ class DataMigrationService
     private ProductRepositoryInterface $productRepositoryInterface;
     /** @var UnitRepositoryInterface */
     private UnitRepositoryInterface $unitRepositoryInterface;
+    /** @var DiscountRepositoryInterface */
+    private DiscountRepositoryInterface $discountRepositoryInterface;
+    private $discounts;
 
     /**
      * DataMigrationService constructor.
@@ -33,11 +37,13 @@ class DataMigrationService
      * @param ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface
      * @param ProductRepositoryInterface $productRepositoryInterface
      * @param UnitRepositoryInterface $unitRepositoryInterface
+     * @param DiscountRepositoryInterface $discountRepositoryInterface
      */
     public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface,
                                 CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface,
                                 PartnerRepositoryInterface $partnerRepositoryInterface, ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface,
-                                ProductRepositoryInterface $productRepositoryInterface, UnitRepositoryInterface $unitRepositoryInterface)
+                                ProductRepositoryInterface $productRepositoryInterface, UnitRepositoryInterface $unitRepositoryInterface,
+                                DiscountRepositoryInterface $discountRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
@@ -45,6 +51,7 @@ class DataMigrationService
         $this->productUpdateLogRepositoryInterface = $productUpdateLogRepositoryInterface;
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->unitRepositoryInterface = $unitRepositoryInterface;
+        $this->discountRepositoryInterface = $discountRepositoryInterface;
     }
 
     /**
@@ -97,11 +104,22 @@ class DataMigrationService
         return $this;
     }
 
+    /**
+     * @param mixed $discounts
+     * @return DataMigrationService
+     */
+    public function setDiscounts($discounts)
+    {
+        $this->discounts = $discounts;
+        return $this;
+    }
+
     public function migrate()
     {
         $this->migratePartnerInfoData();
         $this->migrateCategoryData();
         $this->migrateProductsData();
+        $this->migrateProductDiscountsData();
         $this->migrateProductUpdateLogsData();
     }
 
@@ -175,5 +193,10 @@ class DataMigrationService
     private function migrateProductUpdateLogsData()
     {
         $this->productUpdateLogRepositoryInterface->insertOrIgnore($this->productUpdateLogs);
+    }
+
+    private function migrateProductDiscountsData()
+    {
+        $this->discountRepositoryInterface->insertOrIgnore($this->discounts);
     }
 }

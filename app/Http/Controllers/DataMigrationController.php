@@ -31,11 +31,13 @@ class DataMigrationController extends Controller
         $categories = !is_array($request->pos_categories) ? json_decode($request->pos_categories,1) : $request->pos_categories;
         $products = !is_array($request->products) ? json_decode($request->products,1) : $request->products;
         $product_update_logs = !is_array($request->partner_pos_services_logs) ? json_decode($request->partner_pos_services_logs,1) : $request->partner_pos_services_logs;
+        $discounts = !is_array($request->partner_pos_service_discounts) ? json_decode($request->partner_pos_service_discounts,1) : $request->partner_pos_service_discounts;
         $this->dataMigrationService->setPartnerInfo($partner_info)
             ->setPartnerCategories($category_partner)
             ->setCategories($categories)
             ->setProducts($products)
             ->setProductUpdateLogs($product_update_logs)
+            ->setDiscounts($discounts)
             ->migrate();
         return $this->success('Successful', null);
     }
