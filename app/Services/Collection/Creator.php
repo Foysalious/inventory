@@ -19,12 +19,7 @@ class Creator
 
     protected $image_creator;
 
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
-
-    /**
-     * @param mixed $sharding_id
-     * @return Creator
-     */
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
 
 
     private $data = [];
@@ -152,8 +147,7 @@ class Creator
             'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? '',
             'app_banner' => $this->collection_image_links['app_banner_link'] ?? '',
             'partner_id' => $this->partner_id,
-            'is_published' => $this->is_published,
-            'sharding_id' => $this->sharding_id
+            'is_published' => $this->is_published
         ] + $this->modificationFields(true, false);
     }
 
