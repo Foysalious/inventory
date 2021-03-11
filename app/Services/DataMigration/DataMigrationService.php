@@ -4,38 +4,56 @@
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\PartnerRepositoryInterface;
-use App\Models\Product;
-use App\Models\Unit;
+use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\ProductUpdateLogRepositoryInterface;
+use App\Interfaces\UnitRepositoryInterface;
 
 class DataMigrationService
 {
     private CategoryRepositoryInterface $categoryRepositoryInterface;
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
     private PartnerRepositoryInterface $partnerRepositoryInterface;
-    private array $categoryPartner;
-    private array $categories;
+    private $categoryPartner;
+    private $categories;
     private $products;
-    private $partner;
+    private $partnerInfo;
+    /** @var ProductUpdateLogRepositoryInterface */
+    private ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface;
+    private $productUpdateLogs;
+    /** @var ProductRepositoryInterface */
+    private ProductRepositoryInterface $productRepositoryInterface;
+    /** @var UnitRepositoryInterface */
+    private UnitRepositoryInterface $unitRepositoryInterface;
 
     /**
      * DataMigrationService constructor.
      * @param CategoryRepositoryInterface $categoryRepositoryInterface
      * @param CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface
+     * @param PartnerRepositoryInterface $partnerRepositoryInterface
+     * @param ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface
+     * @param ProductRepositoryInterface $productRepositoryInterface
+     * @param UnitRepositoryInterface $unitRepositoryInterface
      */
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, PartnerRepositoryInterface $partnerRepositoryInterface)
+    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface,
+                                CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface,
+                                PartnerRepositoryInterface $partnerRepositoryInterface, ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface,
+                                ProductRepositoryInterface $productRepositoryInterface, UnitRepositoryInterface $unitRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
         $this->partnerRepositoryInterface = $partnerRepositoryInterface;
+        $this->productUpdateLogRepositoryInterface = $productUpdateLogRepositoryInterface;
+        $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->unitRepositoryInterface = $unitRepositoryInterface;
     }
 
     /**
-     * @param mixed $partner
+     * @param $partnerInfo
      * @return DataMigrationService
      */
-    public function setPartner($partner)
+    public function setPartnerInfo($partnerInfo)
     {
-        $this->partner = $partner;
+        $this->partnerInfo = $partnerInfo;
         return $this;
     }
 
@@ -69,17 +87,27 @@ class DataMigrationService
         return $this;
     }
 
+    /**
+     * @param mixed $productUpdateLogs
+     * @return DataMigrationService
+     */
+    public function setProductUpdateLogs($productUpdateLogs)
+    {
+        $this->productUpdateLogs = $productUpdateLogs;
+        return $this;
+    }
 
     public function migrate()
     {
-        $this->migratePartnerData();
+        $this->migratePartnerInfoData();
         $this->migrateCategoryData();
         $this->migrateProductsData();
+        $this->migrateProductUpdateLogsData();
     }
 
-    private function migratePartnerData()
+    private function migratePartnerInfoData()
     {
-        $this->partnerRepositoryInterface->insertOrIgnore($this->partner);
+        $this->partnerRepositoryInterface->insertOrIgnore($this->partnerInfo);
     }
 
     private function migrateCategoryData()
@@ -90,26 +118,11 @@ class DataMigrationService
 
     private function migrateProductsData()
     {
-        $units = Unit::select('id', 'name_en')->pluck('name_en', 'id')->toArray();
+        $units = $this->unitRepositoryInterface->builder()->select('id', 'name_en')->pluck('name_en', 'id')->toArray();
         foreach ($this->products as $singleProduct)
         {
             $unit = array_search($singleProduct['unit'], $units, true);
-            $data = [
-                'id' => $singleProduct['id'],
-                'partner_id' => $singleProduct['partner_id'],
-                'category_id' => $singleProduct['category_id'],
-                'name' => $singleProduct['name'],
-                'description' => $singleProduct['description'],
-                'unit' => $unit ?: null,
-                'warranty' => $singleProduct['warranty'],
-                'warranty_unit' => $singleProduct['warranty_unit'],
-                'vat_percentage' => $singleProduct['vat_percentage'],
-                'created_by_name' => $singleProduct['created_by_name'],
-                'created_at' => $singleProduct['created_at'],
-                'updated_at' => $singleProduct['updated_at'],
-            ];
-
-            $product = Product::insert([
+            $this->productRepositoryInterface->insertOrIgnore([
                 'id' => $singleProduct['id'],
                 'partner_id' => $singleProduct['partner_id'],
                 'category_id' => $singleProduct['category_id'],
@@ -120,28 +133,47 @@ class DataMigrationService
                 'warranty_unit' => $singleProduct['warranty_unit'],
                 'vat_percentage' => $singleProduct['vat_percentage'],
                 'created_by_name' => $singleProduct['created_by_name'],
+                'updated_by_name' => $singleProduct['updated_by_name'],
                 'created_at' => $singleProduct['created_at'],
                 'updated_at' => $singleProduct['updated_at'],
             ]);
-            $product = Product::find($singleProduct['id']);
-            $sku = $product->skus()->create([
-                'stock' => $singleProduct['stock']
-            ]);
-            $sku_channels = collect();
-            if ($singleProduct['publication_status']) $sku_channels->push([
-                'channel_id' => 1,
-                'cost' => $singleProduct['cost'],
-                'price' => $singleProduct['price'],
-                'wholesale_price' => $singleProduct['wholesale_price'],
-            ]);
-            if ($singleProduct['is_published_for_shop']) $sku_channels->push([
-                'channel_id' => 2,
-                'cost' => $singleProduct['cost'],
-                'price' => $singleProduct['price'],
-                'wholesale_price' => $singleProduct['wholesale_price'],
-            ]);
-            if ($singleProduct['publication_status']) $sku->skuChannels()->insert($sku_channels->toArray());
+            $product = $this->productRepositoryInterface->find($singleProduct['id']);
+            if ($product && !$product->skus()->exists()) {
+                $sku = $product->skus()->create([
+                    'stock' => $singleProduct['stock'],
+                    'created_by_name' => $singleProduct['created_by_name'],
+                    'updated_by_name' => $singleProduct['updated_by_name'],
+                    'created_at' => $singleProduct['created_at'],
+                    'updated_at' => $singleProduct['updated_at'],
+                ]);
+                $sku_channels = collect();
+                if ($singleProduct['publication_status']) $sku_channels->push([
+                    'channel_id' => 1,
+                    'cost' => $singleProduct['cost'],
+                    'price' => $singleProduct['price'],
+                    'wholesale_price' => $singleProduct['wholesale_price'],
+                    'created_by_name' => $singleProduct['created_by_name'],
+                    'updated_by_name' => $singleProduct['updated_by_name'],
+                    'created_at' => $singleProduct['created_at'],
+                    'updated_at' => $singleProduct['updated_at'],
+                ]);
+                if ($singleProduct['is_published_for_shop']) $sku_channels->push([
+                    'channel_id' => 2,
+                    'cost' => $singleProduct['cost'],
+                    'price' => $singleProduct['price'],
+                    'wholesale_price' => $singleProduct['wholesale_price'],
+                    'created_by_name' => $singleProduct['created_by_name'],
+                    'updated_by_name' => $singleProduct['updated_by_name'],
+                    'created_at' => $singleProduct['created_at'],
+                    'updated_at' => $singleProduct['updated_at'],
+                ]);
+                if ($singleProduct['publication_status']) $sku->skuChannels()->insertOrIgnore($sku_channels->toArray());
+            }
         }
     }
 
+    private function migrateProductUpdateLogsData()
+    {
+        $this->productUpdateLogRepositoryInterface->insertOrIgnore($this->productUpdateLogs);
+    }
 }
