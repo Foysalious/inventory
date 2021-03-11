@@ -3,6 +3,7 @@
 
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
 use App\Models\Product;
 use App\Models\Unit;
 
@@ -10,19 +11,32 @@ class DataMigrationService
 {
     private CategoryRepositoryInterface $categoryRepositoryInterface;
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
+    private PartnerRepositoryInterface $partnerRepositoryInterface;
     private array $categoryPartner;
     private array $categories;
     private $products;
+    private $partner;
 
     /**
      * DataMigrationService constructor.
      * @param CategoryRepositoryInterface $categoryRepositoryInterface
      * @param CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface
      */
-    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface)
+    public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface, PartnerRepositoryInterface $partnerRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
+        $this->partnerRepositoryInterface = $partnerRepositoryInterface;
+    }
+
+    /**
+     * @param mixed $partner
+     * @return DataMigrationService
+     */
+    public function setPartner($partner)
+    {
+        $this->partner = $partner;
+        return $this;
     }
 
     /**
@@ -58,8 +72,14 @@ class DataMigrationService
 
     public function migrate()
     {
+        $this->migratePartnerData();
         $this->migrateCategoryData();
         $this->migrateProductsData();
+    }
+
+    private function migratePartnerData()
+    {
+        $this->partnerRepositoryInterface->insertOrIgnore($this->partner);
     }
 
     private function migrateCategoryData()

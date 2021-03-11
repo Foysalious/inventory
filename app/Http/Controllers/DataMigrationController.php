@@ -26,10 +26,11 @@ class DataMigrationController extends Controller
      */
     public function store(DataMigrationRequest $request)
     {
+        $partner = !is_array($request->partner) ? json_decode($request->partner,1) : $request->partner;
         $category_partner = !is_array($request->partner_pos_categories) ? json_decode($request->partner_pos_categories,1) : $request->partner_pos_categories;
         $categories = !is_array($request->pos_categories) ? json_decode($request->pos_categories,1) : $request->pos_categories;
         $products = !is_array($request->products) ? json_decode($request->products,1) : $request->products;
-        $this->dataMigrationService->setPartnerCategories($category_partner)->setCategories($categories)->setProducts($products)->migrate();
+        $this->dataMigrationService->setPartner($partner)->setPartnerCategories($category_partner)->setCategories($categories)->setProducts($products)->migrate();
         return $this->success('Successful', null);
     }
 }
