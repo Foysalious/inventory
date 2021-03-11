@@ -1,15 +1,7 @@
 <?php namespace App\Services\Product;
 
-
-use App\Interfaces\CombinationRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
-use App\Interfaces\OptionRepositoryInterface;
-use App\Interfaces\ProductChannelRepositoryInterface;
-use App\Interfaces\ProductOptionRepositoryInterface;
-use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
-use App\Interfaces\ValueRepositoryInterface;
-use App\Models\ProductOption;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Warranty\Units;
@@ -40,53 +32,25 @@ class Creator
     /** @var DiscountCreator */
     protected DiscountCreator $discountCreator;
     protected $productDetails;
-    protected $optionRepositoryInterface;
-    protected $valueRepositoryInterface;
     protected $productOptionRepositoryInterface;
-    protected $productOptionValueRepositoryInterface;
-    protected $combinationRepositoryInterface;
-    protected $productChannelRepositoryInterface;
     private $productOptionCreator;
     private $productOptionValueCreator;
     private $combinationCreator;
+    private $productChannelCreator;
 
 
-    /**
-     * Creator constructor.
-     * @param ProductRepositoryInterface $productRepositoryInterface
-     * @param DiscountCreator $discountCreator
-     * @param ProductImageCreator $productImageCreator
-     * @param OptionRepositoryInterface $optionRepositoryInterface
-     * @param ValueRepositoryInterface $valueRepositoryInterface
-     * @param ProductOptionRepositoryInterface $productOptionRepositoryInterface
-     * @param ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface
-     * @param CombinationRepositoryInterface $combinationRepositoryInterface
-     * @param ProductChannelRepositoryInterface $productChannelRepositoryInterface
-     */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface,
-                                ProductOptionCreator $productOptionCreator, ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
 
-                                DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
-                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface, ProductChannelRepositoryInterface $productChannelRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
+                                ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
+                                DiscountCreator $discountCreator, ProductImageCreator $productImageCreator, ProductChannelCreator $productChannelCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
         $this->discountCreator = $discountCreator;
-        $this->optionRepositoryInterface = $optionRepositoryInterface;
-        $this->valueRepositoryInterface = $valueRepositoryInterface;
-        $this->combinationRepositoryInterface = $combinationRepositoryInterface;
-
         $this->productOptionCreator = $productOptionCreator;
         $this->productOptionValueCreator = $productOptionValueCreator;
         $this->combinationCreator = $combinationCreator;
-
-
-
-
-        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
-        $this->productOptionValueRepositoryInterface = $productOptionValueRepositoryInterface;
-        $this->productChannelRepositoryInterface =  $productChannelRepositoryInterface;
+        $this->productChannelCreator = $productChannelCreator;
     }
 
 
@@ -252,12 +216,19 @@ class Creator
         return $this;
     }
 
+    /**
+     * @param $productDetails
+     * @return $this
+     */
     public function setProductDetails($productDetails)
     {
       $this->productDetails = json_decode($productDetails);
       return $this;
     }
 
+    /**
+     * @return mixed
+     */
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
@@ -271,6 +242,9 @@ class Creator
         return $product;
     }
 
+    /**
+     * @param $product
+     */
     private function createVariantsSKUAndSKUChannels($product)
     {
         foreach($this->productDetails as $productDetail)
@@ -291,14 +265,18 @@ class Creator
              $sku = $this->createSku($product,$values,$product->id,$productDetail->stock);
              $this->createSkuChannels($sku,$productDetail->channel_data);
              $this->createCombination($sku->id,$product_option_value_ids);
-
-            $product_channels = $this->makeProductChannelData($productDetail->channel_data,$product->id);
-            $this->productChannelRepositoryInterface->insert($product_channels->toArray());
-
+             $this->createProductChannel($productDetail->channel_data,$product->id);
         }
     }
 
-    private function createSku($product,$values,$product_id,$stock)
+    /**
+     * @param $product
+     * @param $values
+     * @param $product_id
+     * @param $stock
+     * @return mixed
+     */
+    private function createSku($product, $values, $product_id, $stock)
     {
         $sku_data = [
             'name' => implode("-",$values) ,
@@ -308,17 +286,29 @@ class Creator
         return $product->skus()->create($sku_data);
     }
 
-    private function makeProductChannelData($channels, $product_id)
+    /**
+     * @param $channels
+     * @param $product_id
+     * @return mixed
+     */
+    private function createProductChannel($channels, $product_id)
     {
-       return  collect($channels)->map(function($channel) use($product_id) {
+        $product_channels =   collect($channels)->map(function($channel) use($product_id) {
             return [
                 'product_id' => $product_id,
                 'channel_id' =>   $channel->channel_id,
             ];
         });
+
+        return $this->productChannelCreator->setData($product_channels->toArray())->store();
     }
 
-    private function createCombination($sku_id,$product_option_value_ids)
+    /**
+     * @param $sku_id
+     * @param $product_option_value_ids
+     * @return mixed
+     */
+    private function createCombination($sku_id, $product_option_value_ids)
     {
        $combinations = collect($product_option_value_ids)->map(function($product_option_value_id) use($sku_id){
             return [
@@ -329,7 +319,12 @@ class Creator
        return  $this->combinationCreator->setData($combinations->toArray())->store();
     }
 
-    private function createSkuChannels($sku,$channel_data)
+    /**
+     * @param $sku
+     * @param $channel_data
+     * @return mixed
+     */
+    private function createSkuChannels($sku, $channel_data)
     {
         $data = [];
         foreach($channel_data as $channel)
@@ -347,57 +342,57 @@ class Creator
     }
 
 
-
-    private function createProductOptions($product_id,$option_name)
+    /**
+     * @param $product_id
+     * @param $option_name
+     * @return mixed
+     */
+    private function createProductOptions($product_id, $option_name)
     {
        return $this->productOptionCreator->setProductId($product_id)->setOptionName($option_name)->create();
     }
 
+    /**
+     * @param $product_option_id
+     * @param $value_name
+     * @return mixed
+     */
     private function createProductOptionValues($product_option_id, $value_name)
     {
         return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
     }
 
+    /**
+     * @param $product
+     */
     private function createSKUAndSKUChannels($product)
     {
         $stock = $this->productDetails[0]->stock > 0 ?: 0;
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
-        $skuChannelsData = $this->makeSKUChannelsData($sku);
-        $sku->skuChannels()->insert($skuChannelsData);
-
-        $product_channels = $this->makeProductChannelData($this->productDetails[0]->channel_data,$product->id);
-        $this->productChannelRepositoryInterface->insert($product_channels->toArray());
-
+        $this->createSKUChannels($sku,$this->productDetails[0]->channel_data);
+        $this->createProductChannel($this->productDetails[0]->channel_data,$product->id);
     }
 
 
-    private function makeSKUChannelsData($sku)
-    {
-        $data = [];
-        $channels = $this->productDetails[0]->channel_data;
-        foreach($channels as $channel)
-        {
-            $temp['sku_id'] = $sku->id;
-            $temp['channel_id'] = $channel->channel_id;
-            $temp['cost'] = $channel->cost? : 0;
-            $temp['price'] = $channel->price ? : 0;
-            $temp['wholesale_price'] = $channel->wholesale_price ? : null;
-            array_push($data,$temp);
-        }
-
-        return $data;
-    }
-
+    /**
+     * @param $product
+     */
     private function createProductDiscount($product)
     {
         $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
     }
 
+    /**
+     * @param $product
+     */
     private function createImageGallery($product)
     {
         $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
     }
 
+    /**
+     * @return array
+     */
     private function makeData()
     {
         return [
