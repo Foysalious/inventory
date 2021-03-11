@@ -2,8 +2,13 @@
 
 
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\CombinationRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ProductChannelRepositoryInterface;
+use App\Interfaces\ProductOptionRepositoryInterface;
+use App\Interfaces\ProductOptionValueRepositoryInterface;
+use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\UnitRepositoryInterface;
 
 use App\Interfaces\CategoryPartnerRepositoryInterface;
@@ -13,10 +18,14 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Interfaces\ChannelRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Repositories\CombinationRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OptionRepository;
+use App\Repositories\ProductChannelRepository;
+use App\Repositories\ProductOptionRepository;
+use App\Repositories\ProductOptionValueRepository;
+use App\Repositories\SkuRepository;
 use App\Repositories\UnitRepository;
-
 use App\Repositories\CategoryPartnerRepository;
 use App\Repositories\ProductImageRepository;
 use App\Repositories\ProductRepository;
@@ -56,6 +65,11 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ProductImageRepositoryInterface::class, ProductImageRepository::class);
         $this->app->singleton(DiscountRepositoryInterface::class, DiscountRepository::class);
         $this->app->singleton(ChannelRepositoryInterface::class, ChannelRepository::class);
+        $this->app->singleton(ProductOptionRepositoryInterface::class, ProductOptionRepository::class);
+        $this->app->singleton(ProductOptionValueRepositoryInterface::class, ProductOptionValueRepository::class);
+        $this->app->singleton(CombinationRepositoryInterface::class, CombinationRepository::class);
+        $this->app->singleton(ProductChannelRepositoryInterface::class, ProductChannelRepository::class);
+        $this->app->singleton(SkuRepositoryInterface::class, SkuRepository::class);
     }
 
 }

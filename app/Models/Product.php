@@ -3,10 +3,8 @@
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-
 class Product extends BaseModel
 {
-
     use HasFactory, SoftDeletes;
 
     protected $guarded = ['id'];
@@ -30,5 +28,10 @@ class Product extends BaseModel
         ];
 
         return $data;
+    }
+
+    public function productOptions()
+    {
+        return $this->hasMany(ProductOption::class,'product_id');
     }
 }

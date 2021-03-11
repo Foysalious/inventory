@@ -6,8 +6,17 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductChannelPriceResource;
 use App\Http\Resources\ProductResource;
+use App\Interfaces\CombinationRepositoryInterface;
+use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ProductChannelRepositoryInterface;
+use App\Interfaces\ProductOptionRepositoryInterface;
+use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\SkuRepositoryInterface;
+use App\Interfaces\ValueRepositoryInterface;
 use App\Services\BaseService;
+use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\ProductImage\Creator as ProductImageCreator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -20,11 +29,22 @@ class ProductService extends BaseService
     /** @var Updater */
     protected Updater $updater;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater)
+    protected $optionRepositoryInterface;
+    protected $valueRepositoryInterface;
+    protected $productOptionRepositoryInterface;
+    protected $productOptionValueRepositoryInterface;
+    protected $combinationRepositoryInterface;
+    protected $productChannelRepositoryInterface;
+    protected $skuRepositoryInterface;
+
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
+                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
+                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface, ProductChannelRepositoryInterface $productChannelRepositoryInterface,SkuRepositoryInterface $skuRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
+        $this->skuRepositoryInterface = $skuRepositoryInterface;
     }
 
     /**
@@ -37,7 +57,7 @@ class ProductService extends BaseService
     {
         list($offset, $limit) = calculatePagination($request);
         $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner, $offset, $limit);
-        if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কো পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
+        if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $products = ProductResource::collection($resource);
         return $this->success('Successful', $products, 200);
     }
@@ -48,14 +68,48 @@ class ProductService extends BaseService
      */
     public function getDetails($product)
     {
-        $resource = $this->productRepositoryInterface->findOrFail($product);
-        $product_channel_price = ProductChannelPriceResource::collection($this->productRepositoryInterface->productChannelPrice($product)[0]);
-        if(empty($product_channel_price))
-            return $this->error('Product has no variant', 404);
-        $product = new ProductResource($resource);
-        $data['product'] = $product;
-        $data['sku_channel_price'] = $product_channel_price;
-        return $this->success('Successful', $data, 200);
+        $general_details = $this->productRepositoryInterface->findOrFail($product);
+        $combinations = $this->getCombinationData($general_details);
+        $general_details->combinations = collect($combinations);
+        $product = new ProductResource($general_details);
+        return $this->success('Successful', $product, 200);
+    }
+
+    private function getCombinationData($product)
+    {
+
+        $skus = $this->skuRepositoryInterface->where('product_id', $product->id)->with('combinations')->get();
+        $data = [];
+        foreach ($skus as $sku) {
+            $sku_data = [];
+            $temp = [];
+            $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
+                $product_option_value = $combination->productOptionValue;
+                $value = $product_option_value->name;
+                $option = $product_option_value->productOption->name;
+                array_push($temp, [
+                    'option' => $option,
+                    'value' => $value,
+                ]);
+            });
+            if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
+            $sku_data['combination'] = $temp;
+            if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
+            $sku_data['stock'] = $sku->stock;
+            $temp = [];
+            $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                array_push($temp, [
+                    "channel_id" => $sku_channel->channel_id,
+                    "cost" => $sku_channel->cost,
+                    "price" => $sku_channel->price,
+                    "wholesale_price" => $sku_channel->wholesale_price
+                ]);
+            });
+            if (!isset($sku_data['channel_data'])) $sku_data['channel_data'] = [];
+            $sku_data['channel_data'] = $temp;
+            array_push($data, $sku_data);
+        }
+        return $data;
     }
 
     /**
@@ -76,11 +130,7 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-            ->setWholesalePrice($request->wholesale_price)
-            ->setCost($request->cost)
-            ->setPrice($request->price)
-            ->setStock($request->stock)
-            ->setChannelId($request->channel_id)
+            ->setProductDetails($request->product_details)
             ->create();
 
         return $this->success("Successful", $product,201);
@@ -102,6 +152,7 @@ class ProductService extends BaseService
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
             ->setUnitId($request->unit_id)
+            ->setProductDetails($request->product_details)
             ->update();
         return $this->success("Successful", $product,200);
     }

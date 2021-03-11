@@ -1,8 +1,18 @@
 <?php namespace App\Services\Product;
 
 
+use App\Interfaces\CombinationRepositoryInterface;
+use App\Interfaces\OptionRepositoryInterface;
+use App\Interfaces\ProductChannelRepositoryInterface;
+use App\Interfaces\ProductOptionRepositoryInterface;
+use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\SkuRepositoryInterface;
+use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
+use App\Models\Sku;
+use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\ProductImage\Creator as ProductImageCreator;
 
 class Updater
 {
@@ -17,14 +27,42 @@ class Updater
     protected $warrantyUnit;
     protected $vatPercentage;
     protected $unitId;
+    protected $productDetails;
+    protected $optionRepositoryInterface;
+    protected $valueRepositoryInterface;
+    protected $productOptionRepositoryInterface;
+    protected $productOptionValueRepositoryInterface;
+    protected $combinationRepositoryInterface;
+    protected $productChannelRepositoryInterface;
+    protected $skuRepositoryInterface;
 
     /**
      * Updater constructor.
      * @param ProductRepositoryInterface $productRepositoryInterface
+     * @param DiscountCreator $discountCreator
+     * @param ProductImageCreator $productImageCreator
+     * @param OptionRepositoryInterface $optionRepositoryInterface
+     * @param ValueRepositoryInterface $valueRepositoryInterface
+     * @param ProductOptionRepositoryInterface $productOptionRepositoryInterface
+     * @param ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface
+     * @param CombinationRepositoryInterface $combinationRepositoryInterface
+     * @param ProductChannelRepositoryInterface $productChannelRepositoryInterface
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
+                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
+                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
+                                ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->productImageCreator = $productImageCreator;
+        $this->discountCreator = $discountCreator;
+        $this->optionRepositoryInterface = $optionRepositoryInterface;
+        $this->valueRepositoryInterface = $valueRepositoryInterface;
+        $this->combinationRepositoryInterface = $combinationRepositoryInterface;
+        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
+        $this->productOptionValueRepositoryInterface = $productOptionValueRepositoryInterface;
+        $this->productChannelRepositoryInterface =  $productChannelRepositoryInterface;
+        $this->skuRepositoryInterface = $skuRepositoryInterface;
     }
 
     /**
@@ -107,9 +145,29 @@ class Updater
         return $this;
     }
 
+    public function setProductDetails($productDetails)
+    {
+        $this->productDetails = $productDetails;
+        return $this;
+    }
+
     public function update()
     {
-        return $this->productRepositoryInterface->update($this->product, $this->makeData());
+        $product =  $this->productRepositoryInterface->update($this->product, $this->makeData());
+        $nature = $this->getNature($product);
+
+
+    }
+
+    private function getNature($product)
+    {
+        $skus = $this->skuRepositoryInterface->where('product_id',$product->id)->with('combinations')->get();
+        foreach($skus as $sku)
+        {
+            $p_o_v_s = $sku->combinaions->pluck('product_option_value_id');
+            $p_o_v = $this->productOptionValueRepositoryInterface->whereIn('id',$p_o_v_s)->select('product_option_id','name')->get();
+        }
+
     }
 
     private function makeData()
