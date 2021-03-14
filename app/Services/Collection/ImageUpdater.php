@@ -26,7 +26,7 @@ class ImageUpdater
 
     private function deleteCollectionImageFromCDN($partner_id, $collection_id, $column_name = '')
     {
-        $fileName = $this->collection_repo->deleteCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+        $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
         $this->deleteFileFromCDN($fileName);
     }
 

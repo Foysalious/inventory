@@ -1,17 +1,19 @@
 <?php namespace App\Services\Collection;
 
 
+use App\Constants\ImageConstants;
 use App\Http\Requests\CollectionRequest;
 use App\Http\Resources\CollectionResource;
 use App\Repositories\CollectionRepository;
 use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Services\FileManagers\CdnFileManager;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
 
 class CollectionService extends BaseService
 {
-    use ResponseAPI;
+    use ResponseAPI, CdnFileManager;
 
     protected $collectionRepository;
 
@@ -91,6 +93,14 @@ class CollectionService extends BaseService
             $collection = $this->collectionRepositoryInterface->find($collection);
             $collection_id = $collection->id;
             $this->collectionRepositoryInterface->where('id', $collection_id)->delete();
+
+            foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
+            {
+                $thumbFile = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+                if(isset($thumbFile))
+                    $this->deleteFileFromCDN($thumbFile);
+            }
+
             return $this->success("Successful",200);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);

@@ -18,7 +18,6 @@ class CollectionController extends Controller
         $this->collectionService = $collectionService;
     }
 
-
     public function index(Request $request, $partner_id) : object
     {
         try {
