@@ -18,7 +18,8 @@ class ProductDetailsObject
 
     public function build()
     {
-        $this->validate();
+        if(!$this->validate())
+            throw new ProductDetailsPropertyValidationError();
         $this->setCombination();
         $this->setStock();
         $this->setChannelData();
@@ -26,19 +27,25 @@ class ProductDetailsObject
     }
 
 
+    /**
+     * @return bool|mixed
+     * @throws ProductDetailsPropertyValidationError
+     */
     public function validate()
     {
-        return property_exists($this->productDetail,'combination') && property_exists($this->productDetail,'stock')
-            && property_exists($this->productDetail,'channel_data') ?: throw new ProductDetailsPropertyValidationError();
+        return (property_exists($this->productDetail,'combination') && property_exists($this->productDetail,'stock')
+            && property_exists($this->productDetail,'channel_data'));
     }
 
 
     public function setCombination()
     {
+
         $final = [];
-        foreach ($this->combination as $option_value) {
+        foreach ($this->productDetail->combination as $option_value) {
             array_push($final, app(CombinationDetailsObject::class)->setCombinationDetail($option_value)->build());
         }
+
         $this->combination = $final;
         return $this;
     }
@@ -61,8 +68,8 @@ class ProductDetailsObject
     public function setChannelData()
     {
         $final = [];
-        foreach ($this->channelData as $channel_data) {
-            array_push($final, app(ChannelDetailsObject::class)->setChannelDetail($channel_data)->build());
+        foreach ($this->productDetail->channel_data as $channel_data) {
+            array_push($final, app(ChannelDetailsObject::class)->setChannelDetails($channel_data)->build());
         }
         $this->channelData = $final;
         return $this;

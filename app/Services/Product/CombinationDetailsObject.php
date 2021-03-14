@@ -12,11 +12,13 @@ class CombinationDetailsObject
     public function setCombinationDetail($combinationDetail)
     {
         $this->combinationDetail =  $combinationDetail;
+        return $this;
     }
 
     public function build()
     {
-        $this->validate();
+        if(!$this->validate())
+            throw new ProductDetailsPropertyValidationError();
         $this->option = $this->combinationDetail->option;
         $this->value = $this->combinationDetail->value;
         return $this;
@@ -25,7 +27,7 @@ class CombinationDetailsObject
 
     public function validate()
     {
-        return (property_exists( $this->combinationDetail,'option')) && (property_exists( $this->combinationDetail,'value'))?: throw new ProductDetailsPropertyValidationError();
+        return (property_exists( $this->combinationDetail,'option')) && (property_exists( $this->combinationDetail,'value'));
     }
 
 

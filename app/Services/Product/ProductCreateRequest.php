@@ -6,12 +6,11 @@ class ProductCreateRequest
 
     private $productDetails;
 
-
-    public function setProductRequest($productDetails)
+    public function setProductDetails($productDetails)
     {
         $this->productDetails = json_decode($productDetails);
+        return $this;
     }
-
 
     /**
      * @return bool
