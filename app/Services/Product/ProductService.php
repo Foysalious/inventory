@@ -130,7 +130,7 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-            ->setProductDetails($request->product_details)
+           /* ->setProductDetails($request->product_details)*/
             ->create();
 
         return $this->success("Successful", $product,201);
