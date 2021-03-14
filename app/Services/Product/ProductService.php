@@ -5,17 +5,9 @@ use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
-use App\Interfaces\CombinationRepositoryInterface;
-use App\Interfaces\OptionRepositoryInterface;
-use App\Interfaces\ProductChannelRepositoryInterface;
-use App\Interfaces\ProductOptionRepositoryInterface;
-use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
-use App\Interfaces\ValueRepositoryInterface;
 use App\Services\BaseService;
-use App\Services\Discount\Creator as DiscountCreator;
-use App\Services\ProductImage\Creator as ProductImageCreator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -31,14 +23,9 @@ class ProductService extends BaseService
     protected $optionRepositoryInterface;
     protected $valueRepositoryInterface;
     protected $productOptionRepositoryInterface;
-    protected $productOptionValueRepositoryInterface;
-    protected $combinationRepositoryInterface;
-    protected $productChannelRepositoryInterface;
     protected $skuRepositoryInterface;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
-                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface, ProductChannelRepositoryInterface $productChannelRepositoryInterface,SkuRepositoryInterface $skuRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater,SkuRepositoryInterface $skuRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->creator = $creator;
