@@ -9,6 +9,7 @@ class ProductDetailsObject
     private  $combination;
     private $stock;
     private $channelData;
+    private $hasVariant;
 
     public function setProductDetail($productDetail)
     {
@@ -16,11 +17,18 @@ class ProductDetailsObject
         return $this;
     }
 
+    public function hasVariant($hasValiant)
+    {
+        $this->hasVariant = $hasValiant;
+        return $this;
+    }
+
     public function build()
     {
         if(!$this->validate())
             throw new ProductDetailsPropertyValidationError();
-        $this->setCombination();
+        if($this->hasVariant)
+            $this->setCombination();
         $this->setStock();
         $this->setChannelData();
         return $this;

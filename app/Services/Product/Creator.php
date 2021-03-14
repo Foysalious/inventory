@@ -375,7 +375,7 @@ class Creator
      */
     private function createSKUAndSKUChannels($product)
     {
-        $stock = $this->productRequestObjects[0]->getProductDetails()->getStock() > 0 ?: 0;
+        $stock = $this->productRequestObjects[0]->getStock();
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
         $this->createSKUChannels($sku,$this->productRequestObjects[0]->getChannelData());
         $this->createProductChannel($this->productRequestObjects[0]->getChannelData(),$product->id);
