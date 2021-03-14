@@ -232,7 +232,7 @@ class Creator
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
-        is_null($this->productDetails[0]->combination) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
+       // is_null($this->productDetails[0]->combination) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
 
         if ($this->discountAmount)
             $this->createProductDiscount($product);
