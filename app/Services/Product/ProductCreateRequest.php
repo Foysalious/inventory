@@ -21,8 +21,6 @@ class ProductCreateRequest
         return !is_null($this->productDetails[0]->combination);
     }
 
-
-
     public function get()
     {
         $final = [];

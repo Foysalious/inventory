@@ -1,6 +1,8 @@
 <?php namespace App\Services\Product;
 
 
+use App\Exceptions\ProductDetailsPropertyValidationError;
+
 class CombinationDetailsObject
 {
     private $combinationDetail;
@@ -23,7 +25,7 @@ class CombinationDetailsObject
 
     public function validate()
     {
-        return (property_exists( $this->combinationDetail,['option','value']))?: throw new CombinationDetailsPropertyValidationError();
+        return (property_exists( $this->combinationDetail,'option')) && (property_exists( $this->combinationDetail,'value'))?: throw new ProductDetailsPropertyValidationError();
     }
 
 

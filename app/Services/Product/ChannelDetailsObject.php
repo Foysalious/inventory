@@ -1,8 +1,7 @@
-<?php
+<?php namespace App\Services\Product;
 
 
-namespace App\Services\Product;
-
+use App\Exceptions\ProductDetailsPropertyValidationError;
 
 class ChannelDetailsObject
 {
@@ -30,15 +29,6 @@ class ChannelDetailsObject
     }
 
     /**
-     * @param mixed $price
-     */
-    public function setPrice($price)
-    {
-        $this->price = $price;
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getCost()
@@ -47,29 +37,11 @@ class ChannelDetailsObject
     }
 
     /**
-     * @param mixed $cost
-     */
-    public function setCost($cost)
-    {
-        $this->cost = $cost;
-        return $this;
-    }
-
-    /**
      * @return mixed
      */
     public function getWholeSalePrice()
     {
         return $this->wholeSalePrice;
-    }
-
-    /**
-     * @param mixed $wholeSalePrice
-     */
-    public function setWholeSalePrice($wholeSalePrice)
-    {
-        $this->wholeSalePrice = $wholeSalePrice;
-        return $this;
     }
 
     public function build()
@@ -84,7 +56,9 @@ class ChannelDetailsObject
 
     public function validate()
     {
-        return (property_exists( $this->channelDetails,['channel_id','cost','price','wholsale_price']))?: throw new CombinationDetailsPropertyValidationError();
+        return (property_exists( $this->channelDetails,'channel_id')) && (property_exists( $this->channelDetails,'cost'))
+        && (property_exists( $this->channelDetails,'price')) && (property_exists( $this->channelDetails,'wholsale_price'))
+            ?: throw new ProductDetailsPropertyValidationError();
     }
 
 }
