@@ -5,6 +5,7 @@ use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
+use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Services\BaseService;
@@ -25,9 +26,10 @@ class ProductService extends BaseService
     protected $productOptionRepositoryInterface;
     protected $skuRepositoryInterface;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater,SkuRepositoryInterface $skuRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionRepositoryInterface $productOptionRepositoryInterface, Creator $creator, Updater $updater,SkuRepositoryInterface $skuRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->skuRepositoryInterface = $skuRepositoryInterface;
@@ -56,7 +58,7 @@ class ProductService extends BaseService
     {
         $general_details = $this->productRepositoryInterface->findOrFail($product);
         list($options,$combinations) = $this->getCombinationData($general_details);
-        $general_details->options = $options;
+        $general_details->options = collect($options);
         $general_details->combinations = collect($combinations);
         $product = new ProductResource($general_details);
         return $this->success('Successful', $product, 200);
@@ -65,10 +67,7 @@ class ProductService extends BaseService
     private function getCombinationData($product)
     {
         $data = [];
-        $options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->select('name')->get();
-        if($options)
-            $options = implode("-",$options);
-
+        $options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->pluck('name');
         $skus = $this->skuRepositoryInterface->where('product_id', $product->id)->with('combinations')->get();
 
         foreach ($skus as $sku) {
@@ -77,7 +76,7 @@ class ProductService extends BaseService
             if($sku->combinations)
             {
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
-                    $product_option_value = $combination->productOptionValue->name;
+                    $product_option_value = $combination->productOptionValue;
                     $value = $product_option_value->name;
                     $option = $product_option_value->productOption->name;
                     array_push($temp, [
