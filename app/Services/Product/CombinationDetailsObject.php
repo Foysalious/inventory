@@ -40,8 +40,4 @@ class CombinationDetailsObject
     {
         return $this->value;
     }
-
-
-
-
 }
