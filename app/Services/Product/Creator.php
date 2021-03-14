@@ -262,9 +262,9 @@ class Creator
             $values = [];
             foreach($combinations as $combination)
             {
-                $option_name = $combination->option;
+                $option_name = $combination->getoption();
                 $product_option = $this->createProductOptions($product->id, $option_name);
-                $value_name = $combination->value;
+                $value_name = $combination->getValue();
                 $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
                 array_push($product_option_value_ids,$product_option_value->id);
                 array_push($values,$value_name);
@@ -304,7 +304,7 @@ class Creator
         $product_channels =   collect($channels)->map(function($channel) use($product_id) {
             return [
                 'product_id' => $product_id,
-                'channel_id' =>   $channel->channel_id,
+                'channel_id' =>   $channel->getChannelId(),
             ];
         });
 
@@ -339,10 +339,10 @@ class Creator
         {
            array_push($data,[
                'sku_id' => $sku->id,
-               'channel_id' => $channel->channel_id,
-               'cost' =>  $channel->cost ?: 0,
-               'price' => $channel->price ?: 0,
-               'wholesale_price' => $channel->wholesale_price ?: null
+               'channel_id' => $channel->getChannelId(),
+               'cost' =>  $channel->getCost() ?: 0,
+               'price' => $channel->getPrice() ?: 0,
+               'wholesale_price' => $channel->getWholeSalePrice() ?: null
            ]);
         }
        return  $sku->skuChannels()->insert($data);
@@ -375,10 +375,10 @@ class Creator
      */
     private function createSKUAndSKUChannels($product)
     {
-        $stock = $this->productRequestObject->getProductDetails()[0]->stock > 0 ?: 0;
+        $stock = $this->productRequestObjects[0]->getProductDetails()->getStock() > 0 ?: 0;
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
-        $this->createSKUChannels($sku,$this->productDetails[0]->channel_data);
-        $this->createProductChannel($this->productDetails[0]->channel_data,$product->id);
+        $this->createSKUChannels($sku,$this->productRequestObjects[0]->getChannelData());
+        $this->createProductChannel($this->productRequestObjects[0]->getChannelData(),$product->id);
     }
 
 
