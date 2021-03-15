@@ -52,6 +52,7 @@ class Handler extends ExceptionHandler
 
     public function handleException(Throwable $e)
     {
+        dd($e);
         if ($e instanceof HttpException) {
             $code = $e->getStatusCode();
             $defaultMessage = Response::$statusTexts[$code];

@@ -10,6 +10,8 @@ interface BaseRepositoryInterface
 
     public function insert(array $data);
 
+    public function insertOrIgnore(array $data);
+
     public function find($id);
 
     public function findOrFail($id);

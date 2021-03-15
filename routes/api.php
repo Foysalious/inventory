@@ -45,6 +45,7 @@ Route::group(['prefix'=>'v1'], function(){
     Route::apiResource('options', OptionController::class);
     Route::apiResource('options.values', ValueController::class)->shallow();
     Route::apiResource('partners.categories', CategoryController::class);
+    Route::apiResource('partners.migrate', \App\Http\Controllers\DataMigrationController::class)->only('store');
     Route::group(['prefix' => 'units'], function () {
         Route::get('/', [UnitController::class, 'index']);
     });
