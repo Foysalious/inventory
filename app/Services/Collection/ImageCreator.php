@@ -40,6 +40,6 @@ class ImageCreator
             $collection_images['app_banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
         }
 
-        return $collection_images;
+        return json_encode($collection_images);
     }
 }
