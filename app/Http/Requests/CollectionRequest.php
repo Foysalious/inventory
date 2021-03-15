@@ -23,7 +23,7 @@ class CollectionRequest extends FormRequest
             'name'              => 'required|string',
             'description'       => 'nullable',
             'is_published'      => 'required',
-            'thumb'             => 'nullable|mimes:jpg,bmp,png,jpeg',
+            'thumb'             => 'nullable',
             'banner'            => 'nullable|mimes:jpg,bmp,png,jpeg',
             'app_thumb'         => 'nullable|mimes:jpg,bmp,png,jpeg',
             'app_banner'        => 'nullable|mimes:jpg,bmp,png,jpeg'
