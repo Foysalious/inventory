@@ -124,7 +124,7 @@ class Creator
 
     public function create()
     {
-        $this->collection_image_links = json_decode($this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner), true);
+        $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
         return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
     }
 
