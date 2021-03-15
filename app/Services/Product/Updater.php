@@ -35,6 +35,9 @@ class Updater
     protected $combinationRepositoryInterface;
     protected $productChannelRepositoryInterface;
     protected $skuRepositoryInterface;
+    protected $discountAmount;
+    protected $discountEndDate;
+    protected $images;
 
     /**
      * Updater constructor.
@@ -145,18 +148,46 @@ class Updater
         return $this;
     }
 
-    public function setProductDetails($productDetails)
+    public function setDiscount($discount_amount)
     {
-        $this->productDetails = $productDetails;
+        $this->discountAmount = $discount_amount;
+        return $this;
+    }
+
+    public function setDiscountEndDate($discount_end_date)
+    {
+        $this->discountEndDate = $discount_end_date;
+        return $this;
+    }
+
+    public function setImages($images)
+    {
+        $this->images = $images;
+        return $this;
+    }
+
+    public function setProductRequestObjects($productRequestObjects)
+    {
+        $this->productRequestObjects = $productRequestObjects;
+        return $this;
+    }
+
+    public function setHasVariant($hasVariants)
+    {
+        $this->hasVariants = $hasVariants;
+        return $this;
+    }
+
+    public function setOptions($options)
+    {
+        $this->options = $options;
         return $this;
     }
 
     public function update()
     {
         $product =  $this->productRepositoryInterface->update($this->product, $this->makeData());
-        $nature = $this->getNature($product);
-
-
+        $this->getNature();
     }
 
     private function getNature($product)

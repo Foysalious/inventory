@@ -145,6 +145,7 @@ class ProductService extends BaseService
      */
     public function update($productId, ProductUpdateRequest $request)
     {
+        list($has_variant,$product_update_request_objs) =  app(ProductUpdateRequest::class)->setProductDetails($request->product_details)->get();
         $product = $this->productRepositoryInterface->findOrFail($productId);
         $this->updater->setProduct($product)
             ->setCategoryId($request->category_id)
@@ -154,7 +155,12 @@ class ProductService extends BaseService
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
             ->setUnitId($request->unit_id)
-            ->setProductDetails($request->product_details)
+            ->setDiscount($request->discount_amount)
+            ->setDiscountEndDate($request->discount_end_date)
+            ->setImages($request->images)
+            ->setProductRequestObjects($product_update_request_objs)
+            ->setHasVariant($has_variant)
+            ->setOptions($request->options)
             ->update();
         return $this->success("Successful", $product,200);
     }
