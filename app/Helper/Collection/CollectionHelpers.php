@@ -24,7 +24,6 @@ if( !function_exists('getCollectionDefaultThumbFolder')) {
 
 
     function getCollectionDefaultThumbFolder() : string {
-
         return 'images/categories_images/thumbs/';
     }
 }
