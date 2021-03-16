@@ -8,12 +8,11 @@ use App\Repositories\CollectionRepository;
 use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Services\FileManagers\CdnFileManager;
-use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
 
 class CollectionService extends BaseService
 {
-    use ResponseAPI, CdnFileManager;
+    use CdnFileManager;
 
     protected $collectionRepository;
 
@@ -36,7 +35,7 @@ class CollectionService extends BaseService
             $options = CollectionResource::collection($resource);
             if(!$options) return $this->error("Collection not found!", 404);
 
-            return $this->success("Successful", $options, 200);
+            return $this->success("Successful", ['options' => $options], 200);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
@@ -47,7 +46,7 @@ class CollectionService extends BaseService
         try {
             $resource = $this->collectionRepositoryInterface->find($collection);
             $collection = new CollectionResource($resource);
-            return $this->success('Successful', $collection, 200);
+            return $this->success('Successful', ['collections' => $collection], 200);
         } catch(\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
@@ -84,7 +83,7 @@ class CollectionService extends BaseService
             ->setIsPublished($request['is_published'])
             ->update();
 
-        return $this->success("Successful", $option,201);
+        return $this->success("Successful", ['collection' => $option],201);
     }
 
     public function delete($partner_id, $collection)
@@ -101,7 +100,7 @@ class CollectionService extends BaseService
                     $this->deleteFileFromCDN($thumbFile);
             }
 
-            return $this->success("Successful",200);
+            return $this->success("Successful",null, 200);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }

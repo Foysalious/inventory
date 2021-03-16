@@ -39,7 +39,7 @@ class OptionService extends BaseService
         $resource = $this->optionRepositoryInterface->getAllWithOptions($request->partner,$offset, $limit);
         $options = OptionResource::collection($resource);
         if ($options->isEmpty()) throw new OptionNotFoundException('আপনার কোন ভেরিয়েসন এড করা নেই!');
-        return $this->success("Successful", $options);
+        return $this->success("Successful", ['options' => $options]);
     }
 
     /**
@@ -61,7 +61,7 @@ class OptionService extends BaseService
     {
         $option = $this->optionRepositoryInterface->findOrFail($optionId);
         $this->updater->setOption($option)->setName($request->name)->update();
-        return $this->success("Successful", $option,200);
+        return $this->success("Successful", ['option' => $option],200);
     }
 
     public function  delete($optionId)
@@ -70,7 +70,7 @@ class OptionService extends BaseService
             $option = $this->optionRepositoryInterface->findOrFail($optionId);
             $option_id=$option->id;
             $this->optionRepositoryInterface->where('id', $option_id)->delete();
-            return $this->success("Successful", $option,200, false);
+            return $this->success("Successful", ['option' => $option],200, false);
         }
         catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);

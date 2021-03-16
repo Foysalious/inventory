@@ -1,13 +1,12 @@
 <?php namespace App\Services\Channel;
+
 use App\Http\Resources\ChannelResource;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use App\Interfaces\ChannelRepositoryInterface;
 
 
-class ChannelService
+class ChannelService extends BaseService
 {
-    use ResponseAPI;
-
     /**
      * @var ChannelRepositoryInterface
      */
@@ -27,7 +26,7 @@ class ChannelService
                 return $this->error("There is no Channel", 404);
             }
                 $channels = ChannelResource::collection($resource);
-            return $this->success("Successful", $channels);
+            return $this->success("Successful", ['channels' => $channels]);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }

@@ -8,16 +8,13 @@ use App\Http\Resources\CategorySubResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Repositories\CategoryRepository;
-
-
 use App\Interfaces\CategoryPartnerRepositoryInterface;
-use App\Traits\ResponseAPI;
+use App\Services\BaseService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Http\JsonResponse;
 
-class CategoryService
+class CategoryService extends BaseService
 {
-    use ResponseAPI;
-
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
 
     /**
@@ -50,7 +47,7 @@ class CategoryService
 
     /**
      * @param $partner_id
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws CategoryNotFoundException
      */
     public function getCategoriesByPartner($partner_id)
@@ -63,26 +60,25 @@ class CategoryService
         $data['total_category'] = count($master_categories);
         $data['categories'] = $resource;
 
-        return $this->success("Successful", $data);
+        return $this->success("Successful", ['categories' => $data]);
     }
 
 
     /**
      * @param CategoryRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function create(CategoryRequest $request,$partner_id)
     {
-
-        $category =  $this->creator->setModifyBy($request->modifier)->setPartner($partner_id)->setName($request->name)->create();
-        return $this->success("Successful", $category,201);
+        $category = $this->creator->setModifyBy($request->modifier)->setPartner($partner_id)->setName($request->name)->create();
+        return $this->success("Successful", ['category' => $category],201);
     }
 
     /**
      * @param CategoryRequest $request
-     * @param $partner_id
-     * @param $category_id
-     * @return \Illuminate\Http\JsonResponse
+     * @param $partner
+     * @param $category
+     * @return JsonResponse
      */
     public function update(CategoryRequest $request, $partner, $category)
     {
@@ -92,12 +88,12 @@ class CategoryService
         if($category->is_published_for_sheba)
         return $this->error("Not allowed to update this category", 403);
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setName($request->name)->update();
-        return $this->success("Successful", $category,200);
+        return $this->success("Successful", ['category' => $category],200);
     }
 
     /**
      * @param $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function delete($request)
     {
@@ -124,11 +120,7 @@ class CategoryService
         if ($master_categories->isEmpty())
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
         $resource = CategorySubResource::collection($master_categories, $partner_id);
-        $data = [];
-
-        $data['categories'] = $resource;
-
-        return $this->success("Successful", $resource);
+        return $this->success("Successful", ['categories' => $resource]);
     }
 
 

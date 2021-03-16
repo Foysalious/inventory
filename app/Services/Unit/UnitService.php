@@ -20,7 +20,7 @@ class UnitService extends BaseService
         try {
             $resource = $this->unitRepositoryInterface->getAll();
             $units = UnitResource::collection($resource);
-            return $this->success("Successful", $units);
+            return $this->success("Successful", ['units' => $units]);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
         }

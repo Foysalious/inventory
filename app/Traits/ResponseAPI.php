@@ -15,19 +15,12 @@ trait ResponseAPI
      */
     public function coreResponse($message, $data = null, $statusCode, $isSuccess = true)
     {
-        // Check the params
         if(!$message) return response()->json(['message' => 'Message is required'], 500);
-
-        // Send the response
+        $public_response = array_merge(['message' => $message], $data);
         if($isSuccess) {
-            return response()->json([
-                'message' => $message,
-                'data' => $data
-            ], $statusCode);
+            return response()->json($public_response, $statusCode);
         } else {
-            return response()->json([
-                'message' => $message,
-            ], $statusCode);
+            return response()->json(['message' => $message], $statusCode);
         }
     }
 
