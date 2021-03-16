@@ -38,6 +38,7 @@ class Updater
     protected $discountAmount;
     protected $discountEndDate;
     protected $images;
+    private $options;
 
     /**
      * Updater constructor.
@@ -187,17 +188,33 @@ class Updater
     public function update()
     {
         $product =  $this->productRepositoryInterface->update($this->product, $this->makeData());
-        $this->getNature();
+         $nature =  $this->getNature($product);
+         if($nature == UpdateNature::OPTION_ADD)
+            return $this->updateWithNewOption($product);
+         elseif ($nature == UpdateNature::OPTION_DELETE)
+             return $this->updateWithDeletedOption($product);
+         elseif ($nature == UpdateNature::VALUE_ADD)
+             return $this->updateWithNewValue($product);
+         else
+             return $this->updateWithDeletedValue($product);
+    }
+
+    private function updateWithNewOption($product)
+    {
+
+    }
+
+
+    private function updateWithDeletedOption($product)
+    {
+
     }
 
     private function getNature($product)
     {
-        $skus = $this->skuRepositoryInterface->where('product_id',$product->id)->with('combinations')->get();
-        foreach($skus as $sku)
-        {
-            $p_o_v_s = $sku->combinaions->pluck('product_option_value_id');
-            $p_o_v = $this->productOptionValueRepositoryInterface->whereIn('id',$p_o_v_s)->select('product_option_id','name')->get();
-        }
+        $created_options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->pluck('name')->toArray();
+        if($created_options != $this->options)
+            return UpdateNature::OPTION_ADD;
 
     }
 
