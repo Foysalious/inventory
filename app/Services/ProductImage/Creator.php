@@ -3,11 +3,11 @@
 
 use App\Interfaces\ProductImageRepositoryInterface;
 use App\Services\FileManagers\CdnFileManager;
-use App\Services\FileManagers\FileManager;
+use App\Services\Product\ProductFileManager;
 
 class Creator
 {
-    use FileManager, CdnFileManager;
+    use ProductFileManager, CdnFileManager;
 
     protected $productId;
     protected $images;
