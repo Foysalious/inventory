@@ -8,6 +8,7 @@ class UpdatedCombinationDetailsObject
     private $combinationDetail;
     private $option;
     private $value;
+    private $productOptionValueId;
 
     public function setCombinationDetail($combinationDetail)
     {
@@ -21,13 +22,14 @@ class UpdatedCombinationDetailsObject
             throw new ProductDetailsPropertyValidationError();
         $this->option = $this->combinationDetail->option;
         $this->value = $this->combinationDetail->value;
+        $this->productOptionValueId = $this->combinationDetail->product_option_value_id;
         return $this;
 
     }
 
     public function validate()
     {
-        return (property_exists( $this->combinationDetail,'option')) && (property_exists( $this->combinationDetail,'value'));
+        return (property_exists( $this->combinationDetail,'product_option_value_id')) && (property_exists( $this->combinationDetail,'option')) && (property_exists( $this->combinationDetail,'value'));
     }
 
 
@@ -39,6 +41,11 @@ class UpdatedCombinationDetailsObject
     public function getValue()
     {
         return $this->value;
+    }
+
+    public function getProductOptionValueId()
+    {
+        return $this->productOptionValueId;
     }
 
 }

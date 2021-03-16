@@ -39,6 +39,8 @@ class Updater
     protected $discountEndDate;
     protected $images;
     private $options;
+    private $productUpdateRequestObjects;
+
 
     /**
      * Updater constructor.
@@ -167,9 +169,9 @@ class Updater
         return $this;
     }
 
-    public function setProductRequestObjects($productRequestObjects)
+    public function setProductUpdateRequestObjects($productUpdateRequestObjects)
     {
-        $this->productRequestObjects = $productRequestObjects;
+        $this->productUpdateRequestObjects = $productUpdateRequestObjects;
         return $this;
     }
 
@@ -188,7 +190,7 @@ class Updater
     public function update()
     {
         $product =  $this->productRepositoryInterface->update($this->product, $this->makeData());
-         $nature =  $this->getNature($product);
+         $nature =  $this->getNature($product, $this->productUpdateRequestObjects);
          if($nature == UpdateNature::OPTION_ADD)
             return $this->updateWithNewOption($product);
          elseif ($nature == UpdateNature::OPTION_DELETE)
@@ -210,11 +212,13 @@ class Updater
 
     }
 
-    private function getNature($product)
+    private function getNature($product,$product_update_request_objects)
     {
-        $created_options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->pluck('name')->toArray();
-        if($created_options != $this->options)
-            return UpdateNature::OPTION_ADD;
+        foreach($product_update_request_objects as $product_update_request_object)
+        {
+
+        }
+        $created_options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->with('productOptionValues')->get();
 
     }
 

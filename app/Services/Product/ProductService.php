@@ -119,6 +119,7 @@ class ProductService extends BaseService
     {
         /** @var ProductDetailsObject[] $product_create_requests */
        list($has_variant,$product_create_request_objs) =  app(ProductCreateRequest::class)->setProductDetails($request->product_details)->get();
+       dd($product_create_request_objs);
 
 
         $product = $this->creator->setPartnerId($partnerId)
@@ -145,7 +146,7 @@ class ProductService extends BaseService
      */
     public function update($productId, ProductUpdateRequest $request)
     {
-        list($has_variant,$product_update_request_objs) =  app(ProductUpdateRequest::class)->setProductDetails($request->product_details)->get();
+        list($has_variant,$product_update_request_objs) =  app(UpdateProductRequest::class)->setProductDetails($request->product_details)->get();
         $product = $this->productRepositoryInterface->findOrFail($productId);
         $this->updater->setProduct($product)
             ->setCategoryId($request->category_id)
@@ -158,7 +159,7 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-            ->setProductRequestObjects($product_update_request_objs)
+            ->setProductUpdateRequestObjects($product_update_request_objs)
             ->setHasVariant($has_variant)
             ->setOptions($request->options)
             ->update();

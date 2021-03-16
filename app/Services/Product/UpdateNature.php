@@ -6,8 +6,7 @@ class UpdateNature
 {
     use ConstGetter;
 
-    const OPTION_ADD = 'option_add';
-    const OPTION_DELETE = 'option_delete';
+    const OPTIONS_CHANGED = 'options_changed';
     const VALUE_ADD  = 'value_add';
     const VALUE_DELETE = 'value_delete';
 

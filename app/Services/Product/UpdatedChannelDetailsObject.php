@@ -10,6 +10,7 @@ class UpdatedChannelDetailsObject
     private $cost;
     private $wholeSalePrice;
     private $channelId;
+    private $skuChannelId;
 
     /**
      * @param mixed $channelDetails
@@ -68,7 +69,8 @@ class UpdatedChannelDetailsObject
     public function validate()
     {
         return (property_exists( $this->channelDetails,'channel_id')) && (property_exists( $this->channelDetails,'cost'))
-            && (property_exists( $this->channelDetails,'price')) && (property_exists( $this->channelDetails,'wholesale_price'));
+            && (property_exists( $this->channelDetails,'price')) && (property_exists( $this->channelDetails,'wholesale_price'))
+            && (property_exists( $this->channelDetails,'sku_channel_id'));
     }
 
 

@@ -1,6 +1,5 @@
 <?php namespace App\Services\Product;
 
-
 use App\Exceptions\ProductDetailsPropertyValidationError;
 
 class UpdatedProductDetailsObject
@@ -40,7 +39,7 @@ class UpdatedProductDetailsObject
      */
     public function validate()
     {
-        return (property_exists($this->productDetail,'combination') && property_exists($this->productDetail,'stock')
+        return  (property_exists($this->productDetail,'combination') && property_exists($this->productDetail,'stock')
             && property_exists($this->productDetail,'channel_data'));
     }
 
@@ -50,9 +49,8 @@ class UpdatedProductDetailsObject
 
         $final = [];
         foreach ($this->productDetail->combination as $option_value) {
-            array_push($final, app(CombinationDetailsObject::class)->setCombinationDetail($option_value)->build());
+            array_push($final, app(UpdatedCombinationDetailsObject::class)->setCombinationDetail($option_value)->build());
         }
-
         $this->combination = $final;
         return $this;
     }
@@ -61,6 +59,7 @@ class UpdatedProductDetailsObject
     {
         return $this->combination;
     }
+
 
     public function setStock()
     {
@@ -76,7 +75,7 @@ class UpdatedProductDetailsObject
     {
         $final = [];
         foreach ($this->productDetail->channel_data as $channel_data) {
-            array_push($final, app(ChannelDetailsObject::class)->setChannelDetails($channel_data)->build());
+            array_push($final, app(UpdatedChannelDetailsObject::class)->setChannelDetails($channel_data)->build());
         }
         $this->channelData = $final;
         return $this;
@@ -86,8 +85,5 @@ class UpdatedProductDetailsObject
     {
         return $this->channelData;
     }
-
-
-
 
 }
