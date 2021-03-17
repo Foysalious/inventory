@@ -20,13 +20,13 @@ class CollectionRequest extends FormRequest
     public function rules() : array
     {
         return [
-            'name'          => 'required|string',
-            'thumb'         => 'required|mimes:jpg,jpeg,png',
-            'banner'        => 'required|mimes:jpg,jpeg,png',
-            'app_thumb'     => 'required|mimes:jpg,jpeg,png',
-            'app_banner'    => 'required|mimes:jpg,jpeg,png',
-            'is_published'  => 'required',
-            'partner_id'    => 'required'
+            'name'              => 'required|string',
+            'description'       => 'nullable',
+            'is_published'      => 'required',
+            'thumb'             => 'nullable',
+            'banner'            => 'nullable|mimes:jpg,bmp,png,jpeg',
+            'app_thumb'         => 'nullable|mimes:jpg,bmp,png,jpeg',
+            'app_banner'        => 'nullable|mimes:jpg,bmp,png,jpeg'
         ];
     }
 }

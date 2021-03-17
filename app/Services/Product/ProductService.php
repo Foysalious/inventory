@@ -4,6 +4,7 @@
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Http\Resources\ProductChannelPriceResource;
 use App\Http\Resources\ProductResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -47,7 +48,7 @@ class ProductService extends BaseService
         $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner, $offset, $limit);
         if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $products = ProductResource::collection($resource);
-        return $this->success('Successful', $products, 200);
+        return $this->success('Successful', ['products' => $products], 200);
     }
 
     /**
@@ -61,7 +62,7 @@ class ProductService extends BaseService
         $general_details->options = collect($options);
         $general_details->combinations = collect($combinations);
         $product = new ProductResource($general_details);
-        return $this->success('Successful', $product, 200);
+        return $this->success('Successful', ['product' => $product], 200);
     }
 
     private function getCombinationData($product)
@@ -136,7 +137,8 @@ class ProductService extends BaseService
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
             ->create();
-        return $this->success("Successful", $product,201);
+
+        return $this->success("Successful", ['product' => $product],201);
     }
 
     /**
@@ -163,12 +165,12 @@ class ProductService extends BaseService
             ->setHasVariant($has_variant)
             ->setOptions($request->options)
             ->update();
-        return $this->success("Successful", $product,200);
+        return $this->success("Successful", ['product' => $product],200);
     }
 
     public function delete($productId)
     {
         $product = $this->productRepositoryInterface->findOrFail($productId)->delete();
-        return $this->success("Successful", $product,200, false);
+        return $this->success("Successful", ['product' => $product],200, false);
     }
 }

@@ -2,6 +2,7 @@
 
 
 use App\Http\Requests\CategoryRequest;
+use App\Models\Category;
 use App\Services\Category\CategoryService;
 use App\Traits\ModificationFields;
 use Illuminate\Http\JsonResponse;
@@ -34,13 +35,21 @@ class CategoryController extends Controller
         return $this->categoryService->getCategoriesByPartner($partner_id);
     }
 
+    public function getMasterSubCat($partner_id)
+    {
+
+        return $this->categoryService->getCategory($partner_id);
+
+    }
+
     /**
      * @param CategoryRequest $request
      * @return JsonResponse
      */
     public function store($partner,CategoryRequest $request)
     {
-        return $this->categoryService->create($request,$partner);
+        return $this->categoryService->create($request, $partner);
+
     }
 
     public function update($partner, $category,CategoryRequest $request)
@@ -52,14 +61,6 @@ class CategoryController extends Controller
     {
         return $this->categoryService->delete($request);
     }
-
-    public function getMasterSubCat(Request $request)
-    {
-
-        return $this->categoryService->getCategory();
-
-    }
-
 
 
 }

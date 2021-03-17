@@ -242,6 +242,7 @@ class Creator
         $product =  $this->productRepositoryInterface->create($this->makeData());
         $this->hasVariants ? $this->createVariantsSKUAndSKUChannels($product) : $this->createSKUAndSKUChannels($product);
 
+
         if ($this->discountAmount)
             $this->createProductDiscount($product);
         if ($this->images)

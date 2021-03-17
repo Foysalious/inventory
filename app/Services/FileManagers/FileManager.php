@@ -18,9 +18,4 @@ trait FileManager
         if ($file instanceof UploadedFile) return $file->getClientOriginalExtension();
         return getBase64FileExtension($file);
     }
-
-    protected function makeProductImages($file, $name)
-    {
-        return [$file, $this->uniqueFileName($file, $name)];
-    }
 }

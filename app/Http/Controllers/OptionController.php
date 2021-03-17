@@ -46,8 +46,14 @@ class OptionController extends Controller
      * @param $optionId
      * @return JsonResponse
      */
-    public function update(OptionRequest $request, $partnerId, $optionId)
+    public function update(OptionRequest $request, $optionId)
     {
         return $this->optionService->update($request, $optionId);
+    }
+
+    public function destroy($optionId)
+    {
+        return $this->optionService->delete($optionId);
+
     }
 }

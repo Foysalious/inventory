@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CollectionRequest;
-use App\Models\Collection;
 use App\Services\Collection\CollectionService;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
@@ -19,8 +18,7 @@ class CollectionController extends Controller
         $this->collectionService = $collectionService;
     }
 
-
-    public function index(Request $request) : object
+    public function index(Request $request, $partner_id) : object
     {
         try {
             return $this->collectionService->getAll($request);
@@ -35,20 +33,20 @@ class CollectionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\Response
      */
-    public function store(CollectionRequest $request)
+    public function store($partner_id, CollectionRequest $request)
     {
-        return $this->collectionService->create($request);
+        return $this->collectionService->create($partner_id, $request->validated());
     }
 
     /**
      * Display the specified resource.
      *
      * @param  \App\Models\Collection  $collection
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function show($collection)
+    public function show($partner_id, $collection_id)
     {
-        return $this->collectionService->getDetails($collection);
+        return $this->collectionService->getDetails($partner_id, $collection_id);
     }
 
     /**
@@ -56,11 +54,11 @@ class CollectionController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Collection  $collection
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
-    public function update(CollectionRequest $request, $collection_id)
+    public function update(CollectionRequest $request, $partner_id, $collection_id)
     {
-        return $this->collectionService->update($request, $collection_id);
+        return $this->collectionService->update($request->validated(), $partner_id, $collection_id);
     }
 
     /**
@@ -69,8 +67,8 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function destroy($collection)
+    public function destroy($partner_id, $collection_id)
     {
-        return $this->collectionService->delete($collection);
+        return $this->collectionService->delete($partner_id, $collection_id);
     }
 }

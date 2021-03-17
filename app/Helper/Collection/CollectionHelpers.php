@@ -24,11 +24,7 @@ if( !function_exists('getCollectionDefaultThumbFolder')) {
 
 
     function getCollectionDefaultThumbFolder() : string {
-
-        $url = config('filesystems.disks.s3.default_image_path');
-
-        return $url . 'images/categories_images/thumbs/';
-
+        return 'images/categories_images/thumbs/';
     }
 }
 
@@ -58,11 +54,7 @@ if( !function_exists('getCollectionDefaultAppThumbFolder')) {
      */
 
     function getCollectionDefaultAppThumbFolder() : string {
-
-        $url = config('filesystems.disks.s3.default_image_path');
-
-        return $url . 'images/categories_images/app_thumbs/';
-
+        return 'images/categories_images/app_thumbs/';
     }
 }
 
@@ -92,11 +84,7 @@ if( !function_exists('getCollectionDefaultBannerFolder')) {
      */
 
     function getCollectionDefaultBannerFolder() : string {
-
-        $url = config('filesystems.disks.s3.default_image_path');
-
-        return $url . 'images/categories_images/banner/';
-
+        return 'images/categories_images/banner/';
     }
 }
 
@@ -126,11 +114,7 @@ if( !function_exists('getCollectionDefaultAppBannerFolder')) {
      */
 
     function getCollectionDefaultAppBannerFolder() : string {
-
-        $url = config('filesystems.disks.s3.default_image_path');
-
-        return $url . 'images/categories_images/banner/';
-
+        return 'images/categories_images/banner/';
     }
 }
 

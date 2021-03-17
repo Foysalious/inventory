@@ -10,7 +10,7 @@ class Category extends BaseModel
 
     protected $guarded = ['id'];
 
-
+//    protected $visible = ['id', 'name'];
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
@@ -49,5 +49,10 @@ class Category extends BaseModel
     public function partners()
     {
         return $this->belongsToMany(Partner::class);
+    }
+
+    public function categoryPartner()
+    {
+        return $this->hasMany(CategoryPartner::class, 'category_id');
     }
 }
