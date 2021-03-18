@@ -45,8 +45,6 @@ trait CdnFileManager
 
     protected function deleteFileFromCDN($filename)
     {
-        dd($filename);
-        $file = $this->getCDN()->delete($filename);
-        dd($file);
+        $this->getCDN()->delete($filename);
     }
 }
