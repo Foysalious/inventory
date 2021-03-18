@@ -55,13 +55,13 @@ class CollectionService extends BaseService
     public function create($partner_id, $request)
     {
         $collection = $this->creator->setName($request['name'])
-            ->setDescription($request['description'])
+            ->setDescription($request['description'] ?? '')
             ->setIsPublished($request['is_published'])
             ->setPartnerId($partner_id)
-            ->setThumb($request['thumb'])
-            ->setBanner($request['banner'])
-            ->setAppThumb($request['app_thumb'])
-            ->setAppBanner($request['app_banner'])
+            ->setThumb($request['thumb'] ?? '')
+            ->setBanner($request['banner'] ?? '')
+            ->setAppThumb($request['app_thumb'] ?? '')
+            ->setAppBanner($request['app_banner'] ?? '')
             ->create();
 
         return $this->success("Successful", ['collection' => $collection],201);
@@ -96,8 +96,7 @@ class CollectionService extends BaseService
             foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
             {
                 $thumbFile = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-                if(isset($thumbFile))
-                    $this->deleteFileFromCDN($thumbFile);
+                if(isset($thumbFile)) $this->deleteFileFromCDN($thumbFile);
             }
 
             return $this->success("Successful",null, 200);
