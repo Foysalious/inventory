@@ -16,7 +16,7 @@ trait ResponseAPI
     public function coreResponse($message, $data = null, $statusCode, $isSuccess = true)
     {
         if(!$message) return response()->json(['message' => 'Message is required'], 500);
-        $public_response = array_merge(['message' => $message], $data);
+        if ($data != null) $public_response = array_merge(['message' => $message], $data);
         if($isSuccess) {
             return response()->json($public_response, $statusCode);
         } else {
