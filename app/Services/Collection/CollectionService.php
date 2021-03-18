@@ -95,6 +95,7 @@ class CollectionService extends BaseService
             foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
             {
                 $fileName = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+                dd($fileName);
                 if(isset($fileName))
                 {
                     $storagePath = config('s3.url');
