@@ -32,10 +32,10 @@ class CollectionService extends BaseService
         try {
             list($offset, $limit) = calculatePagination($request);
             $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit);
-            $options = CollectionResource::collection($resource);
-            if(!$options) return $this->error("Collection not found!", 404);
+            $collections = CollectionResource::collection($resource);
+            if(!$collections) return $this->error("Collection not found!", 404);
 
-            return $this->success("Successful", ['options' => $options], 200);
+            return $this->success("Successful", ['collections' => $collections], 200);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
@@ -54,7 +54,7 @@ class CollectionService extends BaseService
 
     public function create($partner_id, $request)
     {
-        $option = $this->creator->setName($request['name'])
+        $collection = $this->creator->setName($request['name'])
             ->setDescription($request['description'])
             ->setIsPublished($request['is_published'])
             ->setPartnerId($partner_id)
@@ -64,7 +64,7 @@ class CollectionService extends BaseService
             ->setAppBanner($request['app_banner'])
             ->create();
 
-        return $this->success("Successful", $option,201);
+        return $this->success("Successful", ['collection' => $collection],201);
     }
 
     public function update($request, $partner_id, $collection_id)
@@ -72,7 +72,7 @@ class CollectionService extends BaseService
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
 
-        $option = $this->updater->setCollection($collection)->setName($request['name'])
+        $collection_update = $this->updater->setCollection($collection)->setName($request['name'])
             ->setCollectionId($collection_id)
             ->setDescription($request['description'])
             ->setPartnerId($partner_id)
@@ -83,7 +83,7 @@ class CollectionService extends BaseService
             ->setIsPublished($request['is_published'])
             ->update();
 
-        return $this->success("Successful", ['collection' => $option],201);
+        return $this->success("Successful", ['collection' => $collection_update],201);
     }
 
     public function delete($partner_id, $collection)
