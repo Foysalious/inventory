@@ -24,7 +24,8 @@ class CollectionUpdateRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'name' => 'required|string',
+            'is_published' => 'required'
         ];
     }
 }
