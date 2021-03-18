@@ -52,7 +52,7 @@ class CollectionService extends BaseService
         }
     }
 
-    public function create($partner_id, CollectionRequest $request)
+    public function create($partner_id, $request)
     {
         $collection = $this->creator->setName($request['name'])
             ->setDescription($request['description'] ?? '')
@@ -67,7 +67,7 @@ class CollectionService extends BaseService
         return $this->success("Successful", ['collection' => $collection],201);
     }
 
-    public function update(CollectionRequest $request, $partner_id, $collection_id)
+    public function update($request, $partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
