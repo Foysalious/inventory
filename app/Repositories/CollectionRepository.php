@@ -22,6 +22,6 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name)
     {
-        return $this->model->where('id', $collection_id)->first()[$column_name];
+        return $this->model->where('id', $collection_id)->first()[$column_name] ?? [];
     }
 }
