@@ -91,7 +91,6 @@ class CollectionService extends BaseService
         try {
             $collection = $this->collectionRepositoryInterface->find($collection);
             $collection_id = $collection->id;
-            $this->collectionRepositoryInterface->where('id', $collection_id)->delete();
 
             foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
             {
@@ -104,7 +103,7 @@ class CollectionService extends BaseService
                     $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
                 }
             }
-
+            $this->collectionRepositoryInterface->where('id', $collection_id)->delete();
             return $this->success("Successful",null, 200);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
