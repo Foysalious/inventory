@@ -98,8 +98,6 @@ class CollectionService extends BaseService
                 if(isset($fileName))
                 {
                     $storagePath = config('s3.url');
-                    //dd($storagePath);
-                    dd(substr($fileName, strlen($storagePath)));
                     $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
                 }
             }
