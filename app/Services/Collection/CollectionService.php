@@ -74,12 +74,12 @@ class CollectionService extends BaseService
 
         $collection_update = $this->updater->setCollection($collection)->setName($request['name'])
             ->setCollectionId($collection_id)
-            ->setDescription($request['description'])
+            ->setDescription($request['description'] ?? '')
             ->setPartnerId($partner_id)
-            ->setThumb($request['thumb'])
-            ->setBanner($request['banner'])
-            ->setAppThumb($request['app_thumb'])
-            ->setAppBanner($request['app_banner'])
+            ->setThumb($request['thumb'] ?? '')
+            ->setBanner($request['banner'] ?? '')
+            ->setAppThumb($request['app_thumb'] ?? '')
+            ->setAppBanner($request['app_banner'] ?? '')
             ->setIsPublished($request['is_published'])
             ->update();
 
