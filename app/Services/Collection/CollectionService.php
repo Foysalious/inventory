@@ -98,6 +98,7 @@ class CollectionService extends BaseService
                 if(isset($fileName))
                 {
                     $storagePath = $this->getCDN();
+                    dd($storagePath);
                     dd(substr($fileName, strlen($storagePath)));
                     $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
                 }
