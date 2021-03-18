@@ -46,7 +46,6 @@ trait CdnFileManager
     protected function
     deleteFileFromCDN($filename)
     {
-        $filename = 'images/categories_images/thumbs/1616047868_phpe7ldol_collection_thumb.png';
         $this->getCDN()->delete($filename);
     }
 }

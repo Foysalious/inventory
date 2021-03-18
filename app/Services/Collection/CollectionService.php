@@ -95,8 +95,13 @@ class CollectionService extends BaseService
 
             foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
             {
-                $thumbFile = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-                if(isset($thumbFile)) $this->deleteFileFromCDN($thumbFile);
+                $fileName = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+                if(isset($thumbFile))
+                {
+                    $storagePath = $this->getCDN();
+                    dd(substr($fileName, strlen($storagePath)));
+                    $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
+                }
             }
 
             return $this->success("Successful",null, 200);
