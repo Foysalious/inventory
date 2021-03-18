@@ -99,7 +99,7 @@ class CollectionService extends BaseService
                 }
             }
             $collection = $this->collectionRepositoryInterface->findOrFail($collection_id)->delete();
-            return $this->success("Successful",['collection' => $collection], 200);
+            return $this->success("Successful",['collection' => $collection], 200, false);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
