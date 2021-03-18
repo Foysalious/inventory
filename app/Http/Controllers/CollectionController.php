@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\CollectionRequest;
+use App\Http\Requests\CollectionUpdateRequest;
 use App\Services\Collection\CollectionService;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
@@ -56,7 +57,7 @@ class CollectionController extends Controller
      * @param  \App\Models\Collection  $collection
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(CollectionRequest $request, $partner_id, $collection_id)
+    public function update(CollectionUpdateRequest $request, $partner_id, $collection_id)
     {
         return $this->collectionService->update($request->validated(), $partner_id, $collection_id);
     }
