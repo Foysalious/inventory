@@ -97,8 +97,8 @@ class CollectionService extends BaseService
                 $fileName = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
                 if(isset($fileName))
                 {
-                    $storagePath = $this->getCDN();
-                    dd($storagePath);
+                    $storagePath = config('s3.url');
+                    //dd($storagePath);
                     dd(substr($fileName, strlen($storagePath)));
                     $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
                 }
