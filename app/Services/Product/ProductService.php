@@ -79,10 +79,19 @@ class ProductService extends BaseService
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
                     $product_option_value = $combination->productOptionValue;
                     $value = $product_option_value->name;
+                    $product_option_value_id = $product_option_value->id;
                     $option = $product_option_value->productOption->name;
+                    $product_option_id = $product_option_value->id;
                     array_push($temp, [
-                        'option' => $option,
-                        'value' => $value,
+                        'option' => [
+                            'name' => $option,
+                            'product_option_id' => $product_option_id
+                        ],
+                        'value' => [
+                            'name' => $value,
+                            'prodcut_option_value_id' => $product_option_value_id
+                        ]
+
                     ]);
                 });
             }
@@ -120,7 +129,6 @@ class ProductService extends BaseService
     {
         /** @var ProductDetailsObject[] $product_create_requests */
        list($has_variant,$product_create_request_objs) =  app(ProductCreateRequest::class)->setProductDetails($request->product_details)->get();
-       dd($product_create_request_objs);
 
 
         $product = $this->creator->setPartnerId($partnerId)
@@ -163,7 +171,6 @@ class ProductService extends BaseService
             ->setImages($request->images)
             ->setProductUpdateRequestObjects($product_update_request_objs)
             ->setHasVariant($has_variant)
-            ->setOptions($request->options)
             ->update();
         return $this->success("Successful", ['product' => $product],200);
     }
