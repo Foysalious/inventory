@@ -12,6 +12,10 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
 use App\Models\Sku;
 use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\Product\Update\Operations\OptionsChanged;
+use App\Services\Product\Update\Operations\ValuesAdded;
+use App\Services\Product\Update\Operations\ValuesAddedDeleted;
+use App\Services\Product\Update\Operations\ValuesDeleted;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 
 class Updater
@@ -35,6 +39,16 @@ class Updater
     protected $combinationRepositoryInterface;
     protected $productChannelRepositoryInterface;
     protected $skuRepositoryInterface;
+    protected $discountAmount;
+    protected $discountEndDate;
+    protected $images;
+    private $options;
+    private $productUpdateRequestObjects;
+    /**
+     * @var mixed
+     */
+    private $deletedValues;
+
 
     /**
      * Updater constructor.
@@ -145,29 +159,118 @@ class Updater
         return $this;
     }
 
-    public function setProductDetails($productDetails)
+    public function setDiscount($discount_amount)
     {
-        $this->productDetails = $productDetails;
+        $this->discountAmount = $discount_amount;
+        return $this;
+    }
+
+    public function setDiscountEndDate($discount_end_date)
+    {
+        $this->discountEndDate = $discount_end_date;
+        return $this;
+    }
+
+    public function setImages($images)
+    {
+        $this->images = $images;
+        return $this;
+    }
+
+    public function setProductUpdateRequestObjects($productUpdateRequestObjects)
+    {
+        $this->productUpdateRequestObjects = $productUpdateRequestObjects;
+        return $this;
+    }
+
+    public function setHasVariant($hasVariants)
+    {
+        $this->hasVariants = $hasVariants;
+        return $this;
+    }
+
+    public function setOptions($options)
+    {
+        $this->options = $options;
         return $this;
     }
 
     public function update()
     {
-        $product =  $this->productRepositoryInterface->update($this->product, $this->makeData());
-        $nature = $this->getNature($product);
+        $product = $this->productRepositoryInterface->update($this->product, $this->makeData());
+        $nature =  $this->getNature($product, $this->productUpdateRequestObjects);
+        if ($nature == UpdateNature::OPTIONS_CHANGED)
+            return app(OptionsChanged::class)->setProduct($product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        elseif ($nature == UpdateNature::VALUE_ADD_DELETE)
+            return app(ValuesAddedDeleted::class)->setProduct($product)->setDeletedValues($this->deletedValues)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        elseif ($nature == UpdateNature::VALUE_ADD)
+            return app(ValuesAdded::class)->setProduct($product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        else
+            return app(ValuesDeleted::class)->setProduct($product)->setDeletedValues($this->deletedValues)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+    }
+
+    private function getNature($product, $skus)
+    {
+        if ($this->checkIsOptionChanged($skus[0]->getCombination()))
+            return UpdateNature::OPTIONS_CHANGED;
+        list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
+        list($is_values_deleted,$deleted_values) = $this->checkIsValesDeleted($product, $updatedValues);
+        $this->deletedValues = $deleted_values;
+
+        if ($is_new_values_added && $is_values_deleted)
+            return UpdateNature::VALUE_ADD_DELETE;
+        elseif ($is_new_values_added && !$is_values_deleted)
+            return UpdateNature::VALUE_ADD;
+        else
+            return UpdateNature::VALUE_DELETE;
+
+    }
+
+    private function checkIsValesDeleted($product, $updatedValues)
+    {
+        $is_deleted = false;
+        $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'));
+
+        $filtered_updated_values = array_filter($updatedValues, function ($a) {
+            return $a !== null;
+        });
+        if($created_product_option_value_ids != $filtered_updated_values)
+            $is_deleted = true;
+
+        return $is_deleted ? [$is_deleted,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false,null];
 
 
     }
 
-    private function getNature($product)
+    private function checkIsValuesAdded($skus)
     {
-        $skus = $this->skuRepositoryInterface->where('product_id',$product->id)->with('combinations')->get();
-        foreach($skus as $sku)
-        {
-            $p_o_v_s = $sku->combinaions->pluck('product_option_value_id');
-            $p_o_v = $this->productOptionValueRepositoryInterface->whereIn('id',$p_o_v_s)->select('product_option_id','name')->get();
+        $product_option_value_ids = [];
+        foreach ($skus as $sku) {
+            $combination = $sku->getCombination();
+            foreach ($combination as $options_values) {
+                foreach ($options_values as $option_value)
+                    array_push($product_option_value_ids, $option_value->getProductOptionValueId());
+            }
         }
 
+        return [in_array(null, $product_option_value_ids, true), $product_option_value_ids];
+    }
+
+    private function checkIsOptionChanged($first_options_values)
+    {
+        $updated_option_ids = [];
+        foreach ($first_options_values as $option_value) {
+            array_push($updated_option_ids, $option_value->option_id);
+        }
+        return $this->containsOnlyNull($updated_option_ids);
+
+    }
+
+    private function containsOnlyNull($input)
+    {
+        return empty(array_filter($input, function ($a) {
+            return $a !== null;
+        }));
     }
 
     private function makeData()

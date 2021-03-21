@@ -6,17 +6,10 @@ use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductChannelPriceResource;
 use App\Http\Resources\ProductResource;
-use App\Interfaces\CombinationRepositoryInterface;
-use App\Interfaces\OptionRepositoryInterface;
-use App\Interfaces\ProductChannelRepositoryInterface;
 use App\Interfaces\ProductOptionRepositoryInterface;
-use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
-use App\Interfaces\ValueRepositoryInterface;
 use App\Services\BaseService;
-use App\Services\Discount\Creator as DiscountCreator;
-use App\Services\ProductImage\Creator as ProductImageCreator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -32,16 +25,12 @@ class ProductService extends BaseService
     protected $optionRepositoryInterface;
     protected $valueRepositoryInterface;
     protected $productOptionRepositoryInterface;
-    protected $productOptionValueRepositoryInterface;
-    protected $combinationRepositoryInterface;
-    protected $productChannelRepositoryInterface;
     protected $skuRepositoryInterface;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, Creator $creator, Updater $updater, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
-                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface, ProductChannelRepositoryInterface $productChannelRepositoryInterface,SkuRepositoryInterface $skuRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionRepositoryInterface $productOptionRepositoryInterface, Creator $creator, Updater $updater,SkuRepositoryInterface $skuRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->skuRepositoryInterface = $skuRepositoryInterface;
@@ -69,56 +58,74 @@ class ProductService extends BaseService
     public function getDetails($product)
     {
         $general_details = $this->productRepositoryInterface->findOrFail($product);
-        $combinations = $this->getCombinationData($general_details);
+        list($options,$combinations) = $this->getCombinationData($general_details);
+        $general_details->options = collect($options);
         $general_details->combinations = collect($combinations);
         $product = new ProductResource($general_details);
         return $this->success('Successful', ['product' => $product], 200);
     }
 
+    /**
+     * @param $product
+     * @return array
+     */
     private function getCombinationData($product)
     {
-
-        $skus = $this->skuRepositoryInterface->where('product_id', $product->id)->with('combinations')->get();
         $data = [];
+        $options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->pluck('name');
+        $skus = $this->skuRepositoryInterface->where('product_id', $product->id)->with('combinations')->get();
+
         foreach ($skus as $sku) {
             $sku_data = [];
             $temp = [];
-            $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
-                $product_option_value = $combination->productOptionValue;
-                $value = $product_option_value->name;
-                $option = $product_option_value->productOption->name;
-                array_push($temp, [
-                    'option' => $option,
-                    'value' => $value,
-                ]);
-            });
+            if($sku->combinations)
+            {
+                $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
+                    $product_option_value = $combination->productOptionValue;
+                    array_push($temp, [
+                        'option_id' => $product_option_value->productOption->id,
+                        'option_name' => $product_option_value->productOption->name,
+                        'option_value_id' => $product_option_value->id,
+                        'option_value_name' => $product_option_value->name
+                    ]);
+                });
+            }
+
             if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
-            $sku_data['combination'] = $temp;
+            $sku_data['combination'] = !empty($temp)? $temp :null;
             if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
             $sku_data['stock'] = $sku->stock;
             $temp = [];
-            $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
-                array_push($temp, [
-                    "channel_id" => $sku_channel->channel_id,
-                    "cost" => $sku_channel->cost,
-                    "price" => $sku_channel->price,
-                    "wholesale_price" => $sku_channel->wholesale_price
-                ]);
-            });
+            if($sku->skuChannels)
+            {
+                $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                    array_push($temp, [
+                        "channel_id" => $sku_channel->channel_id,
+                        "cost" => $sku_channel->cost,
+                        "price" => $sku_channel->price,
+                        "wholesale_price" => $sku_channel->wholesale_price
+                    ]);
+                });
+            }
+
             if (!isset($sku_data['channel_data'])) $sku_data['channel_data'] = [];
-            $sku_data['channel_data'] = $temp;
+            $sku_data['channel_data'] = !empty($temp)? $temp :null;
             array_push($data, $sku_data);
         }
-        return $data;
+        return [$options,$data];
     }
 
     /**
      * @param $partnerId
-     * @param ProductRequest $request
+     * @param ProductCreateRequest $request
      * @return JsonResponse
      */
     public function create($partnerId, ProductRequest $request)
     {
+        /** @var ProductDetailsObject[] $product_create_requests */
+       list($has_variant,$product_create_request_objs) =  app(ProductCreateRequest::class)->setProductDetails($request->product_details)->get();
+
+
         $product = $this->creator->setPartnerId($partnerId)
             ->setCategoryId($request->category_id)
             ->setName($request->name)
@@ -130,7 +137,8 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
-           /* ->setProductDetails($request->product_details)*/
+            ->setProductRequestObjects($product_create_request_objs)
+            ->setHasVariant($has_variant)
             ->create();
 
         return $this->success("Successful", ['product' => $product],201);
@@ -143,6 +151,7 @@ class ProductService extends BaseService
      */
     public function update($productId, ProductUpdateRequest $request)
     {
+        list($has_variant,$product_update_request_objs) =  app(UpdateProductRequest::class)->setProductDetails($request->product_details)->get();
         $product = $this->productRepositoryInterface->findOrFail($productId);
         $this->updater->setProduct($product)
             ->setCategoryId($request->category_id)
@@ -152,7 +161,11 @@ class ProductService extends BaseService
             ->setWarrantyUnit($request->warranty_unit)
             ->setVatPercentage($request->vat_percentage)
             ->setUnitId($request->unit_id)
-            ->setProductDetails($request->product_details)
+            ->setDiscount($request->discount_amount)
+            ->setDiscountEndDate($request->discount_end_date)
+            ->setImages($request->images)
+            ->setProductUpdateRequestObjects($product_update_request_objs)
+            ->setHasVariant($has_variant)
             ->update();
         return $this->success("Successful", ['product' => $product],200);
     }

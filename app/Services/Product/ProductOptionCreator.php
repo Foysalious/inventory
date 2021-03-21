@@ -2,7 +2,7 @@
 
 
 use App\Interfaces\ProductOptionRepositoryInterface;
-use App\Repositories\ProductOptionRepository;
+
 
 class ProductOptionCreator
 {
@@ -47,7 +47,7 @@ class ProductOptionCreator
 
     public function create()
     {
-        return $this->productOptionRepository->create($this->makeData());
+        return $this->productOptionRepository->firstOrCreate($this->makeData());
     }
 
 
