@@ -59,7 +59,6 @@ class CollectionController extends Controller
      */
     public function update(CollectionUpdateRequest $request, $partner_id, $collection_id)
     {
-        dd($request->all());
         return $this->collectionService->update($request->validated(), $partner_id, $collection_id);
     }
 
