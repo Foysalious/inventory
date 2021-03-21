@@ -27,7 +27,8 @@ class ImageUpdater
     private function deleteCollectionImageFromCDN($partner_id, $collection_id, $column_name = '')
     {
         $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-        $this->deleteFileFromCDN($fileName);
+        $storagePath = config('s3.url');
+        $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
     }
 
     public function updateImages($partner_id, $collection_id, $thumb, $banner, $app_thumb, $app_banner)
