@@ -237,7 +237,7 @@ class Updater
         if($created_product_option_value_ids != $filtered_updated_values)
             $is_deleted = true;
 
-        return $is_deleted ? [$is_deleted,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [$is_deleted,null];
+        return $is_deleted ? [$is_deleted,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false,null];
 
 
     }

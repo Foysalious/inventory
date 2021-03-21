@@ -65,6 +65,10 @@ class ProductService extends BaseService
         return $this->success('Successful', ['product' => $product], 200);
     }
 
+    /**
+     * @param $product
+     * @return array
+     */
     private function getCombinationData($product)
     {
         $data = [];
@@ -78,20 +82,11 @@ class ProductService extends BaseService
             {
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
                     $product_option_value = $combination->productOptionValue;
-                    $value = $product_option_value->name;
-                    $product_option_value_id = $product_option_value->id;
-                    $option = $product_option_value->productOption->name;
-                    $product_option_id = $product_option_value->id;
                     array_push($temp, [
-                        'option' => [
-                            'name' => $option,
-                            'product_option_id' => $product_option_id
-                        ],
-                        'value' => [
-                            'name' => $value,
-                            'prodcut_option_value_id' => $product_option_value_id
-                        ]
-
+                        'option_id' => $product_option_value->productOption->id,
+                        'option_name' => $product_option_value->productOption->name,
+                        'option_value_id' => $product_option_value->id,
+                        'option_value_name' => $product_option_value->name
                     ]);
                 });
             }
