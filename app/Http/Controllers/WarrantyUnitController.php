@@ -16,6 +16,6 @@ class WarrantyUnitController extends Controller
 
     public function index(Request $request)
     {
-        return $this->warranty_unit_service->getAllWarrantyUnits($request);
+//        return $this->warranty_unit_service->getAllWarrantyUnits($request);
     }
 }
