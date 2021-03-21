@@ -37,6 +37,8 @@ class Creator
     private $productOptionValueCreator;
     private $combinationCreator;
     private $productChannelCreator;
+    private $productRequestObjects;
+    private $hasVariants;
 
 
 
@@ -220,10 +222,16 @@ class Creator
      * @param $productDetails
      * @return $this
      */
-    public function setProductDetails($productDetails)
+    public function setProductRequestObjects($productRequestObjects)
     {
-      $this->productDetails = json_decode($productDetails);
+      $this->productRequestObjects = $productRequestObjects;
       return $this;
+    }
+
+    public function setHasVariant($hasVariants)
+    {
+        $this->hasVariants = $hasVariants;
+        return $this;
     }
 
     /**
@@ -232,7 +240,8 @@ class Creator
     public function create()
     {
         $product =  $this->productRepositoryInterface->create($this->makeData());
-       // is_null($this->productDetails[0]->combination) ?  $this->createSKUAndSKUChannels($product) : $this->createVariantsSKUAndSKUChannels($product);
+        $this->hasVariants ? $this->createVariantsSKUAndSKUChannels($product) : $this->createSKUAndSKUChannels($product);
+
 
         if ($this->discountAmount)
             $this->createProductDiscount($product);
@@ -247,25 +256,25 @@ class Creator
      */
     private function createVariantsSKUAndSKUChannels($product)
     {
-        foreach($this->productDetails as $productDetail)
+        foreach($this->productRequestObjects as $productDetailObject)
         {
-            $combinations = $productDetail->combination;
+            $combinations = $productDetailObject->getCombination();
             $product_option_value_ids = [];
             $values = [];
             foreach($combinations as $combination)
             {
-                $option_name = $combination->option;
+                $option_name = $combination->getoption();
                 $product_option = $this->createProductOptions($product->id, $option_name);
-                $value_name = $combination->value;
+                $value_name = $combination->getValue();
                 $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
                 array_push($product_option_value_ids,$product_option_value->id);
                 array_push($values,$value_name);
             }
 
-             $sku = $this->createSku($product,$values,$product->id,$productDetail->stock);
-             $this->createSkuChannels($sku,$productDetail->channel_data);
+             $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
+             $this->createSkuChannels($sku,$productDetailObject->getChannelData());
              $this->createCombination($sku->id,$product_option_value_ids);
-             $this->createProductChannel($productDetail->channel_data,$product->id);
+             $this->createProductChannel($productDetailObject->getChannelData(),$product->id);
         }
     }
 
@@ -296,7 +305,7 @@ class Creator
         $product_channels =   collect($channels)->map(function($channel) use($product_id) {
             return [
                 'product_id' => $product_id,
-                'channel_id' =>   $channel->channel_id,
+                'channel_id' =>   $channel->getChannelId(),
             ];
         });
 
@@ -331,10 +340,10 @@ class Creator
         {
            array_push($data,[
                'sku_id' => $sku->id,
-               'channel_id' => $channel->channel_id,
-               'cost' =>  $channel->cost ?: 0,
-               'price' => $channel->price ?: 0,
-               'wholesale_price' => $channel->wholesale_price ?: null
+               'channel_id' => $channel->getChannelId(),
+               'cost' =>  $channel->getCost() ?: 0,
+               'price' => $channel->getPrice() ?: 0,
+               'wholesale_price' => $channel->getWholeSalePrice() ?: null
            ]);
         }
        return  $sku->skuChannels()->insert($data);
@@ -367,10 +376,10 @@ class Creator
      */
     private function createSKUAndSKUChannels($product)
     {
-        $stock = $this->productDetails[0]->stock > 0 ?: 0;
+        $stock = $this->productRequestObjects[0]->getStock();
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
-        $this->createSKUChannels($sku,$this->productDetails[0]->channel_data);
-        $this->createProductChannel($this->productDetails[0]->channel_data,$product->id);
+        $this->createSKUChannels($sku,$this->productRequestObjects[0]->getChannelData());
+        $this->createProductChannel($this->productRequestObjects[0]->getChannelData(),$product->id);
     }
 
 
