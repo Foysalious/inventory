@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\WarrantyUnitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +38,7 @@ Route::group(['prefix'=>'v1'], function(){
 
         });
         Route::apiResource('collection', CollectionController::class);
+        Route::get('warranty-unit', [WarrantyUnitController::class, 'index']);
     });
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
@@ -50,6 +52,6 @@ Route::group(['prefix'=>'v1'], function(){
         Route::get('/', [UnitController::class, 'index']);
     });
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
-    Route::apiResource('collection', CollectionController::class);
+//    Route::apiResource('collection', CollectionController::class);
     Route::get('/channels', [ChannelController::class, 'index']);
 });
