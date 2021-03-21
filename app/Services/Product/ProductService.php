@@ -100,6 +100,7 @@ class ProductService extends BaseService
             {
                 $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
                     array_push($temp, [
+                        "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,
                         "cost" => $sku_channel->cost,
                         "price" => $sku_channel->price,
