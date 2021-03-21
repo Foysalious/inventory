@@ -45,6 +45,16 @@ class UpdatedChannelDetailsObject
         return $this->wholeSalePrice;
     }
 
+    public function getChannelId()
+    {
+        return $this->channelId;
+    }
+
+    public function getSkuChannelId()
+    {
+        return $this->skuChannelId;
+    }
+
     /**
      * @return $this
      * @throws ProductDetailsPropertyValidationError
@@ -57,14 +67,10 @@ class UpdatedChannelDetailsObject
         $this->price = $this->channelDetails->price;
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;
+        $this->skuChannelId = $this->channelDetails->sku_channel_id;
         return $this;
-
     }
 
-    public function getChannelId()
-    {
-        return $this->channelId;
-    }
 
     public function validate()
     {
