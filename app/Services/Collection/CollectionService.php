@@ -14,18 +14,19 @@ class CollectionService extends BaseService
 {
     use CdnFileManager;
 
-    protected $collectionRepository;
+    protected $collectionRepository, $imageUpdater;
 
     protected $collectionRepositoryInterface;
 
     protected $creator, $updater;
 
-    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface, Creator $creator, Updater $updater)
+    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface, Creator $creator, Updater $updater, ImageUpdater $imageUpdater)
     {
         $this->collectionRepository = $collectionRepository;
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
+        $this->imageUpdater = $imageUpdater;
     }
 
     public function getAll(Request $request) : object{
@@ -89,15 +90,7 @@ class CollectionService extends BaseService
     public function delete($partner_id, $collection_id)
     {
         try {
-            foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
-            {
-                $fileName = $this->collectionRepository->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-                if(isset($fileName))
-                {
-                    $storagePath = config('s3.url');
-                    $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
-                }
-            }
+            $this->imageUpdater->deleteAllCollectionImages($partner_id, $collection_id);
             $collection = $this->collectionRepositoryInterface->findOrFail($collection_id)->delete();
             return $this->success("Successful",['collection' => $collection], 200, false);
         } catch (\Exception $exception) {
