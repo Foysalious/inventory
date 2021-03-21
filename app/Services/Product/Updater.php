@@ -201,16 +201,17 @@ class Updater
     public function update()
     {
         $product = $this->productRepositoryInterface->update($this->product, $this->makeData());
-        $nature = $this->natureFactory->getNature($product, $this->productUpdateRequestObjects);
+        list($nature,$deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects);
+        //dd($nature,$deleted_values);
 
         if ($nature == UpdateNature::OPTIONS_CHANGED)
             return app(OptionsChanged::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         elseif ($nature == UpdateNature::VALUE_ADD_DELETE)
-            return app(ValuesAddedDeleted::class)->setProduct($this->product)->setDeletedValues($this->deletedValues)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            return app(ValuesAddedDeleted::class)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         elseif ($nature == UpdateNature::VALUE_ADD)
             return app(ValuesAdded::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else
-            return app(ValuesDeleted::class)->setProduct($this->product)->setDeletedValues($this->deletedValues)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            return app(ValuesDeleted::class)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
     }
 
    /* private function getNature($product, $skus)

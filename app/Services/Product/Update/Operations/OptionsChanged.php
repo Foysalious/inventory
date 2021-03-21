@@ -13,6 +13,28 @@ class OptionsChanged
 {
 
 
+    /**
+     * @var ProductRepositoryInterface
+     */
+
+    private ProductRepositoryInterface $productRepositoryInterface;
+    /**
+     * @var ProductOptionCreator
+     */
+    private ProductOptionCreator $productOptionCreator;
+    /**
+     * @var ProductOptionValueCreator
+     */
+    private ProductOptionValueCreator $productOptionValueCreator;
+    /**
+     * @var CombinationCreator
+     */
+    private CombinationCreator $combinationCreator;
+    /**
+     * @var ProductChannelCreator
+     */
+    private ProductChannelCreator $productChannelCreator;
+
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator,
                                 ProductChannelCreator $productChannelCreator)

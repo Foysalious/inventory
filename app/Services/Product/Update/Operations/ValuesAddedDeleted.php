@@ -85,7 +85,7 @@ class ValuesAddedDeleted
     /**
      * @param mixed $updateDataObejects
      */
-    public function setUpdateDataObejects($updateDataObejects)
+    public function setUpdatedDataObjects($updateDataObejects)
     {
         $this->updateDataObejects = $updateDataObejects;
         return $this;
@@ -97,7 +97,8 @@ class ValuesAddedDeleted
         foreach($this->updateDataObejects as $sku)
         {
             $combination = $sku->getCombination();
-            $sku_channels = $sku->getSkuChannels();
+            $sku_channels = $sku->getChannelData();
+           // dd($sku_channels);
             if($this->checkAndApplyOperationIfOldCombination($combination))
             {
                 $this->updateSkuChannels($sku_channels);
@@ -172,20 +173,18 @@ class ValuesAddedDeleted
 
     private function checkAndApplyOperationIfOldCombination($combination)
     {
-        $is_old =  !is_null($combination[0]['product_option_value_id']);
+        $is_old =  !is_null($combination[0]->option_value_id);
         if($is_old)
         {
             $old_product_option_value_ids = [];
-            foreach($combination as $options_values)
+            foreach($combination as $option_values)
             {
-                foreach($options_values as $option_value)
-                {
-                    array_push($old_product_option_value_ids,$option_value->getProductOptionValueId());
-                }
+                array_push($old_product_option_value_ids,$option_values->getOptionValueId());
             }
 
             $stock = $combination->getStock();
             $old_skus = $this->combinationRepository->whereIn('product_opotion_value_id',$old_product_option_value_ids)->pluck('sku_id')->toArray();
+            dd($old_skus);
             $this->skuRepository->whereIn('id',$old_skus)->update(['stock' => $stock ]);
 
         }
