@@ -34,4 +34,9 @@ class Product extends BaseModel
     {
         return $this->hasMany(ProductOption::class,'product_id');
     }
+
+    public function productChannels()
+    {
+        return $this->hasMany(ProductChannel::class,'product_id');
+    }
 }

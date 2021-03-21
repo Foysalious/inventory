@@ -60,7 +60,7 @@ class OptionsChanged
     /**
      * @param mixed $updateDataObejects
      */
-    public function setUpdateDataObejects($updateDataObejects)
+    public function setUpdatedDataObjects($updateDataObejects)
     {
         $this->updateDataObejects = $updateDataObejects;
         return $this;
@@ -69,26 +69,32 @@ class OptionsChanged
 
     public function apply()
     {
-        $this->deleteCreatedProductVariantsData();
-        $this->createNewProductVariantsData();
-    }
-
-
-    private function deleteCreatedProductVariantsData()
-    {
         $this->deleteProductOptions();
         $this->deleteSkuAndCombination();
-
+        $this->deleteProductChannels();
+        $this->createNewProductVariantsData();
     }
 
     private function deleteProductOptions()
     {
-        return $this->product->productOptions()->delete(); //delete product_options and product_option_values
+        $this->product->productOptions()->get()->each(function($productOption){
+            $productOption->productOptionValues()->delete();
+        });
+        return $this->product->productOptions()->delete();
+    }
+
+    private function deleteProductChannels()
+    {
+        return $this->product->productChannels()->delete();
     }
 
     private function deleteSkuAndCombination()
     {
-        return $this->product->skus()->delete(); //delete skus, combination, sku_channels, product_channels
+        $this->product->skus()->get()->each(function($sku){
+            $sku->combinations()->delete();
+            $sku->skuChannels()->delete();
+        });
+        return $this->product->skus()->delete();
     }
 
     private function createNewProductVariantsData()
@@ -100,9 +106,9 @@ class OptionsChanged
             $product_option_value_ids = [];
             $values = [];
             foreach ($combinations as $combination) {
-                $option_name = $combination->getoption();
+                $option_name = $combination->getOptionName();
                 $product_option = $this->createProductOptions($product->id, $option_name);
-                $value_name = $combination->getValue();
+                $value_name = $combination->getOptionValueName();
                 $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
                 array_push($product_option_value_ids, $product_option_value->id);
                 array_push($values, $value_name);

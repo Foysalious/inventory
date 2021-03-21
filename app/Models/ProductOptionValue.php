@@ -2,10 +2,12 @@
 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ProductOptionValue extends BaseModel
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
+
     protected $guarded = ['id'];
 
     public function productOption()

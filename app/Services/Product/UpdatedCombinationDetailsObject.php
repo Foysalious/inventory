@@ -6,9 +6,10 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 class UpdatedCombinationDetailsObject
 {
     private $combinationDetail;
-    private $option;
-    private $value;
-    private $productOptionValueId;
+    private $optionId;
+    private $optionName;
+    private $optionValueName;
+    private $optionValueId;
 
     public function setCombinationDetail($combinationDetail)
     {
@@ -18,34 +19,40 @@ class UpdatedCombinationDetailsObject
 
     public function build()
     {
-        if(!$this->validate())
+        if (!$this->validate())
             throw new ProductDetailsPropertyValidationError();
-        $this->option = $this->combinationDetail->option;
-        $this->value = $this->combinationDetail->value;
-        $this->productOptionValueId = $this->combinationDetail->product_option_value_id;
+        $this->optionId = $this->combinationDetail->option_id;
+        $this->optionName = $this->combinationDetail->option_name;
+        $this->optionValueId = $this->combinationDetail->option_value_id;
+        $this->optionValueName = $this->combinationDetail->option_value_name;
         return $this;
-
     }
 
     public function validate()
     {
-        return (property_exists( $this->combinationDetail,'product_option_value_id')) && (property_exists( $this->combinationDetail,'option')) && (property_exists( $this->combinationDetail,'value'));
+        return (property_exists( $this->combinationDetail,'option_id')) && (property_exists( $this->combinationDetail,'option_name'))
+            && (property_exists( $this->combinationDetail,'option_value_id'))  && (property_exists( $this->combinationDetail,'option_value_name'));
     }
 
 
-    public function getOption()
+    public function getOptionId()
     {
-        return $this->option;
+        return $this->optionId;
     }
 
-    public function getValue()
+    public function getOptionName()
     {
-        return $this->value;
+        return $this->optionName;
     }
 
-    public function getProductOptionValueId()
+    public function getOptionValueId()
     {
-        return $this->productOptionValueId;
+        return $this->optionValueId;
+    }
+
+    public function getOptionValueName()
+    {
+        return $this->optionValueName;
     }
 
 }
