@@ -274,7 +274,7 @@ class Creator
              $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
              $this->createSkuChannels($sku,$productDetailObject->getChannelData());
              $this->createCombination($sku->id,$product_option_value_ids);
-             $this->createProductChannel($productDetailObject->getChannelData(),$product->id);
+             //$this->createProductChannel($productDetailObject->getChannelData(),$product->id);
         }
     }
 

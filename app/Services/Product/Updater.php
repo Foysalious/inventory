@@ -200,83 +200,13 @@ class Updater
 
     public function update()
     {
-        $product = $this->productRepositoryInterface->update($this->product, $this->makeData());
-        list($nature,$deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects);
-        //dd($nature,$deleted_values);
-
+        $this->productRepositoryInterface->update($this->product, $this->makeData());
+        list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects);
         if ($nature == UpdateNature::OPTIONS_CHANGED)
             return app(OptionsChanged::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-        elseif ($nature == UpdateNature::VALUE_ADD_DELETE)
-            return app(ValuesAddedDeleted::class)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-        elseif ($nature == UpdateNature::VALUE_ADD)
-            return app(ValuesAdded::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else
-            return app(ValuesDeleted::class)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            return app(ValuesAddedDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
     }
-
-   /* private function getNature($product, $skus)
-    {
-        if ($this->checkIsOptionChanged($skus[0]->getCombination()))
-            return UpdateNature::OPTIONS_CHANGED;
-        list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
-        list($is_values_deleted,$deleted_values) = $this->checkIsValesDeleted($product, $updatedValues);
-        $this->deletedValues = $deleted_values;
-
-        if ($is_new_values_added && $is_values_deleted)
-            return UpdateNature::VALUE_ADD_DELETE;
-        elseif ($is_new_values_added && !$is_values_deleted)
-            return UpdateNature::VALUE_ADD;
-        else
-            return UpdateNature::VALUE_DELETE;
-
-    }*/
-
-   /* private function checkIsValesDeleted($product, $updatedValues)
-    {
-        $is_deleted = false;
-        $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'));
-
-        $filtered_updated_values = array_filter($updatedValues, function ($a) {
-            return $a !== null;
-        });
-        if($created_product_option_value_ids != $filtered_updated_values)
-            $is_deleted = true;
-
-        return $is_deleted ? [$is_deleted,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false,null];
-
-
-    }*/
-
-   /* private function checkIsValuesAdded($skus)
-    {
-        $product_option_value_ids = [];
-        foreach ($skus as $sku) {
-            $combination = $sku->getCombination();
-            foreach ($combination as $options_values) {
-                foreach ($options_values as $option_value)
-                    array_push($product_option_value_ids, $option_value->getProductOptionValueId());
-            }
-        }
-
-        return [in_array(null, $product_option_value_ids, true), $product_option_value_ids];
-    }*/
-
-    /*private function checkIsOptionChanged($first_options_values)
-    {
-        $updated_option_ids = [];
-        foreach ($first_options_values as $option_value) {
-            array_push($updated_option_ids, $option_value->getOptionId());
-        }
-        return $this->containsOnlyNull($updated_option_ids);
-
-    }*/
-
-   /* private function containsOnlyNull($input)
-    {
-        return empty(array_filter($input, function ($a) {
-            return $a !== null;
-        }));
-    }*/
 
     private function makeData()
     {

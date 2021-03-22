@@ -44,7 +44,7 @@ class NatureFactory
         if ($this->checkIsOptionChanged($skus[0]->getCombination()))
             return [UpdateNature::OPTIONS_CHANGED,null];
         list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
-        list($is_values_deleted,$deleted_values) = $this->checkIsValesDeleted($product, $updatedValues);
+        list($is_values_deleted,$deleted_values) = $this->checkIsValuesDeleted($product, $updatedValues);
         $this->deletedValues = $deleted_values;
         if ($is_new_values_added && $is_values_deleted)
             return [UpdateNature::VALUE_ADD_DELETE,$deleted_values];
@@ -55,15 +55,13 @@ class NatureFactory
 
     }
 
-    private function checkIsValesDeleted($product, $updatedValues)
+    private function checkIsValuesDeleted($product, $updatedValues)
     {
         $is_deleted = false;
-
         $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'))->pluck('product_option_value_id')->toArray();
         $filtered_updated_values = array_filter($updatedValues, function ($a) {
             return $a !== null;
         });
-
         if($created_product_option_value_ids != $filtered_updated_values)
             $is_deleted = true;
 
