@@ -73,8 +73,6 @@ class CollectionService extends BaseService
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
 
-        dd($request->all());
-
         $collection_update = $this->updater->setCollection($collection)->setName($request->name)
             ->setCollectionId($collection_id)
             ->setDescription(isset($request->description) ?? '')

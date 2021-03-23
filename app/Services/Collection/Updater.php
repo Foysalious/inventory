@@ -172,10 +172,10 @@ class Updater
         return [
                 'name' => $this->name,
                 'description' => $this->description,
-                'thumb' => $this->collection_updated_image_links['thumb_link'] ?? $this->thumb,
-                'banner' => $this->collection_updated_image_links['banner_link'] ?? $this->banner,
-                'app_thumb' => $this->collection_updated_image_links['app_thumb_link'] ?? $this->app_thumb,
-                'app_banner' => $this->collection_updated_image_links['app_banner_link'] ?? $this->app_banner,
+                isset($this->collection_updated_image_links['thumb_link']) ?? 'thumb' => $this->collection_updated_image_links['thumb_link'],
+                isset($this->collection_updated_image_links['banner_link']) ?? 'banner' => $this->collection_updated_image_links['banner_link'],
+                isset($this->collection_updated_image_links['app_thumb_link']) ?? 'app_thumb' => $this->collection_updated_image_links['app_thumb_link'],
+                isset($this->collection_updated_image_links['app_banner_link']) ?? 'app_banner' => $this->collection_updated_image_links['app_banner_link'],
                 'partner_id' => $this->partner_id,
                 'is_published' => $this->is_published
             ] + $this->modificationFields(false, true);
