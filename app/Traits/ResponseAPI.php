@@ -48,6 +48,6 @@ trait ResponseAPI
      */
     public function error($message, $statusCode = 500)
     {
-        return $this->coreResponse($message, null, $statusCode, false);
+        return $this->coreResponse($message, $statusCode, false, null);
     }
 }

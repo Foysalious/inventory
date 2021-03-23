@@ -15,9 +15,7 @@ class CollectionService extends BaseService
     use CdnFileManager;
 
     protected $collectionRepository, $imageUpdater;
-
     protected $collectionRepositoryInterface;
-
     protected $creator, $updater;
 
     public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface, Creator $creator, Updater $updater, ImageUpdater $imageUpdater)
@@ -75,12 +73,12 @@ class CollectionService extends BaseService
 
         $collection_update = $this->updater->setCollection($collection)->setName($request->name)
             ->setCollectionId($collection_id)
-            ->setDescription(isset($request->description) ?? '')
+            ->setDescription($request->description)
             ->setPartnerId($partner_id)
-            ->setThumb(isset($request->thumb) ?? null)
-            ->setBanner(isset($request->banner) ?? null)
-            ->setAppThumb(isset($request->app_thumb) ?? null)
-            ->setAppBanner(isset($request->app_banner) ?? null)
+            ->setThumb($request->thumb)
+            ->setBanner($request->banner)
+            ->setAppThumb($request->app_thumb)
+            ->setAppBanner($request->app_banner)
             ->setIsPublished($request->is_published)
             ->update();
 

@@ -5,13 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CollectionRequest;
 use App\Http\Requests\CollectionUpdateRequest;
 use App\Services\Collection\CollectionService;
-use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
 
 class CollectionController extends Controller
 {
-    use ResponseAPI;
-
     protected $collectionService;
 
     public function __construct(CollectionService $collectionService)
