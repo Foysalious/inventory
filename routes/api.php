@@ -52,6 +52,5 @@ Route::group(['prefix'=>'v1'], function(){
         Route::get('/', [UnitController::class, 'index']);
     });
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
-//    Route::apiResource('collection', CollectionController::class);
     Route::get('/channels', [ChannelController::class, 'index']);
 });

@@ -25,9 +25,9 @@ class ImageUpdater
         return [$file, $this->uniqueFileName($file, $name)];
     }
 
-    public function deleteAllCollectionImages($partner_id, $collection_id)
+    public function deleteAllCollectionImages($partner_id, $collection_id, $column_name)
     {
-        foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
+        //foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
         {
             $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
             if(isset($fileName))
@@ -40,25 +40,29 @@ class ImageUpdater
 
     public function updateImages($partner_id, $collection_id, $thumb, $banner, $app_thumb, $app_banner)
     {
-        $this->deleteAllCollectionImages($partner_id, $collection_id);
+        //$this->deleteAllCollectionImages($partner_id, $collection_id);
         $collection_images = [];
 
-        if(($thumb)) {
+        if(isset($thumb)) {
+            $this->deleteAllCollectionImages($partner_id, $collection_id, 'thumb');
             list($file, $fileName) = $this->updateCollectionImage($thumb, '_' . getFileName($thumb) . '_collection_thumb');
             $collection_images['thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
         }
 
-        if(($banner)) {
+        if(isset($banner)) {
+            $this->deleteAllCollectionImages($partner_id, $collection_id, 'banner');
             list($file, $fileName) = $this->updateCollectionImage($banner, '_' . getFileName($banner) . '_collection_banner');
             $collection_images['banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultBannerFolder(), $fileName);
         }
 
-        if(($app_thumb)) {
+        if(isset($app_thumb)) {
+            $this->deleteAllCollectionImages($partner_id, $collection_id, 'app_thumb');
             list($file, $fileName) = $this->updateCollectionImage($app_thumb, '_' . getFileName($app_thumb) . '_collection_app_thumb');
             $collection_images['app_thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultAppThumbFolder(), $fileName);
         }
 
-        if(($app_banner)) {
+        if(isset($app_banner)) {
+            $this->deleteAllCollectionImages($partner_id, $collection_id, 'app_banner');
             list($file, $fileName) = $this->updateCollectionImage($app_banner, '_' . getFileName($app_banner) . '_collection_app_banner');
             $collection_images['app_banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
         }
