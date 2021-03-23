@@ -73,15 +73,15 @@ class CollectionService extends BaseService
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("Collection not found!", 404);
 
-        $collection_update = $this->updater->setCollection($collection)->setName($request['name'])
+        $collection_update = $this->updater->setCollection($collection)->setName($request->name)
             ->setCollectionId($collection_id)
-            ->setDescription($request['description'] ?? '')
+            ->setDescription($request->description)
             ->setPartnerId($partner_id)
-            ->setThumb($request['thumb'] ?? '')
-            ->setBanner($request['banner'] ?? '')
-            ->setAppThumb($request['app_thumb'] ?? '')
-            ->setAppBanner($request['app_banner'] ?? '')
-            ->setIsPublished($request['is_published'])
+            ->setThumb($request->file('thumb'))
+            ->setBanner($request->file('banner'))
+            ->setAppThumb($request->file('app_thumb'))
+            ->setAppBanner($request->file('app_banner'))
+            ->setIsPublished($request->is_published)
             ->update();
 
         return $this->success("Successful", ['collection' => $collection_update],201);
