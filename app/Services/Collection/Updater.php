@@ -178,6 +178,6 @@ class Updater
         if(isset($this->app_banner)) $data['app_banner'] = $this->collection_updated_image_links['app_banner_link'];
         if(isset($this->partner_id)) $data['partner_id'] = $this->partner_id;
         if(isset($this->is_published)) $data['is_published'] = $this->is_published;
-        return $data + $this->modificationFields(false, true);
+        dd($data + $this->modificationFields(false, true));
     }
 }
