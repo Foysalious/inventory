@@ -69,7 +69,7 @@ class CollectionService extends BaseService
     public function update($request, $partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->find($collection_id);
-        if(!$collection) return $this->error("Collection not found!", 404);
+        if(!$collection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
 
         $collection_update = $this->updater->setCollection($collection)->setName($request->name)
             ->setCollectionId($collection_id)
