@@ -169,15 +169,15 @@ class Updater
 
     public function makeDataForUpdate() : array
     {
-        return [
-                'name' => $this->name,
-                'description' => $this->description,
-                isset($this->collection_updated_image_links['thumb_link']) ?? 'thumb' => $this->collection_updated_image_links['thumb_link'],
-                isset($this->collection_updated_image_links['banner_link']) ?? 'banner' => $this->collection_updated_image_links['banner_link'],
-                isset($this->collection_updated_image_links['app_thumb_link']) ?? 'app_thumb' => $this->collection_updated_image_links['app_thumb_link'],
-                isset($this->collection_updated_image_links['app_banner_link']) ?? 'app_banner' => $this->collection_updated_image_links['app_banner_link'],
-                'partner_id' => $this->partner_id,
-                'is_published' => $this->is_published
-            ] + $this->modificationFields(false, true);
+        $data = [];
+        if(isset($this->name)) $data['name'] = $this->name;
+        if(isset($this->description)) $data['description'] = $this->description;
+        if(isset($this->thumb)) $data['thumb'] = $this->collection_updated_image_links['thumb_link'];
+        if(isset($this->banner)) $data['banner'] = $this->collection_updated_image_links['banner_link'];
+        if(isset($this->app_thumb)) $data['app_thumb'] = $this->collection_updated_image_links['app_thumb_link'];
+        if(isset($this->app_banner)) $data['app_banner'] = $this->collection_updated_image_links['app_banner_link'];
+        if(isset($this->partner_id)) $data['partner_id'] = $this->partner_id;
+        if(isset($this->is_published)) $data['is_published'] = $this->is_published;
+        return $data + $this->modificationFields(false, true);
     }
 }
