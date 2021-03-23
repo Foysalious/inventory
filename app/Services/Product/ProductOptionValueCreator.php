@@ -10,6 +10,7 @@ class ProductOptionValueCreator
     private $productOptionId;
     private $valueName;
     private $productOptionValueRepository;
+    private $valueDetails;
 
 
     public function __construct(ProductOptionValueRepositoryInterface  $productOptionValueRepository)
@@ -28,6 +29,15 @@ class ProductOptionValueCreator
         return $this;
     }
 
+    /**
+     * @param mixed $valueDetails
+     * @return ProductOptionValueCreator
+     */
+    public function setValueDetails($valueDetails)
+    {
+        $this->valueDetails = $valueDetails;
+        return $this;
+    }
 
     /**
      * @param $productOptionId
@@ -49,7 +59,8 @@ class ProductOptionValueCreator
     {
         return [
             'product_option_id' => $this->productOptionId,
-            'name' => $this->valueName
+            'name' => $this->valueName,
+            'details' => $this->valueDetails,
         ];
     }
 
