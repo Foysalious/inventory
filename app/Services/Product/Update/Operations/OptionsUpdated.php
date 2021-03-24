@@ -9,7 +9,7 @@ use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 
 
-class OptionsChanged
+class OptionsUpdated
 {
 
 

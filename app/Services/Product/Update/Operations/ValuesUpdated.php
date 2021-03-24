@@ -13,7 +13,7 @@ use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\UpdateNature;
 
 
-class ValuesAddedDeleted
+class ValuesUpdated
 {
 
     /**
@@ -69,7 +69,7 @@ class ValuesAddedDeleted
 
     private $updateDataObejects;
 
-    private $deletedValues;
+    protected $deletedValues;
 
 
     /**
@@ -114,14 +114,12 @@ class ValuesAddedDeleted
 
     public function apply()
     {
-        if($this->nature == UpdateNature::VALUE_ADD_DELETE || $this->nature == UpdateNature::VALUE_DELETE)
         $this->deleteDiscardedCombinations();
-        if($this->nature == UpdateNature::VALUE_ADD_DELETE || $this->nature == UpdateNature::VALUE_ADD)
         $this->operationsForValueAdd();
         $this->resolveProductChannel();
     }
 
-    private function resolveProductChannel()
+    protected function resolveProductChannel()
     {
         $product_channel = [];
         $this->product->productChannels()->delete();
@@ -138,7 +136,17 @@ class ValuesAddedDeleted
 
     }
 
-    private function operationsForValueAdd()
+    protected function operationsForOldValues()
+    {
+        foreach ($this->updateDataObejects as $productDetailObject) {
+            $combinations = $productDetailObject->getCombination();
+            $sku_channels = $productDetailObject->getChannelData();
+            $related_skus = $this->checkAndApplyOperationForOldCombination($combinations, $productDetailObject);
+
+            $this->updateSkuChannels($sku_channels, $related_skus);
+        }
+    }
+    protected function operationsForValueAdd()
     {
         foreach($this->updateDataObejects as $productDetailObject)
         {
@@ -237,7 +245,7 @@ class ValuesAddedDeleted
 
     private function checkAndApplyOperationIfSkuChannelsDeleted($sku_channels,$related_skus)
     {
-        $created_sku_channels_ids = $this->skuChannelRepository->whereIn('sku_id',$related_skus)->pluck('id')->toArray();
+        $created_sku_channels_ids = $this->skuChannelRepository->where('sku_id',$related_skus)->pluck('id')->toArray();
         $updated_sku_channels_ids = [];
         foreach ($sku_channels as $sku_channel) {
             $sku_channel_id = $sku_channel->getSkuChannelId();
@@ -251,20 +259,15 @@ class ValuesAddedDeleted
                     'wholesale_price' => $sku_channel->getWholesalePrice()
                 ]);
             } else { //new sku_channel
-                $this->product->skus()->each(function ($sku) use ($sku_channel) {
+                //$this->product->skus()->each(function ($sku) use ($sku_channel) {
                     $this->skuChannelRepository->create([
-                        'sku_id' => $sku->id,
+                        'sku_id' => $related_skus,
                         'channel_id' => $sku_channel->getChannelId(),
                         'cost' => $sku_channel->getCost(),
                         'price' => $sku_channel->getPrice(),
                         'wholesale_price' => $sku_channel->getWholesalePrice()
                     ]);
-                });
-              /*  $product_channel_data = [
-                    'product_id' => $this->product->id,
-                    'channel_id' => $sku_channel->getChannelId(),
-                ];*/
-                //$this->productChannelCreator->setData($product_channel_data)->store();
+               // });
             }
         }
         $filtered_updated_sku_channels_ids = array_filter($updated_sku_channels_ids, function ($a) {
@@ -275,6 +278,20 @@ class ValuesAddedDeleted
         if($is_deleted) //checkPoint for notDeleted
             $deleted_sku_channel_ids   = array_diff($created_sku_channels_ids,$filtered_updated_sku_channels_ids);
         return [$is_deleted , $deleted_sku_channel_ids ];
+    }
+
+    private function checkAndApplyOperationForOldCombination($combination,$sku)
+    {
+            $old_product_option_value_ids = [];
+            foreach($combination as $option_values)
+            {
+                array_push($old_product_option_value_ids,$option_values->getOptionValueId());
+            }
+
+            $stock = $sku->getStock();
+            $old_skus = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
+            $this->skuRepository->where('id',$old_skus)->update(['stock' => $stock ]);
+            return $old_skus;
     }
 
     private function checkAndApplyOperationIfOldCombination($combination,$sku)
@@ -291,16 +308,18 @@ class ValuesAddedDeleted
             }
 
             $stock = $sku->getStock();
-            $old_skus = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->toArray();
-            $this->skuRepository->whereIn('id',$old_skus)->update(['stock' => $stock ]);
+            $old_skus = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
+            $this->skuRepository->where('id',$old_skus)->update(['stock' => $stock ]);
 
         }
+
         return [$is_old,$old_skus];
     }
 
-    private function deleteDiscardedCombinations()
+    protected function deleteDiscardedCombinations()
     {
-      $this->productOptionValueRepository->whereIn('id',$this->deletedValues)->delete();
+
+      $this->productOptionValueRepository->whereIn('id',$this->getDeletedValues())->delete();
       $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id',$this->deletedValues)->pluck('sku_id');
       $this->skuRepository->whereIn('id',$skus_to_delete)->delete();
       $this->skuChannelRepository->whereIn('sku_id',$skus_to_delete)->delete();

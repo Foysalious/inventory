@@ -13,9 +13,9 @@ use App\Models\Product;
 use App\Models\Sku;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Update\NatureFactory;
-use App\Services\Product\Update\Operations\OptionsChanged;
+use App\Services\Product\Update\Operations\OptionsUpdated;
 use App\Services\Product\Update\Operations\ValuesAdded;
-use App\Services\Product\Update\Operations\ValuesAddedDeleted;
+use App\Services\Product\Update\Operations\ValuesUpdated;
 use App\Services\Product\Update\Operations\ValuesDeleted;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 
@@ -202,10 +202,17 @@ class Updater
     {
         $this->productRepositoryInterface->update($this->product, $this->makeData());
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects);
-        if ($nature == UpdateNature::OPTIONS_CHANGED)
-            return app(OptionsChanged::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        if ($nature == UpdateNature::OPTIONS_UPDATED)
+            return app(OptionsUpdated::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        else if($nature == UpdateNature::VALUES_UPDATED)
+            return app(ValuesUpdated::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        else if($nature == UpdateNature::VALUE_ADD)
+            return app(ValuesAdded::class)->setNature($nature)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else
-            return app(ValuesAddedDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            return app(ValuesDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+
+
+
     }
 
     private function makeData()

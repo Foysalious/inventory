@@ -42,12 +42,12 @@ class NatureFactory
     {
         $deleted_values = null;
         if ($this->checkIsOptionChanged($skus[0]->getCombination()))
-            return [UpdateNature::OPTIONS_CHANGED,null];
+            return [UpdateNature::OPTIONS_UPDATED,null];
         list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
         list($is_values_deleted,$deleted_values) = $this->checkIsValuesDeleted($product, $updatedValues);
         //$this->deletedValues = $deleted_values;
         if ($is_new_values_added && $is_values_deleted)
-            return [UpdateNature::VALUE_ADD_DELETE,$deleted_values];
+            return [UpdateNature::VALUES_UPDATED,$deleted_values];
         elseif ($is_new_values_added && !$is_values_deleted)
             return [UpdateNature::VALUE_ADD,$deleted_values];
         else
