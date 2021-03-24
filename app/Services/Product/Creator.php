@@ -258,15 +258,18 @@ class Creator
     {
         foreach($this->productRequestObjects as $productDetailObject)
         {
+            /** @var  $productDetailObject ProductDetailsObject */
             $combinations = $productDetailObject->getCombination();
             $product_option_value_ids = [];
             $values = [];
             foreach($combinations as $combination)
             {
+                /** @var $combination CombinationDetailsObject */
                 $option_name = $combination->getoption();
                 $product_option = $this->createProductOptions($product->id, $option_name);
                 $value_name = $combination->getValue();
-                $product_option_value = $this->createProductOptionValues($product_option->id, $value_name);
+                $value_details = $combination->getValueDetails();
+                $product_option_value = $this->createProductOptionValues($product_option->id, $value_name, $value_details);
                 array_push($product_option_value_ids,$product_option_value->id);
                 array_push($values,$value_name);
             }
@@ -274,7 +277,7 @@ class Creator
              $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
              $this->createSkuChannels($sku,$productDetailObject->getChannelData());
              $this->createCombination($sku->id,$product_option_value_ids);
-             $this->createProductChannel($productDetailObject->getChannelData(),$product->id);
+             //$this->createProductChannel($productDetailObject->getChannelData(),$product->id);
         }
     }
 
@@ -364,11 +367,12 @@ class Creator
     /**
      * @param $product_option_id
      * @param $value_name
+     * @param $value_details
      * @return mixed
      */
-    private function createProductOptionValues($product_option_id, $value_name)
+    private function createProductOptionValues($product_option_id, $value_name, $value_details)
     {
-        return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
+        return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->setValueDetails($value_details)->create();
     }
 
     /**

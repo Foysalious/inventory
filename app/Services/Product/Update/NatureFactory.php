@@ -40,26 +40,25 @@ class NatureFactory
 
     public function getNature($product, $skus)
     {
+        $deleted_values = null;
         if ($this->checkIsOptionChanged($skus[0]->getCombination()))
-            return UpdateNature::OPTIONS_CHANGED;
+            return [UpdateNature::OPTIONS_CHANGED,null];
         list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
-        list($is_values_deleted,$deleted_values) = $this->checkIsValesDeleted($product, $updatedValues);
+        list($is_values_deleted,$deleted_values) = $this->checkIsValuesDeleted($product, $updatedValues);
         $this->deletedValues = $deleted_values;
-
         if ($is_new_values_added && $is_values_deleted)
-            return UpdateNature::VALUE_ADD_DELETE;
+            return [UpdateNature::VALUE_ADD_DELETE,$deleted_values];
         elseif ($is_new_values_added && !$is_values_deleted)
-            return UpdateNature::VALUE_ADD;
+            return [UpdateNature::VALUE_ADD,$deleted_values];
         else
-            return UpdateNature::VALUE_DELETE;
+            return [UpdateNature::VALUE_DELETE,$deleted_values];
 
     }
 
-    private function checkIsValesDeleted($product, $updatedValues)
+    private function checkIsValuesDeleted($product, $updatedValues)
     {
         $is_deleted = false;
-        $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'));
-
+        $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'))->pluck('product_option_value_id')->toArray();
         $filtered_updated_values = array_filter($updatedValues, function ($a) {
             return $a !== null;
         });
@@ -73,15 +72,14 @@ class NatureFactory
 
     private function checkIsValuesAdded($skus)
     {
+
         $product_option_value_ids = [];
         foreach ($skus as $sku) {
             $combination = $sku->getCombination();
-            foreach ($combination as $options_values) {
-                foreach ($options_values as $option_value)
-                    array_push($product_option_value_ids, $option_value->getProductOptionValueId());
+            foreach ($combination as $option_values) {
+                    array_push($product_option_value_ids, $option_values->getOptionValueId());
             }
         }
-
         return [in_array(null, $product_option_value_ids, true), $product_option_value_ids];
     }
 
