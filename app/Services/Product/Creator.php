@@ -258,16 +258,17 @@ class Creator
     {
         foreach($this->productRequestObjects as $productDetailObject)
         {
+            /** @var  $productDetailObject ProductDetailsObject */
             $combinations = $productDetailObject->getCombination();
             $product_option_value_ids = [];
             $values = [];
             foreach($combinations as $combination)
             {
+                /** @var $combination CombinationDetailsObject */
                 $option_name = $combination->getoption();
                 $product_option = $this->createProductOptions($product->id, $option_name);
                 $value_name = $combination->getValue();
-                // TODO Set proper data in value_details
-                $value_details = null;
+                $value_details = $combination->getValueDetails();
                 $product_option_value = $this->createProductOptionValues($product_option->id, $value_name, $value_details);
                 array_push($product_option_value_ids,$product_option_value->id);
                 array_push($values,$value_name);
