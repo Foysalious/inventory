@@ -35,7 +35,7 @@ class ProductOptionValueCreator
      */
     public function setValueDetails($valueDetails)
     {
-        $this->valueDetails = $valueDetails;
+        $this->valueDetails = json_encode($valueDetails);
         return $this;
     }
 

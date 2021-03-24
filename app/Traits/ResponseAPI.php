@@ -13,7 +13,7 @@ trait ResponseAPI
      * @param boolean $isSuccess
      * @return JsonResponse
      */
-    public function coreResponse($message, $data = null, $statusCode, $isSuccess = true)
+    public function coreResponse($message, $statusCode, $isSuccess = true, $data = null)
     {
         if(!$message) return response()->json(['message' => 'Message is required'], 500);
         $public_response = array_merge(['message' => $message], $data);
@@ -35,7 +35,7 @@ trait ResponseAPI
      */
     public function success($message, $data, $statusCode = 200, $isSuccess = true)
     {
-        return $this->coreResponse($message, $data, $statusCode, $isSuccess);
+        return $this->coreResponse($message, $statusCode, $isSuccess, $data);
     }
 
     /**

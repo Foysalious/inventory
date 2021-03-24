@@ -47,6 +47,6 @@ class CombinationDetailsObject
 
     public function getValueDetails()
     {
-        return $this->value;
+        return $this->value_details;
     }
 }
