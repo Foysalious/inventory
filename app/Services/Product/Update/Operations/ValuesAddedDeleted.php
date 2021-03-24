@@ -41,6 +41,7 @@ class ValuesAddedDeleted
     private $combinationCreator;
     private $productChannelCreator;
     private $nature;
+    private $channels = [];
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepository,
@@ -117,6 +118,24 @@ class ValuesAddedDeleted
         $this->deleteDiscardedCombinations();
         if($this->nature == UpdateNature::VALUE_ADD_DELETE || $this->nature == UpdateNature::VALUE_ADD)
         $this->operationsForValueAdd();
+        $this->resolveProductChannel();
+    }
+
+    private function resolveProductChannel()
+    {
+        $product_channel = [];
+        $this->product->productChannels()->delete();
+        $product_id = $this->product->id;
+        $channels = array_unique($this->channels);
+        foreach($channels as $channel)
+        {
+            array_push($product_channel,[
+               'product_id' =>  $product_id,
+                'channel_id' => $channel
+            ]);
+        }
+       return $this->productChannelCreator->setData($product_channel)->store();
+
     }
 
     private function operationsForValueAdd()
@@ -171,6 +190,7 @@ class ValuesAddedDeleted
                 'price' => $channel->getPrice() ?: 0,
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
+            array_push($this->channels, $channel->getChannelId());
         }
         return $sku->skuChannels()->insert($data);
     }
@@ -221,6 +241,7 @@ class ValuesAddedDeleted
         $updated_sku_channels_ids = [];
         foreach ($sku_channels as $sku_channel) {
             $sku_channel_id = $sku_channel->getSkuChannelId();
+            array_push($this->channels,$sku_channel->getChannelId());
             array_push($updated_sku_channels_ids, $sku_channel_id);
             if($sku_channel_id)//old sku_channel
             {
@@ -239,11 +260,11 @@ class ValuesAddedDeleted
                         'wholesale_price' => $sku_channel->getWholesalePrice()
                     ]);
                 });
-                $product_channel_data = [
+              /*  $product_channel_data = [
                     'product_id' => $this->product->id,
                     'channel_id' => $sku_channel->getChannelId(),
-                ];
-                $this->productChannelCreator->setData($product_channel_data)->store();
+                ];*/
+                //$this->productChannelCreator->setData($product_channel_data)->store();
             }
         }
         $filtered_updated_sku_channels_ids = array_filter($updated_sku_channels_ids, function ($a) {
