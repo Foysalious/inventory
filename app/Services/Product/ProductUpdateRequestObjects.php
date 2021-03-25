@@ -1,7 +1,7 @@
 <?php namespace App\Services\Product;
 
 
-class UpdateProductRequest
+class ProductUpdateRequestObjects
 {
     private $productDetails;
 
@@ -25,7 +25,7 @@ class UpdateProductRequest
         $final = [];
         foreach( $this->productDetails as $productDetail)
         {
-            $productRequestObject = app(UpdatedProductDetailsObject::class)->hasVariant($has_variant)->setProductDetail($productDetail)->build();
+            $productRequestObject = app(ProductUpdateDetailsObjects::class)->hasVariant($has_variant)->setProductDetail($productDetail)->build();
             array_push($final,$productRequestObject);
         }
         return [$has_variant,$final];

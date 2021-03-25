@@ -2,7 +2,7 @@
 
 use App\Exceptions\ProductDetailsPropertyValidationError;
 
-class UpdatedProductDetailsObject
+class ProductUpdateDetailsObjects
 {
     private $productDetail;
     private  $combination;
@@ -49,7 +49,7 @@ class UpdatedProductDetailsObject
 
         $final = [];
         foreach ($this->productDetail->combination as $option_value) {
-            array_push($final, app(UpdatedCombinationDetailsObject::class)->setCombinationDetail($option_value)->build());
+            array_push($final, app(CombinationUpdateDetailsObject::class)->setCombinationDetail($option_value)->build());
         }
         $this->combination = $final;
         return $this;
@@ -75,7 +75,7 @@ class UpdatedProductDetailsObject
     {
         $final = [];
         foreach ($this->productDetail->channel_data as $channel_data) {
-            array_push($final, app(UpdatedChannelDetailsObject::class)->setChannelDetails($channel_data)->build());
+            array_push($final, app(ChannelUpdateDetailsObjects::class)->setChannelDetails($channel_data)->build());
         }
         $this->channelData = $final;
         return $this;

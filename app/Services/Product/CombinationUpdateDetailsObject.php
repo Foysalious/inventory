@@ -3,7 +3,7 @@
 
 use App\Exceptions\ProductDetailsPropertyValidationError;
 
-class UpdatedCombinationDetailsObject
+class CombinationUpdateDetailsObject
 {
     private $combinationDetail;
     private $optionId;

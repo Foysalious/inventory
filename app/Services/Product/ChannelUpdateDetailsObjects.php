@@ -2,7 +2,7 @@
 
 use App\Exceptions\ProductDetailsPropertyValidationError;
 
-class UpdatedChannelDetailsObject
+class ChannelUpdateDetailsObjects
 {
 
     private $channelDetails;
