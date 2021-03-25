@@ -125,9 +125,7 @@ class ProductService extends BaseService
     {
         /** @var ProductDetailsObject[] $product_create_requests */
        list($has_variant,$product_create_request_objs) =  app(ProductCreateRequest::class)->setProductDetails($request->product_details)->get();
-
-
-        $product = $this->creator->setPartnerId($partnerId)
+       $product = $this->creator->setPartnerId($partnerId)
             ->setCategoryId($request->category_id)
             ->setName($request->name)
             ->setDescription($request->description)

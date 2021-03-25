@@ -11,8 +11,6 @@ use App\Services\Product\ProductOptionValueCreator;
 
 class OptionsUpdated
 {
-
-
     /**
      * @var ProductRepositoryInterface
      */
@@ -35,6 +33,13 @@ class OptionsUpdated
      */
     private ProductChannelCreator $productChannelCreator;
 
+    /**
+     * @var Product $product
+     */
+    private $product;
+
+    private $updateDataObejects;
+
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator,
                                 ProductChannelCreator $productChannelCreator)
@@ -45,14 +50,6 @@ class OptionsUpdated
         $this->combinationCreator = $combinationCreator;
         $this->productChannelCreator = $productChannelCreator;
     }
-
-    /**
-     * @var Product $product
-     */
-    private $product;
-
-    private $updateDataObejects;
-
 
     /**
      * @return Product
@@ -221,8 +218,6 @@ class OptionsUpdated
         return $channels;
 
     }
-
-
     /**
      * @param $product_id
      * @param $option_name
@@ -232,7 +227,6 @@ class OptionsUpdated
     {
         return $this->productOptionCreator->setProductId($product_id)->setOptionName($option_name)->create();
     }
-
     /**
      * @param $product_option_id
      * @param $value_name
@@ -242,6 +236,5 @@ class OptionsUpdated
     {
         return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
     }
-
 
 }

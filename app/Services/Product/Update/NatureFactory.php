@@ -66,13 +66,10 @@ class NatureFactory
             $is_deleted = true;
 
         return $is_deleted ? [true,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false,null];
-
-
     }
 
     private function checkIsValuesAdded($skus)
     {
-
         $product_option_value_ids = [];
         foreach ($skus as $sku) {
             $combination = $sku->getCombination();
@@ -90,7 +87,6 @@ class NatureFactory
             array_push($updated_option_ids, $option_value->getOptionId());
         }
         return $this->containsOnlyNull($updated_option_ids);
-
     }
 
     private function containsOnlyNull($input)
