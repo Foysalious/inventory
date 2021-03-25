@@ -9,7 +9,7 @@ use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 
 
-class OptionsChanged
+class OptionsUpdated
 {
 
 
@@ -123,6 +123,7 @@ class OptionsChanged
     {
 
         $product = $this->product;
+        $all_channels = [];
         foreach ($this->updateDataObejects as $productDetailObject) {
             $combinations = $productDetailObject->getCombination();
             $product_option_value_ids = [];
@@ -137,10 +138,12 @@ class OptionsChanged
             }
 
             $sku = $this->createSku($product, $values, $product->id, $productDetailObject->getStock());
-            $this->createSkuChannels($sku, $productDetailObject->getChannelData());
+            $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
+            array_push($all_channels,$channels);
             $this->createCombination($sku->id, $product_option_value_ids);
-            $this->createProductChannel($productDetailObject->getChannelData(), $product->id);
         }
+        $all_channels = array_merge(... $all_channels);
+        $this->createProductChannel($all_channels, $product->id);
     }
 
     /**
@@ -168,14 +171,15 @@ class OptionsChanged
      */
     private function createProductChannel($channels, $product_id)
     {
-        $product_channels = collect($channels)->map(function ($channel) use ($product_id) {
-            return [
-                'product_id' => $product_id,
-                'channel_id' => $channel->getChannelId(),
-            ];
-        });
-
-        return $this->productChannelCreator->setData($product_channels->toArray())->store();
+        $product_channels = [];
+        $channels = array_unique($channels);
+        foreach ($channels as $channel) {
+            array_push($product_channels, [
+                'channel_id' => $channel,
+                'product_id' => $product_id
+            ]);
+        }
+        return $this->productChannelCreator->setData($product_channels)->store();
     }
 
     /**
@@ -201,6 +205,7 @@ class OptionsChanged
      */
     private function createSkuChannels($sku, $channel_data)
     {
+        $channels = [];
         $data = [];
         foreach ($channel_data as $channel) {
             array_push($data, [
@@ -210,8 +215,10 @@ class OptionsChanged
                 'price' => $channel->getPrice() ?: 0,
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
+            array_push($channels,$channel->getChannelId());
         }
-        return $sku->skuChannels()->insert($data);
+         $sku->skuChannels()->insert($data);
+        return $channels;
 
     }
 
