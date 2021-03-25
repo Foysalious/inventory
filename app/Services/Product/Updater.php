@@ -12,6 +12,7 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
 use App\Models\Sku;
 use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\Product\Update\NatureFactory;
 use App\Services\Product\Update\Operations\OptionsUpdated;
 use App\Services\Product\Update\Operations\ValuesAdded;
@@ -45,11 +46,11 @@ class Updater
     protected $images;
     private $options;
     private $productUpdateRequestObjects;
-    /**
-     * @var mixed
-     */
+    /** @var mixed */
     private $deletedValues;
     private $natureFactory;
+    /** @var ProductUpdateLogCreateRequest */
+    private ProductUpdateLogCreateRequest $logCreateRequest;
 
 
     /**
@@ -63,11 +64,15 @@ class Updater
      * @param ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface
      * @param CombinationRepositoryInterface $combinationRepositoryInterface
      * @param ProductChannelRepositoryInterface $productChannelRepositoryInterface
+     * @param SkuRepositoryInterface $skuRepositoryInterface
+     * @param NatureFactory $natureFactory
+     * @param ProductUpdateLogCreateRequest $logCreateRequest
      */
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
                                 OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
-                                ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,NatureFactory $natureFactory)
+                                ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
+                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -80,6 +85,7 @@ class Updater
         $this->productChannelRepositoryInterface =  $productChannelRepositoryInterface;
         $this->skuRepositoryInterface = $skuRepositoryInterface;
         $this->natureFactory = $natureFactory;
+        $this->logCreateRequest = $logCreateRequest;
     }
 
     /**
@@ -200,19 +206,18 @@ class Updater
 
     public function update()
     {
+        $oldProductDetails = clone $this->product;
         $this->productRepositoryInterface->update($this->product, $this->makeData());
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects);
         if ($nature == UpdateNature::OPTIONS_UPDATED)
-            return app(OptionsUpdated::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            app(OptionsUpdated::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else if($nature == UpdateNature::VALUES_UPDATED)
-            return app(ValuesUpdated::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            app(ValuesUpdated::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else if($nature == UpdateNature::VALUE_ADD)
-            return app(ValuesAdded::class)->setNature($nature)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+            app(ValuesAdded::class)->setNature($nature)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else
-            return app(ValuesDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-
-
-
+            app(ValuesDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
     }
 
     private function makeData()
