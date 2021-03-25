@@ -18,6 +18,8 @@ use App\Services\Product\Update\Operations\OptionsUpdated;
 use App\Services\Product\Update\Operations\ValuesAdded;
 use App\Services\Product\Update\Operations\ValuesUpdated;
 use App\Services\Product\Update\Operations\ValuesDeleted;
+use App\Services\Product\Update\Operations\VariantsAdd;
+use App\Services\Product\Update\Operations\VariantsDiscard;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 
 class Updater
@@ -51,6 +53,7 @@ class Updater
     private $natureFactory;
     /** @var ProductUpdateLogCreateRequest */
     private ProductUpdateLogCreateRequest $logCreateRequest;
+    private $hasVariants;
 
 
     /**
@@ -206,10 +209,15 @@ class Updater
 
     public function update()
     {
+
         $oldProductDetails = clone $this->product;
         $this->productRepositoryInterface->update($this->product, $this->makeData());
-        list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects);
-        if ($nature == UpdateNature::OPTIONS_UPDATED)
+        list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
+        if($nature == UpdateNature::VARIANTS_ADD)
+            app(VariantsAdd::class)->setProduct($this->product)->setHasVariants(false)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        elseif($nature == UpdateNature::VARIANTS_DISCARD)
+            app(VariantsDiscard::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        elseif ($nature == UpdateNature::OPTIONS_UPDATED)
             app(OptionsUpdated::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else if($nature == UpdateNature::VALUES_UPDATED)
             app(ValuesUpdated::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();

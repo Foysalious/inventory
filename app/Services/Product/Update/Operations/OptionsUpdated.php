@@ -31,14 +31,15 @@ class OptionsUpdated
     /**
      * @var ProductChannelCreator
      */
-    private ProductChannelCreator $productChannelCreator;
+    protected ProductChannelCreator $productChannelCreator;
 
     /**
      * @var Product $product
      */
-    private $product;
+    protected $product;
 
-    private $updateDataObejects;
+    protected $updateDataObejects;
+    protected $hasVariants;
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator,
@@ -68,6 +69,12 @@ class OptionsUpdated
         return $this;
     }
 
+    public function setHasVariants($hasVariants)
+    {
+        $this->hasVariants = $hasVariants;
+        return $this;
+    }
+
     /**
      * @return mixed
      */
@@ -94,7 +101,7 @@ class OptionsUpdated
         $this->createNewProductVariantsData();
     }
 
-    private function deleteProductOptions()
+    protected function deleteProductOptions()
     {
         $this->product->productOptions()->get()->each(function($productOption){
             $productOption->productOptionValues()->delete();
@@ -102,25 +109,26 @@ class OptionsUpdated
         return $this->product->productOptions()->delete();
     }
 
-    private function deleteProductChannels()
+    protected function deleteProductChannels()
     {
         return $this->product->productChannels()->delete();
     }
 
-    private function deleteSkuAndCombination()
+    protected function deleteSkuAndCombination()
     {
         $this->product->skus()->get()->each(function($sku){
-            $sku->combinations()->delete();
+           if($this->hasVariants) $sku->combinations()->delete();
             $sku->skuChannels()->delete();
         });
         return $this->product->skus()->delete();
     }
 
-    private function createNewProductVariantsData()
+    protected function createNewProductVariantsData()
     {
 
         $product = $this->product;
         $all_channels = [];
+
         foreach ($this->updateDataObejects as $productDetailObject) {
             $combinations = $productDetailObject->getCombination();
             $product_option_value_ids = [];
@@ -133,7 +141,6 @@ class OptionsUpdated
                 array_push($product_option_value_ids, $product_option_value->id);
                 array_push($values, $value_name);
             }
-
             $sku = $this->createSku($product, $values, $product->id, $productDetailObject->getStock());
             $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
             array_push($all_channels,$channels);
@@ -186,6 +193,7 @@ class OptionsUpdated
      */
     private function createCombination($sku_id, $product_option_value_ids)
     {
+
         $combinations = collect($product_option_value_ids)->map(function ($product_option_value_id) use ($sku_id) {
             return [
                 'product_option_value_id' => $product_option_value_id,

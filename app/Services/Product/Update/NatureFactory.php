@@ -38,9 +38,14 @@ class NatureFactory
 
     }
 
-    public function getNature($product, $skus)
+    public function getNature($product, $skus, $has_variant)
     {
         $deleted_values = null;
+        $created_with_variants = $this->productOptionRepositoryInterface->where('product_id',$product->id)->count() > 0;
+        if(!$created_with_variants && $has_variant)
+            return [UpdateNature::VARIANTS_ADD,$deleted_values];
+        if($created_with_variants && !$has_variant)
+            return [UpdateNature::VARIANTS_DISCARD,$deleted_values];
         if ($this->checkIsOptionChanged($skus[0]->getCombination()))
             return [UpdateNature::OPTIONS_UPDATED,null];
         list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
