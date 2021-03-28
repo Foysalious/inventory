@@ -134,6 +134,7 @@ class Creator
             'name' => $this->name,
             'description' => $this->description,
             'thumb' => $this->collection_image_links['thumb_link'] ?? config('s3.url').getCollectionDefaultThumb(),
+            // config('s3.url') will give us the S3 basic url and getCollectionDefaultThumb() will give the rest of the URL.
             'banner' => $this->collection_image_links['banner_link'] ?? config('s3.url').getCollectionDefaultBanner(),
             'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? config('s3.url').getCollectionDefaultAppThumb(),
             'app_banner' => $this->collection_image_links['app_banner_link'] ?? config('s3.url').getCollectionDefaultAppBanner(),
