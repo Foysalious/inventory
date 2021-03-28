@@ -24,7 +24,7 @@ if( !function_exists('getCollectionDefaultThumbFolder')) {
 
 
     function getCollectionDefaultThumbFolder() : string {
-        return 'images/categories_images/thumbs/';
+        return 'images/collections/thumbs/';
     }
 }
 
@@ -54,7 +54,7 @@ if( !function_exists('getCollectionDefaultAppThumbFolder')) {
      */
 
     function getCollectionDefaultAppThumbFolder() : string {
-        return 'images/categories_images/app_thumbs/';
+        return 'images/collections/app_thumbs/';
     }
 }
 
@@ -84,7 +84,7 @@ if( !function_exists('getCollectionDefaultBannerFolder')) {
      */
 
     function getCollectionDefaultBannerFolder() : string {
-        return 'images/categories_images/banner/';
+        return 'images/collections/banner/';
     }
 }
 
@@ -114,7 +114,7 @@ if( !function_exists('getCollectionDefaultAppBannerFolder')) {
      */
 
     function getCollectionDefaultAppBannerFolder() : string {
-        return 'images/categories_images/banner/';
+        return 'images/collections/banner/';
     }
 }
 
