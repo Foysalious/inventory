@@ -38,9 +38,14 @@ class NatureFactory
 
     }
 
-    public function getNature($product, $skus)
+    public function getNature($product, $skus, $has_variant)
     {
         $deleted_values = null;
+        $created_with_variants = $this->productOptionRepositoryInterface->where('product_id',$product->id)->count() > 0;
+        if(!$created_with_variants && $has_variant)
+            return [UpdateNature::VARIANTS_ADD,$deleted_values];
+        if($created_with_variants && !$has_variant)
+            return [UpdateNature::VARIANTS_DISCARD,$deleted_values];
         if ($this->checkIsOptionChanged($skus[0]->getCombination()))
             return [UpdateNature::OPTIONS_UPDATED,null];
         list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
@@ -66,13 +71,10 @@ class NatureFactory
             $is_deleted = true;
 
         return $is_deleted ? [true,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false,null];
-
-
     }
 
     private function checkIsValuesAdded($skus)
     {
-
         $product_option_value_ids = [];
         foreach ($skus as $sku) {
             $combination = $sku->getCombination();
@@ -90,7 +92,6 @@ class NatureFactory
             array_push($updated_option_ids, $option_value->getOptionId());
         }
         return $this->containsOnlyNull($updated_option_ids);
-
     }
 
     private function containsOnlyNull($input)
