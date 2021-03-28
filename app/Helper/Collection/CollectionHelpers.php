@@ -21,10 +21,8 @@ if( !function_exists('getCollectionDefaultThumbFolder')) {
      * @param bool $with_base_url
      * @return string
      */
-
-
     function getCollectionDefaultThumbFolder() : string {
-        return 'images/collections/thumbs/';
+        return config('filesystems.disks.s3.default_image_path').'/images/collections/thumbs/';
     }
 }
 
@@ -54,7 +52,7 @@ if( !function_exists('getCollectionDefaultAppThumbFolder')) {
      */
 
     function getCollectionDefaultAppThumbFolder() : string {
-        return 'images/collections/app_thumbs/';
+        return config('filesystems.disks.s3.default_image_path').'/images/collections/app_thumbs/';
     }
 }
 
@@ -84,7 +82,7 @@ if( !function_exists('getCollectionDefaultBannerFolder')) {
      */
 
     function getCollectionDefaultBannerFolder() : string {
-        return 'images/collections/banner/';
+        return config('filesystems.disks.s3.default_image_path').'/images/collections/banner/';
     }
 }
 
@@ -114,7 +112,7 @@ if( !function_exists('getCollectionDefaultAppBannerFolder')) {
      */
 
     function getCollectionDefaultAppBannerFolder() : string {
-        return 'images/collections/banner/';
+        return config('filesystems.disks.s3.default_image_path').'/images/collections/banner/';
     }
 }
 
