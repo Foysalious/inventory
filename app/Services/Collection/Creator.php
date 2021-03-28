@@ -133,10 +133,10 @@ class Creator
         return [
             'name' => $this->name,
             'description' => $this->description,
-            'thumb' => $this->collection_image_links['thumb_link'] ?? getCollectionDefaultThumb(),
-            'banner' => $this->collection_image_links['banner_link'] ?? getCollectionDefaultBanner(),
-            'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? getCollectionDefaultAppThumb(),
-            'app_banner' => $this->collection_image_links['app_banner_link'] ?? getCollectionDefaultAppBanner(),
+            'thumb' => $this->collection_image_links['thumb_link'] ?? config('s3.url').getCollectionDefaultThumb(),
+            'banner' => $this->collection_image_links['banner_link'] ?? config('s3.url').getCollectionDefaultBanner(),
+            'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? config('s3.url').getCollectionDefaultAppThumb(),
+            'app_banner' => $this->collection_image_links['app_banner_link'] ?? config('s3.url').getCollectionDefaultAppBanner(),
             'partner_id' => $this->partner_id,
             'is_published' => $this->is_published
         ] + $this->modificationFields(true, false);
