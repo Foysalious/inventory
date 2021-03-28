@@ -71,7 +71,7 @@ class CollectionService extends BaseService
         $collection = $this->collectionRepositoryInterface->find($collection_id);
         if(!$collection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
 
-        $collection_update = $this->updater->setCollection($collection)->setName($request->name)
+        $this->updater->setCollection($collection)->setName($request->name)
             ->setCollectionId($collection_id)
             ->setDescription($request->description)
             ->setPartnerId($partner_id)
@@ -82,7 +82,7 @@ class CollectionService extends BaseService
             ->setIsPublished($request->is_published)
             ->update();
 
-        return $this->success("Successful", ['collection' => $collection_update],201);
+        return $this->success("Successful", null,200, true);
     }
 
     public function delete($partner_id, $collection_id)
