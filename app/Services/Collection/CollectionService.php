@@ -53,7 +53,7 @@ class CollectionService extends BaseService
 
     public function create($partner_id, $request)
     {
-        $collection = $this->creator->setName($request['name'])
+        $this->creator->setName($request['name'])
             ->setDescription($request['description'] ?? '')
             ->setIsPublished($request['is_published'])
             ->setPartnerId($partner_id)
