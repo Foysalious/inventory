@@ -22,7 +22,7 @@ if( !function_exists('getCollectionDefaultThumbFolder')) {
      * @return string
      */
     function getCollectionDefaultThumbFolder() : string {
-        return config('filesystems.disks.s3.default_image_path').'/images/collections/thumbs/';
+        return config('s3.url').'images/collections/thumbs/';
     }
 }
 
@@ -52,7 +52,7 @@ if( !function_exists('getCollectionDefaultAppThumbFolder')) {
      */
 
     function getCollectionDefaultAppThumbFolder() : string {
-        return config('filesystems.disks.s3.default_image_path').'/images/collections/app_thumbs/';
+        return config('s3.url').'images/collections/app_thumbs/';
     }
 }
 
@@ -82,7 +82,7 @@ if( !function_exists('getCollectionDefaultBannerFolder')) {
      */
 
     function getCollectionDefaultBannerFolder() : string {
-        return config('filesystems.disks.s3.default_image_path').'/images/collections/banner/';
+        return config('s3.url').'images/collections/banner/';
     }
 }
 
@@ -112,7 +112,7 @@ if( !function_exists('getCollectionDefaultAppBannerFolder')) {
      */
 
     function getCollectionDefaultAppBannerFolder() : string {
-        return config('filesystems.disks.s3.default_image_path').'/images/collections/banner/';
+        return config('s3.url').'images/collections/banner/';
     }
 }
 
