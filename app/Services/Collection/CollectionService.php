@@ -63,7 +63,7 @@ class CollectionService extends BaseService
             ->setAppBanner($request['app_banner'] ?? '')
             ->create();
 
-        return $this->success("Successful",null, 201);
+        return $this->success("Successful",null, 201, true);
     }
 
     public function update($request, $partner_id, $collection_id)
