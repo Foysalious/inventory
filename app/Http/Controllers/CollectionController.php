@@ -19,7 +19,7 @@ class CollectionController extends Controller
     public function index(Request $request, $partner_id) : object
     {
         try {
-            return $this->collectionService->getAll($request);
+            return $this->collectionService->getAllAccordingToPartnerID($request, $partner_id);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }

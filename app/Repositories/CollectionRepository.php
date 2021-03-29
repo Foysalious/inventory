@@ -15,9 +15,9 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
         parent::__construct($model);
     }
 
-    public function getAllCollection($offset, $limit)
+    public function getAllCollection($offset, $limit, $partner_id)
     {
-        return $this->model->offset($offset)->limit($limit)->latest()->get();
+        return $this->model->where('partner_id', $partner_id)->offset($offset)->limit($limit)->latest()->get();
     }
 
     public function getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name)

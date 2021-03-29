@@ -27,10 +27,10 @@ class CollectionService extends BaseService
         $this->imageUpdater = $imageUpdater;
     }
 
-    public function getAll(Request $request) : object{
+    public function getAllAccordingToPartnerID(Request $request, $partner_id) : object{
         try {
             list($offset, $limit) = calculatePagination($request);
-            $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit);
+            $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit, $partner_id);
             $collections = CollectionResource::collection($resource);
             if(!$collections) return $this->error("Collection not found!", 404);
 
