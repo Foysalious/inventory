@@ -40,12 +40,14 @@ class CollectionService extends BaseService
         }
     }
 
-    public function getDetails($partnerId, $collection)
+    public function getDetails($partnerId, $collectionId)
     {
         try {
-            $resource = $this->collectionRepositoryInterface->find($collection);
-            $collection = new CollectionResource($resource);
-            return $this->success('Successful', ['collections' => $collection], 200);
+            $singleCollection = $this->collectionRepositoryInterface->where('partner_id', $partnerId)->find($collectionId);
+            if(!$singleCollection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
+
+            $collection = new CollectionResource($singleCollection);
+            return $this->success('Successful', ['collection' => $collection], 200);
         } catch(\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
@@ -68,7 +70,7 @@ class CollectionService extends BaseService
 
     public function update($request, $partner_id, $collection_id)
     {
-        $collection = $this->collectionRepositoryInterface->find($collection_id);
+        $collection = $this->collectionRepositoryInterface->where('partner_id', $partner_id)->find($collection_id);
         if(!$collection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
 
         $this->updater->setCollection($collection)->setName($request->name)
