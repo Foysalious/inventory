@@ -30,25 +30,27 @@ class ImageUpdater
         foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
         {
             $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-            if($fileName)
-            {
-                $storagePath = config('s3.url');
-                $mainFileName = substr($fileName, strlen($storagePath));
-                $end = array_slice(explode('/', $mainFileName), -1)[0];
-                dd($end);
-                $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
-            }
+            $mainFileName = $this->getMainFileName($fileName);
+
+            if($mainFileName != 'default.jpg')
+                $this->deleteFileFromCDN(substr($fileName, strlen(config('s3.url'))));
         }
     }
 
     public function deleteSingleCollectionImage($partner_id, $collection_id, $column_name)
     {
         $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-        if(isset($fileName))
-        {
-            $storagePath = config('s3.url');
-            $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
-        }
+        $mainFileName = $this->getMainFileName($fileName);
+
+        if($mainFileName != 'default.jpg')
+            $this->deleteFileFromCDN(substr($fileName, strlen(config('s3.url'))));
+    }
+
+    public function getMainFileName($fileName)
+    {
+        $storagePath = config('s3.url');
+        $mainFileNameWithPath = substr($fileName, strlen($storagePath));
+        return array_slice(explode('/', $mainFileNameWithPath), -1)[0];
     }
 
     public function updateImages($partner_id, $collection_id, $thumb, $banner, $app_thumb, $app_banner)
