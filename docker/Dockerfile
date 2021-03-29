@@ -32,8 +32,8 @@ RUN docker-php-ext-install -j$(nproc) pdo_mysql zip calendar soap gd intl
 # Install mongodb extension
 RUN pecl install mongodb && docker-php-ext-enable mongodb
 
-#
-RUN pecl install apfd
+# Install php-ext-apfd
+RUN pecl install apfd && docker-php-ext-enable apfd
 
 # Make fpm log script executable
 COPY fpm_log_file_created.sh /etc/fpm_log_file_created.sh
