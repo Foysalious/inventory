@@ -33,7 +33,9 @@ class ImageUpdater
             if($fileName)
             {
                 $storagePath = config('s3.url');
-                dd(substr($fileName, strlen($storagePath)));
+                $mainFileName = substr($fileName, strlen($storagePath));
+                $end = array_slice(explode('/', $mainFileName));
+                dd($end);
                 $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));
             }
         }
