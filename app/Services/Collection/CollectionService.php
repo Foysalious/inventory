@@ -88,7 +88,6 @@ class CollectionService extends BaseService
     public function delete($partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->find($collection_id);
-        dd($collection);
         if(!$collection) {
             return $this->error("কালেকশন পাওয়া যায় নি", 404);
         }
