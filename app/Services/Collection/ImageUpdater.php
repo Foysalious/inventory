@@ -30,7 +30,7 @@ class ImageUpdater
         foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
         {
             $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
-            if(isset($fileName))
+            if(count($fileName) > 0)
             {
                 $storagePath = config('s3.url');
                 $this->deleteFileFromCDN(substr($fileName, strlen($storagePath)));

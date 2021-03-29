@@ -87,10 +87,14 @@ class CollectionService extends BaseService
 
     public function delete($partner_id, $collection_id)
     {
+        $collection = $this->collectionRepositoryInterface->find($collection_id);
+        if(!$collection) {
+            return $this->error("কালেকশন পাওয়া যায় নি", 404);
+        }
         try {
             $this->imageUpdater->deleteAllCollectionImages($partner_id, $collection_id);
-            $collection = $this->collectionRepositoryInterface->findOrFail($collection_id)->delete();
-            return $this->success("Successful",['collection' => $collection], 200, false);
+            $collection->delete();
+            return $this->success("Successful", null , 200, true);
         } catch (\Exception $exception) {
             return $this->error($exception->getMessage(), 500);
         }
