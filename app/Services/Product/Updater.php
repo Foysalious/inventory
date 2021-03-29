@@ -14,6 +14,7 @@ use App\Models\Sku;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\Product\Update\NatureFactory;
+use App\Services\Product\Update\Operations\NonVariant;
 use App\Services\Product\Update\Operations\OptionsUpdated;
 use App\Services\Product\Update\Operations\ValuesAdded;
 use App\Services\Product\Update\Operations\ValuesUpdated;
@@ -209,19 +210,19 @@ class Updater
 
     public function update()
     {
-
         $oldProductDetails = clone $this->product;
         $this->productRepositoryInterface->update($this->product, $this->makeData());
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
-        if($nature == UpdateNature::VARIANTS_ADD)
-            app(VariantsAdd::class)->setProduct($this->product)->setHasVariants(false)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+
+        if($nature == UpdateNature::NON_VARIANT)
+            app(NonVariant::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         elseif($nature == UpdateNature::VARIANTS_DISCARD)
             app(VariantsDiscard::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         elseif ($nature == UpdateNature::OPTIONS_UPDATED)
             app(OptionsUpdated::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-        else if($nature == UpdateNature::VALUES_UPDATED)
+        elseif($nature == UpdateNature::VALUES_UPDATED)
             app(ValuesUpdated::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-        else if($nature == UpdateNature::VALUE_ADD)
+        elseif($nature == UpdateNature::VALUE_ADD)
             app(ValuesAdded::class)->setNature($nature)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         else
             app(ValuesDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();

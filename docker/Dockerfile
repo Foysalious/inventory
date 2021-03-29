@@ -36,6 +36,7 @@ RUN pecl install mongodb && docker-php-ext-enable mongodb
 COPY fpm_log_file_created.sh /etc/fpm_log_file_created.sh
 RUN chmod +x /etc/fpm_log_file_created.sh
 RUN /etc/fpm_log_file_created.sh
+RUN pecl install apfd
 
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
