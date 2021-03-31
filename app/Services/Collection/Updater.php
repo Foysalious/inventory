@@ -164,19 +164,19 @@ class Updater
     public function update($request)
     {
         $this->collection_updated_image_links = $this->collection_image_updater->updateImages($request, $this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        dd($this->collection_updated_image_links);
-        return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate());
+        return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate($request));
     }
 
-    public function makeDataForUpdate() : array
+    public function makeDataForUpdate($request) : array
     {
+        $requestedData = $request->all();
         $data = [];
         if(isset($this->name)) $data['name'] = $this->name;
         if(isset($this->description)) $data['description'] = $this->description;
-        if(isset($this->thumb)) $data['thumb'] = $this->collection_updated_image_links['thumb_link'];
-        if(isset($this->banner)) $data['banner'] = $this->collection_updated_image_links['banner_link'];
-        if(isset($this->app_thumb)) $data['app_thumb'] = $this->collection_updated_image_links['app_thumb_link'];
-        if(isset($this->app_banner)) $data['app_banner'] = $this->collection_updated_image_links['app_banner_link'];
+        if(array_key_exists('thumb', $requestedData)) $data['thumb'] = $this->collection_updated_image_links['thumb_link'];
+        if(array_key_exists('banner', $requestedData)) $data['banner'] = $this->collection_updated_image_links['banner_link'];
+        if(array_key_exists('app_thumb', $requestedData)) $data['app_thumb'] = $this->collection_updated_image_links['app_thumb_link'];
+        if(array_key_exists('app_banner', $requestedData)) $data['app_banner'] = $this->collection_updated_image_links['app_banner_link'];
         if(isset($this->partner_id)) $data['partner_id'] = $this->partner_id;
         if(isset($this->is_published)) $data['is_published'] = $this->is_published;
         return $data + $this->modificationFields(false, true);
