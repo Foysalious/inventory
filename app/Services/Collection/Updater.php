@@ -161,9 +161,9 @@ class Updater
         return $this;
     }
 
-    public function update()
+    public function update($request)
     {
-        $this->collection_updated_image_links = $this->collection_image_updater->updateImages($this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
+        $this->collection_updated_image_links = $this->collection_image_updater->updateImages($request, $this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
         return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate());
     }
 

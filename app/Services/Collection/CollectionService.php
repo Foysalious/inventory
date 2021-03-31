@@ -82,7 +82,7 @@ class CollectionService extends BaseService
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
             ->setIsPublished($request->is_published)
-            ->update();
+            ->update($request);
 
         return $this->success("Successful", null,200, true);
     }
