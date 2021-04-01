@@ -221,7 +221,7 @@ class Updater
 
     public function deleteGalleryImages($product)
     {
-        dd("YES");
+        dd($product);
     }
 
     public function update()
