@@ -47,4 +47,10 @@ trait CdnFileManager
     {
         $this->getCDN()->delete($filename);
     }
+
+    protected function deleteFileFromCDNPath($filePath)
+    {
+        $fileName = substr($filePath, strlen(config('s3.url')) );
+        $this->deleteFileFromCDN($fileName);
+    }
 }
