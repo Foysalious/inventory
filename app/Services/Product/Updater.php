@@ -231,13 +231,9 @@ class Updater
     public function update()
     {
         $oldProductDetails = clone $this->product;
-        if($this->deletedImages) {
-            $this->deleteGalleryImages($this->deletedImages, $this->product);
-        }
+        $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
         $this->productRepositoryInterface->update($this->product, $this->makeData());
-        if($this->images) {
-            $this->productImageCreator->setProductId($this->product->id)->setImages($this->images)->create();
-        }
+
 
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
         if($nature == UpdateNature::VARIANTS_ADD)
