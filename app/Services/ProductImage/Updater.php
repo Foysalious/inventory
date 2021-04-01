@@ -29,7 +29,7 @@ class Updater
                 ->first()['image_link'];
 
             $this->productImageRepositoryInterface->where('product_id', $productId)->where('id', $deleteRequestedImageList[$i])->delete();
-            $this->deleteFileFromCDN(substr($imageLink, 0, strlen($this->getCDN()) ));
+            $this->deleteFileFromCDN(substr($imageLink, strlen($this->getCDN()) ));
         }
     }
 }
