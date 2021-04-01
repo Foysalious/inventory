@@ -10,8 +10,6 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
-use App\Models\Sku;
-use App\Services\ProductImage;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\Product\Update\NatureFactory;
@@ -79,7 +77,7 @@ class Updater
                                 OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
                                 ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
-                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest, ProductImage\Updater $updater)
+                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -93,7 +91,6 @@ class Updater
         $this->skuRepositoryInterface = $skuRepositoryInterface;
         $this->natureFactory = $natureFactory;
         $this->logCreateRequest = $logCreateRequest;
-        $this->productImageUpdater = $updater;
     }
 
     /**
