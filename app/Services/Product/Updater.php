@@ -11,6 +11,7 @@ use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
 use App\Models\Sku;
+use App\Services\ProductImage;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\Product\Update\NatureFactory;
@@ -46,6 +47,9 @@ class Updater
     protected $discountAmount;
     protected $discountEndDate;
     protected $images;
+    protected $deletedImages;
+    protected $productImageUpdater;
+
     private $options;
     private $productUpdateRequestObjects;
     /** @var mixed */
@@ -75,7 +79,7 @@ class Updater
                                 OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
                                 ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
-                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest)
+                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest, ProductImage\Updater $updater)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -89,6 +93,7 @@ class Updater
         $this->skuRepositoryInterface = $skuRepositoryInterface;
         $this->natureFactory = $natureFactory;
         $this->logCreateRequest = $logCreateRequest;
+        $this->productImageUpdater = $updater;
     }
 
     /**
@@ -189,6 +194,16 @@ class Updater
         return $this;
     }
 
+    /**
+     * @param mixed $deletedImages
+     * @return Updater
+     */
+    public function setDeletedImages($deletedImages)
+    {
+        $this->deletedImages = $deletedImages;
+        return $this;
+    }
+
     public function setProductUpdateRequestObjects($productUpdateRequestObjects)
     {
         $this->productUpdateRequestObjects = $productUpdateRequestObjects;
@@ -207,11 +222,19 @@ class Updater
         return $this;
     }
 
+    public function deleteGalleryImages($product)
+    {
+        dd($product);
+    }
+
     public function update()
     {
-
         $oldProductDetails = clone $this->product;
+        if($this->deletedImages) {
+            $this->deleteGalleryImages($this->product);
+        }
         $this->productRepositoryInterface->update($this->product, $this->makeData());
+
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
         if($nature == UpdateNature::VARIANTS_ADD)
             app(VariantsAdd::class)->setProduct($this->product)->setHasVariants(false)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();

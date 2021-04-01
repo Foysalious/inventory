@@ -163,9 +163,11 @@ class ProductService extends BaseService
             ->setDiscount($request->discount_amount)
             ->setDiscountEndDate($request->discount_end_date)
             ->setImages($request->images)
+            ->setDeletedImages($request->deleted_images)
             ->setProductUpdateRequestObjects($product_update_request_objs)
             ->setHasVariant($has_variant)
             ->update();
+
         return $this->success("Successful", ['product' => $product],200);
     }
 
