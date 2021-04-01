@@ -19,4 +19,17 @@ class Updater
     {
         $this->productImageRepositoryInterface = $productImageRepository;
     }
+
+    public function deleteRequestedProductImages($productId, $deleteRequestedImageList)
+    {
+        for ($i=0; $i < count($deleteRequestedImageList); $i++)
+        {
+            $imageLink = $this->productImageRepositoryInterface->where('product_id', $productId)
+                ->where('id', $deleteRequestedImageList[$i])
+                ->first()['image_link'];
+
+            $this->productImageRepositoryInterface->where('product_id', $productId)->where('id', $deleteRequestedImageList[$i])->delete();
+            $this->deleteFileFromCDN($imageLink);
+        }
+    }
 }

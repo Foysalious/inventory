@@ -20,6 +20,7 @@ use App\Services\Product\Update\Operations\ValuesDeleted;
 use App\Services\Product\Update\Operations\VariantsAdd;
 use App\Services\Product\Update\Operations\VariantsDiscard;
 use App\Services\ProductImage\Creator as ProductImageCreator;
+use App\Services\ProductImage\Updater as ProductImageUpdater;
 
 class Updater
 {
@@ -72,12 +73,13 @@ class Updater
      * @param SkuRepositoryInterface $skuRepositoryInterface
      * @param NatureFactory $natureFactory
      * @param ProductUpdateLogCreateRequest $logCreateRequest
+     * @param ProductImageUpdater $productImageUpdater
      */
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
                                 OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
                                 ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
-                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest)
+                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest, ProductImageUpdater $productImageUpdater)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -91,6 +93,7 @@ class Updater
         $this->skuRepositoryInterface = $skuRepositoryInterface;
         $this->natureFactory = $natureFactory;
         $this->logCreateRequest = $logCreateRequest;
+        $this->productImageUpdater = $productImageUpdater;
     }
 
     /**
@@ -219,18 +222,22 @@ class Updater
         return $this;
     }
 
-    public function deleteGalleryImages($product)
+    public function deleteGalleryImages($deleted_images, $product)
     {
-        dd($this->deletedImages);
+        $productId = $product->id;
+        $this->productImageUpdater->deleteRequestedProductImages($productId, $deleted_images);
     }
 
     public function update()
     {
         $oldProductDetails = clone $this->product;
         if($this->deletedImages) {
-            $this->deleteGalleryImages($this->product);
+            $this->deleteGalleryImages($this->deletedImages, $this->product);
         }
         $this->productRepositoryInterface->update($this->product, $this->makeData());
+        if($this->images) {
+            $this->productImageCreator->setProductId($this->product->id)->setImages($this->images)->create();
+        }
 
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
         if($nature == UpdateNature::VARIANTS_ADD)
