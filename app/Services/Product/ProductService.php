@@ -150,6 +150,7 @@ class ProductService extends BaseService
      */
     public function update($productId, ProductUpdateRequest $request)
     {
+        dd($request->all());
         $product = $this->productRepositoryInterface->findOrFail($productId);
         list($has_variant,$product_update_request_objs) =  app(ProductUpdateRequestObjects::class)->setProductDetails($request->product_details)->get();
         $this->updater->setProduct($product)
