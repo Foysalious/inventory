@@ -42,6 +42,8 @@ class NatureFactory
     {
         $deleted_values = null;
         $created_with_variants = $this->productOptionRepositoryInterface->where('product_id',$product->id)->count() > 0;
+        if(!$created_with_variants && !$has_variant)
+            return [UpdateNature::NON_VARIANT,$deleted_values];
         if(!$created_with_variants && $has_variant)
             return [UpdateNature::VARIANTS_ADD,$deleted_values];
         if($created_with_variants && !$has_variant)

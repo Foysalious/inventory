@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\OptionController;
+use App\Http\Controllers\SkuController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ValueController;
@@ -53,4 +54,5 @@ Route::group(['prefix'=>'v1'], function(){
     });
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
     Route::get('/channels', [ChannelController::class, 'index']);
+    Route::apiResource('partners.skus', SkuController::class);
 });

@@ -6,6 +6,7 @@ class UpdateNature
 {
     use ConstGetter;
 
+    const NON_VARIANT = 'non_variant';
     const VARIANTS_ADD = 'variants_add';
     const VARIANTS_DISCARD = 'variants_discard';
     const OPTIONS_UPDATED = 'options_updated';
