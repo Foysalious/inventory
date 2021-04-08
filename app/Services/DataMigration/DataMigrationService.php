@@ -116,11 +116,12 @@ class DataMigrationService
 
     public function migrate()
     {
-        $this->migratePartnerInfoData();
-        $this->migrateCategoryData();
-        $this->migrateProductsData();
-        $this->migrateProductDiscountsData();
-        $this->migrateProductUpdateLogsData();
+        if ($this->partnerInfo) $this->migratePartnerInfoData();
+        if ($this->categories) $this->migrateCategoriesData();
+        if ($this->categoryPartner) $this->migrateCategoryPartnerData();
+        if ($this->products) $this->migrateProductsData();
+        if ($this->productUpdateLogs) $this->migrateProductUpdateLogsData();
+        if ($this->discounts) $this->migrateProductDiscountsData();
     }
 
     private function migratePartnerInfoData()
@@ -128,9 +129,13 @@ class DataMigrationService
         $this->partnerRepositoryInterface->insertOrIgnore($this->partnerInfo);
     }
 
-    private function migrateCategoryData()
+    private function migrateCategoriesData()
     {
         $this->categoryRepositoryInterface->insertOrIgnore($this->categories);
+    }
+
+    private function migrateCategoryPartnerData()
+    {
         $this->categoryPartnerRepositoryInterface->insertOrIgnore($this->categoryPartner);
     }
 
