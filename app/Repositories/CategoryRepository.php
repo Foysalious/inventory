@@ -3,7 +3,6 @@
 
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Models\Category;
-use http\Env\Request;
 
 class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
 {

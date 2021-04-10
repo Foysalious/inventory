@@ -13,11 +13,22 @@ class Updater
     use FileManager, CdnFileManager;
 
     protected $productImageRepositoryInterface;
-    protected $productId;
+    protected $productId, $productImageCreator;
 
-    public function __construct(ProductImageRepositoryInterface $productImageRepository)
+    public function __construct(ProductImageRepositoryInterface $productImageRepository, Creator $productImageCreator)
     {
         $this->productImageRepositoryInterface = $productImageRepository;
+        $this->productImageCreator = $productImageCreator;
+    }
+
+    public function updateImageList($images, $deletedImages, $product)
+    {
+        if($deletedImages) {
+            $this->deleteRequestedProductImages($product->id, $deletedImages);
+        }
+        if($images) {
+            $this->productImageCreator->setProductId($product->id)->setImages($images)->create();
+        }
     }
 
     public function deleteRequestedProductImages($productId, $deleteRequestedImageList)

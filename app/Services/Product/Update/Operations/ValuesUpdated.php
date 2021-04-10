@@ -30,7 +30,7 @@ class ValuesUpdated
     /**
      * @var SkuRepositoryInterface
      */
-    private SkuRepositoryInterface $skuRepository;
+    protected SkuRepositoryInterface $skuRepository;
     /**
      * @var SkuChannelRepositoryInterface
      */
@@ -44,9 +44,9 @@ class ValuesUpdated
     /**
      * @var Product $product
      */
-    private $product;
+    protected $product;
 
-    private $updateDataObejects;
+    protected $updateDataObejects;
 
     protected $deletedValues;
 
@@ -231,7 +231,7 @@ class ValuesUpdated
         return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
     }
 
-    private function updateSkuChannels($sku_channels,$related_skus)
+    protected function updateSkuChannels($sku_channels,$related_skus)
     {
         list($is_deleted,$deleted_sku_Channels) = $this->checkAndApplyOperationIfSkuChannelsDeleted($sku_channels,$related_skus);
         if($is_deleted)
