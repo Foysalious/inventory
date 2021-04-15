@@ -12,6 +12,6 @@ class Collection extends BaseModel
 
     public function products()
     {
-        return $this->hasMany(Product::class);
+        return $this->hasMany(CollectionProduct::class);
     }
 }
