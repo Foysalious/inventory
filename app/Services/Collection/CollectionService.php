@@ -47,7 +47,7 @@ class CollectionService extends BaseService
         if(!$singleCollection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
 
         $collection = $singleCollection;
-        $collection->products = new ProductResource($this->collectionRepositoryInterface->getProductsOfCollection($collectionId));
+        $collection->products = $this->collectionRepositoryInterface->getProductsOfCollection($collectionId);
         $collection = new CollectionResource($collection);
 
         return $this->success('Successful', ['collection' => $collection], 200);
