@@ -55,7 +55,6 @@ class CollectionService extends BaseService
 
     public function create($partner_id, $request)
     {
-        dd('Products: ' . $request['products']);
         $this->creator->setName($request['name'])
             ->setDescription($request['description'] ?? '')
             ->setIsPublished($request['is_published'])
