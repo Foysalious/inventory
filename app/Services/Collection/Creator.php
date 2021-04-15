@@ -15,12 +15,9 @@ class Creator
     use ModificationFields, FileManager, CdnFileManager;
 
     protected $collection_image_links = array();
-
     protected $collectionRepositoryInterface;
-
     protected $image_creator;
-
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $products;
 
 
     private $data = [];
@@ -121,25 +118,43 @@ class Creator
         return $this;
     }
 
+    /**
+     * @param mixed $products
+     * @return Creator
+     */
+    public function setProducts($products)
+    {
+        $this->products = $products;
+        return $this;
+    }
+
 
     public function create()
     {
         $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
+        $collInsertAck = $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
+        $latestCollectionId = null;
+        if($collInsertAck == true) $latestCollectionId = $this->collectionRepositoryInterface->getLatestCollectionId($this->partner_id);
+        if($this->products && $latestCollectionId) $this->collectionRepositoryInterface->insertCollectionProducts($this->products, $latestCollectionId);
+        return true;
     }
 
     public function makeDataForInsert() : array
     {
+        /*
+         * config('s3.url') will give us the S3 basic url and
+         * getCollectionDefaultThumb() will give the rest of the URL after s3.url -> basic url.
+         */
         return [
-            'name' => $this->name,
-            'description' => $this->description,
-            'thumb' => $this->collection_image_links['thumb_link'] ?? '',
-            'banner' => $this->collection_image_links['banner_link'] ?? '',
-            'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? '',
-            'app_banner' => $this->collection_image_links['app_banner_link'] ?? '',
-            'partner_id' => $this->partner_id,
-            'is_published' => $this->is_published
-        ] + $this->modificationFields(true, false);
+                'name' => $this->name,
+                'description' => $this->description,
+                'thumb' => $this->collection_image_links['thumb_link'] ?? config('s3.url').getCollectionDefaultThumb(),
+                'banner' => $this->collection_image_links['banner_link'] ?? config('s3.url').getCollectionDefaultBanner(),
+                'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? config('s3.url').getCollectionDefaultAppThumb(),
+                'app_banner' => $this->collection_image_links['app_banner_link'] ?? config('s3.url').getCollectionDefaultAppBanner(),
+                'partner_id' => $this->partner_id,
+                'is_published' => $this->is_published
+            ] + $this->modificationFields(true, false);
     }
 
 }

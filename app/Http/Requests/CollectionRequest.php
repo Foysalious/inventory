@@ -26,7 +26,8 @@ class CollectionRequest extends FormRequest
             'thumb'             => 'nullable',
             'banner'            => 'nullable|mimes:jpg,bmp,png,jpeg',
             'app_thumb'         => 'nullable|mimes:jpg,bmp,png,jpeg',
-            'app_banner'        => 'nullable|mimes:jpg,bmp,png,jpeg'
+            'app_banner'        => 'nullable|mimes:jpg,bmp,png,jpeg',
+            'products'          => 'nullable'
         ];
     }
 }
