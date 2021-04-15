@@ -32,8 +32,7 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function insertCollectionProducts($products, $collection_id)
     {
-        dd(json_decode($products));
-        for ($i = 0; $i < sizeof($products); $i++)
+        for ($i = 0; $i < count($products); $i++)
         {
             DB::table($this->collectionProductsTable)->insertOrIgnore([
                 ['collection_id' => $collection_id, 'product_id' => $products[$i]->id ]
