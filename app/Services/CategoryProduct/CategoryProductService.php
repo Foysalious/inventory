@@ -32,7 +32,7 @@ class CategoryProductService extends BaseService
         })->get();
         $request->merge(['products' => $products]);
         $resource = CategoryProductResource::collection($master_categories);
-        if (count($resource) > 0) return $this->success("Successful", ['products' => $resource]);
+        if (count($resource) > 0) return $this->success("Successful", ['category_products' => $resource]);
         throw new NotFoundHttpException("Not found");
     }
 }
