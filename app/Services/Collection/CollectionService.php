@@ -4,6 +4,7 @@
 use App\Constants\ImageConstants;
 use App\Http\Requests\CollectionRequest;
 use App\Http\Resources\CollectionResource;
+use App\Http\Resources\ProductResource;
 use App\Repositories\CollectionRepository;
 use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
@@ -46,7 +47,7 @@ class CollectionService extends BaseService
         if(!$singleCollection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
 
         $collection = new CollectionResource($singleCollection);
-        $collection->products = $this->collectionRepositoryInterface->getProductsOfCollection($collectionId);
+        $collection->products = new ProductResource($this->collectionRepositoryInterface->getProductsOfCollection($collectionId));
 
         return $this->success('Successful', ['collection' => $collection], 200);
     }
