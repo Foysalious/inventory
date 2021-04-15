@@ -9,9 +9,4 @@ class Collection extends BaseModel
 {
     use HasFactory;
     protected $guarded = ['id'];
-
-    public function products()
-    {
-        return $this->hasMany(CollectionProduct::class);
-    }
 }

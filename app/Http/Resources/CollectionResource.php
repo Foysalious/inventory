@@ -26,7 +26,7 @@ class CollectionResource extends JsonResource
             'app_thumb'     => $this->app_thumb,
             'app_banner'    => $this->app_banner,
             'is_published'  => $this->is_published,
-            'products'      => []
+            'products'      => $this->products
         ];
     }
 }
