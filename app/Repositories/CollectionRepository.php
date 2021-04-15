@@ -60,7 +60,6 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
             $singleProduct = $this->productRepositoryInterface->findOrFail($productsIds[$i]->product_id);
             array_push($products, $singleProduct);
         }
-        dd($products);
         return $products;
     }
 }
