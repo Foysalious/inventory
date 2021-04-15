@@ -54,8 +54,8 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
     public function getProductsOfCollection($collection_id)
     {
         $products = [];
-        $productsIds = DB::table($this->collectionProductsTable)->where('collection_id', $collection_id)->get(['id']);
-
+        $productsIds = DB::table($this->collectionProductsTable)->where('collection_id', $collection_id)->get();
+        dd($productsIds);
         for ($i = 0; $i <count($productsIds); $i++)
         {
             $singleProduct = $this->productRepositoryInterface->findOrFail($productsIds[$i]);
