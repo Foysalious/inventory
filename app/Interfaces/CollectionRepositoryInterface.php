@@ -13,4 +13,5 @@ interface CollectionRepositoryInterface extends BaseRepositoryInterface
     public function getLatestCollectionId($partner_id);
     public function insertCollectionProducts($products, $collection_id);
     public function updateCollectionProducts($products, $collection_id);
+    public function getProductsOfCollection($collection_id);
 }

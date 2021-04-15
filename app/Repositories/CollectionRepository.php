@@ -47,4 +47,9 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
         DB::table($this->collectionProductsTable)->where('collection_id', $collection_id)->delete();
         return $this->insertCollectionProducts($products, $collection_id);
     }
+
+    public function getProductsOfCollection($collection_id)
+    {
+        return DB::table($this->collectionProductsTable)->where('collection_id', $collection_id)->get();
+    }
 }

@@ -25,8 +25,7 @@ class CollectionResource extends JsonResource
             'banner'        => $this->banner,
             'app_thumb'     => $this->app_thumb,
             'app_banner'    => $this->app_banner,
-            'is_published'  => $this->is_published,
-            'products'      => ProductResource::collection($this->products)
+            'is_published'  => $this->is_published
         ];
     }
 }
