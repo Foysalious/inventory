@@ -12,15 +12,10 @@ class Updater
     use ModificationFields;
 
     protected $collectionRepositoryInterface;
-
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id;
-
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id, $products;
     protected $collection_id;
-
     protected $collection_updated_image_links = array();
-
     protected $collection_image_updater;
-
     private $data = [];
 
     protected Collection $collection;
@@ -161,9 +156,20 @@ class Updater
         return $this;
     }
 
+    /**
+     * @param mixed $products
+     * @return Updater
+     */
+    public function setProducts($products)
+    {
+        $this->products = $products;
+        return $this;
+    }
+
     public function update($request)
     {
         $this->collection_updated_image_links = $this->collection_image_updater->updateImages($request, $this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
+        if($this->products) $this->collectionRepositoryInterface->updateCollectionProducts($this->products, $this->collection_id);
         return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate($request));
     }
 

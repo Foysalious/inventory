@@ -55,6 +55,7 @@ class CollectionService extends BaseService
 
     public function create($partner_id, $request)
     {
+        dd('Products: ' . $request['products']);
         $this->creator->setName($request['name'])
             ->setDescription($request['description'] ?? '')
             ->setIsPublished($request['is_published'])
@@ -63,6 +64,7 @@ class CollectionService extends BaseService
             ->setBanner($request['banner'] ?? '')
             ->setAppThumb($request['app_thumb'] ?? '')
             ->setAppBanner($request['app_banner'] ?? '')
+            ->setProducts($request['products'])
             ->create();
 
         return $this->success("Successful",null, 201, true);
@@ -82,6 +84,7 @@ class CollectionService extends BaseService
             ->setAppThumb($request->app_thumb)
             ->setAppBanner($request->app_banner)
             ->setIsPublished($request->is_published)
+            ->setProducts($request->products)
             ->update($request);
 
         return $this->success("Successful", null,200, true);
