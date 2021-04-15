@@ -3,15 +3,18 @@
 namespace App\Repositories;
 
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Collection;
 use Illuminate\Support\Facades\DB;
 
 class CollectionRepository extends BaseRepository implements CollectionRepositoryInterface
 {
     protected string $collectionProductsTable = 'collection_products';
+    protected $productRepositoryInterface;
 
-    public function __construct(Collection $model)
+    public function __construct(Collection $model, ProductRepositoryInterface $productRepositoryInterface)
     {
+        $this->productRepositoryInterface = $productRepositoryInterface;
         parent::__construct($model);
     }
 
@@ -50,6 +53,13 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function getProductsOfCollection($collection_id)
     {
-        return DB::table($this->collectionProductsTable)->where('collection_id', $collection_id)->get();
+        $products = [];
+        $productsIds = DB::table($this->collectionProductsTable)->where('collection_id', $collection_id)->get('id');
+        for ($i = 0; $i <count($productsIds); $i++)
+        {
+            $singleProduct = $this->productRepositoryInterface->findOrFail($productsIds[$i]);
+            array_push($products, $singleProduct);
+        }
+        return $products;
     }
 }
