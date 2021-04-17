@@ -10,6 +10,7 @@ class SkuResource extends JsonResource
 
         return [
 
+            'id' => $this->id,
             'name'  => $this->name,
             'product_id' => $this->product_id,
             'warranty' => $this->warranty,
