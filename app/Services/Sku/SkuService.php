@@ -29,15 +29,17 @@ class SkuService extends BaseService
         $channel_id = $request->channel_id;
         $skus = json_decode($request->skus, true);
         if ($channel_id && $skus)
-            $skus = $this->skuRepository->getSkusByIdsAndChannel($skus, $channel_id,);
+            $skus = $this->skuRepository->getSkusByIdsAndChannel($skus, $channel_id);
         else
             $skus = $this->skuRepository->getSkusByPartnerId($partner, $offset, $limit);
 
-        $sku_with_sku_details = $skus->map(function ($sku) use ($channel_id) {
-            return $sku->sku_details = $this->getSkuDetails($channel_id, $sku->id);
-        })->first();
 
-        $skus = SkuResource::collection($sku_with_sku_details);
+        $skus->each(function ($sku) use ($channel_id) {
+             $sku->sku_details = $this->getSkuDetails($channel_id, $sku->id);
+        });
+
+
+        $skus = SkuResource::collection($skus);
         return $this->success('Successful', ['skus' => $skus], 200);
     }
 

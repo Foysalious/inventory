@@ -32,7 +32,9 @@ class SkuRepository extends BaseRepository implements SkuRepositoryInterface
 
     public function getSkuDetails($channelId, $skuId)
     {
-        return $this->model->where('id',$skuId)->with('combinations')->get();
+        return $this->model->where('id',$skuId)->with(['combinations' => function($q){
+            $q->select('id','sku_id','product_option_value_id');
+        }])->select('id')->get();
     }
 
 }
