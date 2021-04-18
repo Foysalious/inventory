@@ -12,6 +12,6 @@ class Collection extends BaseModel
 
     public function products()
     {
-        return $this->hasManyThrough(Product::class, CollectionProduct::class, 'collection_id', 'product_id');
+        return $this->belongsToMany(Product::class, 'collection_products')->withTimestamps();
     }
 }
