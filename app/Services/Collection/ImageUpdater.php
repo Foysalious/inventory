@@ -5,6 +5,7 @@ namespace App\Services\Collection;
 
 
 use App\Constants\ImageConstants;
+use App\Interfaces\CollectionRepositoryInterface;
 use App\Repositories\CollectionRepository;
 use App\Services\FileManagers\CdnFileManager;
 use App\Services\FileManagers\FileManager;
@@ -13,11 +14,12 @@ class ImageUpdater
 {
     use FileManager, CdnFileManager;
 
-    protected $collection_repo;
+    protected $collection_repo, $collectionRepositoryInterface;
 
-    public function __construct(CollectionRepository $collectionRepository)
+    public function __construct(CollectionRepository $collectionRepository, CollectionRepositoryInterface $collectionRepositoryInterface)
     {
         $this->collection_repo = $collectionRepository;
+        $this->collectionRepositoryInterface = $collectionRepositoryInterface;
     }
 
     private function updateCollectionImage($file, $name)
@@ -38,7 +40,7 @@ class ImageUpdater
 
     public function deleteSingleCollectionImage($partner_id, $collection_id, $column_name)
     {
-        $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+        $fileName = $this->collectionRepositoryInterface->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
         $mainFileName = $this->getMainFileName($fileName);
 
         if($mainFileName != 'default.jpg')
