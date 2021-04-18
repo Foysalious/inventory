@@ -21,12 +21,18 @@ class SkuRepository extends BaseRepository implements SkuRepositoryInterface
             ->get();
     }
 
-    public function getSkusByIdsAndChannel($channelId,array $skus)
+    public function getSkusByIdsAndChannel(array $skus,$channelId)
     {
         return $this->model->whereIn('id', $skus)->with(['skuChannels' => function ($q) use ($channelId) {
-                $q->where('channel_id', $channelId)->select('id','sku_id','channel_id','cost','price','wholesale_price');
-            },'product'])->get();
+                $q->where('channel_id',$channelId)->select('id','sku_id','channel_id','cost','price','wholesale_price');
+            },'product'=> function($q) {
+            $q->select('id as product_id','warranty','warranty_unit','vat_percentage');
+        }])->get();
+    }
 
+    public function getSkuDetails($channelId, $skuId)
+    {
+        return $this->model->where('id',$skuId)->with('combinations')->get();
     }
 
 }
