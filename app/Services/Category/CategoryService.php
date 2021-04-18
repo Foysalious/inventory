@@ -58,7 +58,7 @@ class CategoryService extends BaseService
         $resource = CategoryResource::collection($master_categories);
         $data = [];
         $data['total_category'] = count($master_categories);
-        $data['category'] = $resource;
+        $data['category']  = $resource;
 
         return $this->success("Successful", ['data' => $data]);
     }
