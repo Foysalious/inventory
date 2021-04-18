@@ -132,9 +132,8 @@ class Creator
     public function create()
     {
         $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        $collInsertAck = $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
-        $latestCollectionId = null;
-        if($collInsertAck == true) $latestCollectionId = $this->collectionRepositoryInterface->getLatestCollectionId($this->partner_id);
+        $collection = $this->collectionRepositoryInterface->create($this->makeDataForInsert());
+        $latestCollectionId = $collection->id;
         if($this->products && $latestCollectionId) $this->collectionRepositoryInterface->insertCollectionProducts($this->products, $latestCollectionId);
         return true;
     }
@@ -146,15 +145,15 @@ class Creator
          * getCollectionDefaultThumb() will give the rest of the URL after s3.url -> basic url.
          */
         return [
-            'name' => $this->name,
-            'description' => $this->description,
-            'thumb' => $this->collection_image_links['thumb_link'] ?? config('s3.url').getCollectionDefaultThumb(),
-            'banner' => $this->collection_image_links['banner_link'] ?? config('s3.url').getCollectionDefaultBanner(),
-            'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? config('s3.url').getCollectionDefaultAppThumb(),
-            'app_banner' => $this->collection_image_links['app_banner_link'] ?? config('s3.url').getCollectionDefaultAppBanner(),
-            'partner_id' => $this->partner_id,
-            'is_published' => $this->is_published
-        ] + $this->modificationFields(true, false);
+                'name' => $this->name,
+                'description' => $this->description,
+                'thumb' => $this->collection_image_links['thumb_link'] ?? config('s3.url').getCollectionDefaultThumb(),
+                'banner' => $this->collection_image_links['banner_link'] ?? config('s3.url').getCollectionDefaultBanner(),
+                'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? config('s3.url').getCollectionDefaultAppThumb(),
+                'app_banner' => $this->collection_image_links['app_banner_link'] ?? config('s3.url').getCollectionDefaultAppBanner(),
+                'partner_id' => $this->partner_id,
+                'is_published' => $this->is_published
+            ] + $this->modificationFields(true, false);
     }
 
 }

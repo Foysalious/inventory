@@ -2,13 +2,13 @@
 
 
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\CollectionProductsRepositoryInterface;
 use App\Interfaces\CombinationRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\ProductChannelRepositoryInterface;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductOptionValueRepositoryInterface;
-use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductUpdateLogRepositoryInterface;
@@ -20,13 +20,13 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Interfaces\ChannelRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Repositories\CollectionProductsRepository;
 use App\Repositories\CombinationRepository;
 use App\Repositories\DiscountRepository;
 use App\Repositories\OptionRepository;
 use App\Repositories\ProductChannelRepository;
 use App\Repositories\ProductOptionRepository;
 use App\Repositories\ProductOptionValueRepository;
-use App\Repositories\SkuChannelRepository;
 use App\Repositories\SkuRepository;
 use App\Repositories\PartnerRepository;
 use App\Repositories\ProductUpdateLogRepository;
@@ -77,6 +77,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(SkuRepositoryInterface::class, SkuRepository::class);
         $this->app->singleton(PartnerRepositoryInterface::class, PartnerRepository::class);
         $this->app->singleton(ProductUpdateLogRepositoryInterface::class, ProductUpdateLogRepository::class);
+        $this->app->singleton(CollectionProductsRepositoryInterface::class, CollectionProductsRepository::class);
         $this->app->singleton(SkuChannelRepositoryInterface::class, SkuChannelRepository::class);
     }
 
