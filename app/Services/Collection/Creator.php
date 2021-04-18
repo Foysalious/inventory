@@ -132,9 +132,8 @@ class Creator
     public function create()
     {
         $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        $collInsertAck = $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
-        $latestCollectionId = null;
-        if($collInsertAck == true) $latestCollectionId = $this->collectionRepositoryInterface->getLatestCollectionId($this->partner_id);
+        $collection = $this->collectionRepositoryInterface->create($this->makeDataForInsert());
+        $latestCollectionId = $collection->id;
         if($this->products && $latestCollectionId) $this->collectionRepositoryInterface->insertCollectionProducts($this->products, $latestCollectionId);
         return true;
     }
