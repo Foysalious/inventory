@@ -1,10 +1,7 @@
 <?php namespace App\Services\Collection;
 
-
-use App\Constants\ImageConstants;
-use App\Http\Requests\CollectionRequest;
+use App\Http\Resources\CollectionProductResource;
 use App\Http\Resources\CollectionResource;
-use App\Http\Resources\ProductResource;
 use App\Repositories\CollectionRepository;
 use App\Services\BaseService;
 use App\Interfaces\CollectionRepositoryInterface;
@@ -29,15 +26,13 @@ class CollectionService extends BaseService
     }
 
     public function getAllAccordingToPartnerID(Request $request, $partner_id) : object{
-        try {
-            list($offset, $limit) = calculatePagination($request);
-            $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit, $partner_id);
-            $collections = CollectionResource::collection($resource);
-            if(!$collections) return $this->error("Collection not found!", 404);
-            return $this->success("Successful", ['collections' => $collections], 200);
-        } catch (\Exception $exception) {
-            return $this->error($exception->getMessage(), 500);
-        }
+
+        list($offset, $limit) = calculatePagination($request);
+        $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit, $partner_id);
+
+        $collections = CollectionResource::collection($resource);
+        if(!$collections) return $this->error("Collection not found!", 404);
+        return $this->success("Successful", ['collections' => $collections], 200);
     }
 
     public function getDetails($partnerId, $collectionId)
@@ -45,10 +40,7 @@ class CollectionService extends BaseService
         $singleCollection = $this->collectionRepositoryInterface->where('partner_id', $partnerId)->find($collectionId);
         if(!$singleCollection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
 
-        $collection = $singleCollection;
-        $collection->products = $singleCollection->products;
-        $collection = new CollectionResource($collection);
-
+        $collection = new CollectionProductResource($singleCollection);
         return $this->success('Successful', ['collection' => $collection], 200);
     }
 
@@ -91,9 +83,8 @@ class CollectionService extends BaseService
     public function delete($partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->find($collection_id);
-        if(!$collection) {
-            return $this->error("কালেকশন পাওয়া যায় নি", 404);
-        }
+        if(!$collection) return $this->error("কালেকশন পাওয়া যায় নি", 404);
+
         try {
             $this->imageUpdater->deleteAllCollectionImages($partner_id, $collection_id);
             $collection->delete();
