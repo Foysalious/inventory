@@ -133,9 +133,7 @@ class Creator
     {
         $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
         $collection = $this->collectionRepositoryInterface->create($this->makeDataForInsert());
-        $latestCollectionId = $collection->id;
-        if($this->products && $latestCollectionId) $this->collectionRepositoryInterface->insertCollectionProducts($this->products, $latestCollectionId);
-        return true;
+        return $this->products ? $this->collectionRepositoryInterface->find($collection->id)->products()->attach(json_decode($this->products)) : null;
     }
 
     public function makeDataForInsert() : array
