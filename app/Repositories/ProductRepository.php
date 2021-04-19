@@ -20,6 +20,11 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         return $this->model->where('partner_id', $partnerId)->skip($offset)->take($limit)->get();
     }
 
+    public function getProductsByCategoryId($category_id)
+    {
+        return $this->model->where('category_id', $category_id)->get();
+    }
+
     public function productChannelPrice($productId)
     {
         $sku_channel_price_array = array();
