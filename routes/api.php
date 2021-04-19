@@ -30,6 +30,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix'=>'v1'], function(){
 
+    Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
         Route::group(['prefix' => 'categories'], function () {
@@ -41,6 +42,7 @@ Route::group(['prefix'=>'v1'], function(){
         Route::apiResource('collection', CollectionController::class);
         Route::get('warranty-unit', [WarrantyUnitController::class, 'index']);
     });
+
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
     Route::apiResource('partners.values', ValueController::class)->only('update');

@@ -20,12 +20,6 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
 
     public function getCategory($partner_id)
     {
-//        return $this->model->leftJoin('category_partner', 'categories.id', '=', 'category_partner.category_id')
-//            ->where('category_partner.partner_id',$partner_id)
-//            ->with(['children'=> function($q){
-//                $q->select('id', 'name', 'parent_id');
-//                }])->where('parent_id',NULL)->get();
-
         return $this->model->where(function ($q) use ($partner_id) {
             $q->where('is_published_for_sheba', 1)->orWhere(function ($q) use ($partner_id) {
                 $q->where('is_published_for_sheba', 0)->whereHas('categoryPartner', function ($q) use ($partner_id) {
@@ -37,26 +31,15 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         }])->where('parent_id', NULL)->get();
 
 
-//        try {
-//            $partner_id = $request->partner->id;
-//            $master_categories = PosCategory::where(function ($q) use ($partner_id) {
-//                $q->where('is_published_for_sheba', 1)->orWhere(function ($q) use ($partner_id) {
-//                    $q->where('is_published_for_sheba', 0)->whereHas('partnerPosCategory', function ($q) use ($partner_id) {
-//                        $q->where('partner_id', $partner_id);
-//                    });
-//                });
-//            })->with(['children' => function ($query) {
-//                $query->select(array_merge($this->getSelectColumnsOfCategory(), ['parent_id']));
-//            }])->parents()->published()->select($this->getSelectColumnsOfCategory())->get();
-//
-//            if (!$master_categories) return api_response($request, null, 404);
-//
-//            return api_response($request, $master_categories, 200, ['categories' => $master_categories]);
-//        } catch (\Throwable $e) {
-//            app('sentry')->captureException($e);
-//            return api_response($request, null, 500);
-//        }
+    }
 
+    public function getCategoryByID($category_id){
+        $products = $this->productRepository->where('partner_id', $partner_id)->get();
+        return $this->model->where('id',$category_id)->whereHas('categoryPartner', function ($q) use ($category_id) {
+            $q->where('category_id', $category_id)->with(['product'=>function($q){
+                $q->select('id','name','category_id');
+            }]);
+        })->get();
     }
 
 

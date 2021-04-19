@@ -35,6 +35,12 @@ class CategoryController extends Controller
         return $this->categoryService->getCategoriesByPartner($partner_id);
     }
 
+    public function getCategoryProduct($category_id,Request $request)
+    {
+        return $this->categoryService->getCategoryByID($category_id,$request);
+
+    }
+
     public function getMasterSubCat($partner_id)
     {
         return $this->categoryService->getCategory($partner_id);
