@@ -22,4 +22,8 @@ class Sku extends BaseModel
     {
         return $this->belongsTo(Product::class,'product_id');
     }
+    public function originalPrice()
+    {
+        return $this->skuChannels()->min('price');
+    }
 }

@@ -40,4 +40,10 @@ class Product extends BaseModel
         return $this->hasMany(ProductChannel::class,'product_id');
     }
 
+    public function unit (){
+
+        return $this->belongsTo(Unit::class,'unit_id');
+    }
+
+
 }
