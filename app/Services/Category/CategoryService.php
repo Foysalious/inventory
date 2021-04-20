@@ -71,12 +71,11 @@ class CategoryService extends BaseService
     public function getCategoryByID($category_id,Request $request)
     {
         $products= $this->productRepositoryInterface->getProductsByCategoryId($category_id);
-        $master_categories = $this->categoryRepositoryInterface->builder()->whereHas('children', function ($q) use ($products) {
-            $q->whereIn('id', $products->pluck('category_id')->unique()->toArray());
-        })->get();
+        $categories = $this->categoryRepositoryInterface->getProductsByCategoryId($category_id);
+
         $request->merge(['products' => $products]);
-        $resource = CategoryWiseProductResource::collection($master_categories);
-        if (count($resource) > 0) return $this->success("Successful", ['category_products' => $resource]);
+        $resource = CategoryWiseProductResource::collection($categories);
+        if (count($resource) > 0) return $this->success("Successful", ['data' => $resource]);
         throw new NotFoundHttpException("No Category Found ");
     }
 

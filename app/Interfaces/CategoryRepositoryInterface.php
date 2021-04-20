@@ -8,6 +8,6 @@ interface CategoryRepositoryInterface extends BaseRepositoryInterface
 
     public function getCategoriesByPartner($partner_id);
 
-    public function getCategoryByID($category_id);
+    public function getProductsByCategoryId($category_id);
 }
 

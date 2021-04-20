@@ -33,13 +33,9 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
 
     }
 
-    public function getCategoryByID($category_id){
-        $products = $this->productRepository->where('partner_id', $partner_id)->get();
-        return $this->model->where('id',$category_id)->whereHas('categoryPartner', function ($q) use ($category_id) {
-            $q->where('category_id', $category_id)->with(['product'=>function($q){
-                $q->select('id','name','category_id');
-            }]);
-        })->get();
+    public function getProductsByCategoryId($category_id){
+
+        return $this->model->where('id',$category_id)->get();
     }
 
 
