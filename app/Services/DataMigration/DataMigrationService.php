@@ -3,6 +3,7 @@
 
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\ChannelRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -28,6 +29,8 @@ class DataMigrationService
     /** @var DiscountRepositoryInterface */
     private DiscountRepositoryInterface $discountRepositoryInterface;
     private $discounts;
+    /** @var ChannelRepositoryInterface */
+    private ChannelRepositoryInterface $channelRepositoryInterface;
 
     /**
      * DataMigrationService constructor.
@@ -38,12 +41,13 @@ class DataMigrationService
      * @param ProductRepositoryInterface $productRepositoryInterface
      * @param UnitRepositoryInterface $unitRepositoryInterface
      * @param DiscountRepositoryInterface $discountRepositoryInterface
+     * @param ChannelRepositoryInterface $channelRepositoryInterface
      */
     public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface,
                                 CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface,
                                 PartnerRepositoryInterface $partnerRepositoryInterface, ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface,
                                 ProductRepositoryInterface $productRepositoryInterface, UnitRepositoryInterface $unitRepositoryInterface,
-                                DiscountRepositoryInterface $discountRepositoryInterface)
+                                DiscountRepositoryInterface $discountRepositoryInterface, ChannelRepositoryInterface $channelRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
@@ -52,6 +56,7 @@ class DataMigrationService
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->unitRepositoryInterface = $unitRepositoryInterface;
         $this->discountRepositoryInterface = $discountRepositoryInterface;
+        $this->channelRepositoryInterface = $channelRepositoryInterface;
     }
 
     /**
@@ -142,6 +147,8 @@ class DataMigrationService
     private function migrateProductsData()
     {
         $units = $this->unitRepositoryInterface->builder()->select('id', 'name_en')->pluck('name_en', 'id')->toArray();
+        $pos_channel_id = $this->channelRepositoryInterface->where('name', 'pos')->first();
+        $webstore_channel_id = $this->channelRepositoryInterface->where('name', 'webstore')->first();
         foreach ($this->products as $singleProduct)
         {
             $unit = array_search($singleProduct['unit'], $units, true);
@@ -150,6 +157,7 @@ class DataMigrationService
                 'partner_id' => $singleProduct['partner_id'],
                 'category_id' => $singleProduct['category_id'],
                 'name' => $singleProduct['name'],
+                'app_thumb' => $singleProduct['app_thumb'],
                 'description' => $singleProduct['description'],
                 'unit_id' => $unit ?: null,
                 'warranty' => $singleProduct['warranty'],
@@ -171,7 +179,7 @@ class DataMigrationService
                 ]);
                 $sku_channels = collect();
                 if ($singleProduct['publication_status']) $sku_channels->push([
-                    'channel_id' => 1,
+                    'channel_id' => $pos_channel_id,
                     'cost' => $singleProduct['cost'],
                     'price' => $singleProduct['price'],
                     'wholesale_price' => $singleProduct['wholesale_price'],
@@ -181,7 +189,7 @@ class DataMigrationService
                     'updated_at' => $singleProduct['updated_at'],
                 ]);
                 if ($singleProduct['is_published_for_shop']) $sku_channels->push([
-                    'channel_id' => 2,
+                    'channel_id' => $webstore_channel_id,
                     'cost' => $singleProduct['cost'],
                     'price' => $singleProduct['price'],
                     'wholesale_price' => $singleProduct['wholesale_price'],
