@@ -13,13 +13,14 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        $original_price = $this->getOriginalPrice();
+        $original_price =  $this->getOriginalPrice();
         return [
             'id' => $this->id,
             'category_id' => $this->category_id,
+            'collection_id' => $this->collection_id,
             'name' => $this->name,
             'description' => $this->description,
-            'original_price' =>  $original_price,
+            'original_price' =>   $original_price,
             'vat_included_price' => $original_price + ($original_price * $this->vat_percentage) / 100,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
@@ -34,6 +35,7 @@ class ProductResource extends JsonResource
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
             'combinations' => $this->combinations,
+            'created_at' => $this->created_at
         ];
     }
 }
