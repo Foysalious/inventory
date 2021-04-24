@@ -17,4 +17,9 @@ Relation::morphMap([
 class Discount extends BaseModel
 {
     protected $guarded = ['id'];
+
+    public function type()
+    {
+        return $this->morphTo();
+    }
 }

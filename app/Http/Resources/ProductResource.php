@@ -13,19 +13,20 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $original_price = $this->getOriginalPrice();
         return [
             'id' => $this->id,
             'category_id' => $this->category_id,
             'name' => $this->name,
             'description' => $this->description,
-            'original_price' => 100,
-            'vat_included_price' => 110,
+            'original_price' =>  $original_price,
+            'vat_included_price' => $original_price + ($original_price * $this->vat_percentage) / 100,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
-            'stock' => 10,
+            'stock' => $this->stock,
             'discount_applicable' => 1,
-            'discounted_amount' => 90,
-            'discount_percentage' => 2,
+            'discounted_amount' => $this->getDiscountedAmount(),
+            'discount_percentage' => $this->getDiscountPercentage(),
             'rating' => 5,
             'count_rating' => 7,
             'app_thumb'=> "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/1608693744_jacket.jpeg",
