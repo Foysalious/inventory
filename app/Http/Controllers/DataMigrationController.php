@@ -30,6 +30,7 @@ class DataMigrationController extends Controller
         $category_partner = $this->formatData($request->partner_pos_categories);
         $categories = $this->formatData($request->pos_categories);
         $products = $this->formatData($request->products);
+        $product_images = $this->formatData($request->partner_pos_services_image_gallery);
         $product_update_logs = $this->formatData($request->partner_pos_services_logs);
         $discounts = $this->formatData($request->partner_pos_service_discounts);
 
@@ -37,6 +38,7 @@ class DataMigrationController extends Controller
             ->setPartnerCategories($category_partner)
             ->setCategories($categories)
             ->setProducts($products)
+            ->setProductImages($product_images)
             ->setProductUpdateLogs($product_update_logs)
             ->setDiscounts($discounts)
             ->migrate();
