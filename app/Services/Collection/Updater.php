@@ -12,16 +12,28 @@ class Updater
     use ModificationFields;
 
     protected $collectionRepositoryInterface;
-
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
-
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by, $sharding_id, $products;
+    protected $collection_id;
+    protected $collection_updated_image_links = array();
+    protected $collection_image_updater;
     private $data = [];
 
     protected Collection $collection;
 
-    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface)
+    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface, ImageUpdater $updater)
     {
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
+        $this->collection_image_updater = $updater;
+    }
+
+    /**
+     * @param mixed $collection_id
+     * @return Updater
+     */
+    public function setCollectionId($collection_id)
+    {
+        $this->collection_id = $collection_id;
+        return $this;
     }
 
     /**
@@ -134,23 +146,48 @@ class Updater
         return $this;
     }
 
-    public function update()
+    /**
+     * @param mixed $sharding_id
+     * @return Updater
+     */
+    public function setShardingId($sharding_id)
     {
-        $this->setModifier($this->modify_by);
-        return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate());
+        $this->sharding_id = $sharding_id;
+        return $this;
     }
 
-    public function makeDataForUpdate() : array
+    /**
+     * @param mixed $products
+     * @return Updater
+     */
+    public function setProducts($products)
     {
-        return [
-                'name' => $this->name,
-                'description' => $this->description,
-                'thumb' => $this->thumb,
-                'banner' => $this->banner,
-                'app_thumb' => $this->app_thumb,
-                'app_banner' => $this->app_banner,
-                'partner_id' => $this->partner_id,
-                'is_published' => $this->is_published
-            ] + $this->modificationFields(false, true);
+        $this->products = $products;
+        return $this;
+    }
+
+    public function update($request)
+    {
+        $this->collection_updated_image_links = $this->collection_image_updater->updateImages($request, $this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
+        if($this->products != null) {
+            $this->collectionRepositoryInterface->findOrFail($this->collection_id)->products()->detach();
+            $this->collectionRepositoryInterface->findOrFail($this->collection_id)->products()->attach(json_decode($this->products));
+        }
+        return $this->collectionRepositoryInterface->update($this->collection, $this->makeDataForUpdate($request));
+    }
+
+    public function makeDataForUpdate($request) : array
+    {
+        $requestedData = $request->all();
+        $data = [];
+        if(isset($this->name)) $data['name'] = $this->name;
+        if(isset($this->description)) $data['description'] = $this->description;
+        if(array_key_exists('thumb', $requestedData)) $data['thumb'] = $this->collection_updated_image_links['thumb_link'];
+        if(array_key_exists('banner', $requestedData)) $data['banner'] = $this->collection_updated_image_links['banner_link'];
+        if(array_key_exists('app_thumb', $requestedData)) $data['app_thumb'] = $this->collection_updated_image_links['app_thumb_link'];
+        if(array_key_exists('app_banner', $requestedData)) $data['app_banner'] = $this->collection_updated_image_links['app_banner_link'];
+        if(isset($this->partner_id)) $data['partner_id'] = $this->partner_id;
+        if(isset($this->is_published)) $data['is_published'] = $this->is_published;
+        return $data + $this->modificationFields(false, true);
     }
 }

@@ -18,10 +18,21 @@ class ProductResource extends JsonResource
             'category_id' => $this->category_id,
             'name' => $this->name,
             'description' => $this->description,
-            'warranty' => $this->warranty,
-            'warranty_unit' => $this->warranty_unit,
+            'original_price' => 100,
+            'vat_included_price' => 110,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
+            'stock' => 10,
+            'discount_applicable' => 1,
+            'discounted_amount' => 90,
+            'discount_percentage' => 2,
+            'rating' => 5,
+            'count_rating' => 7,
+            'app_thumb'=> "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/1608693744_jacket.jpeg",
+            'warranty' => $this->warranty,
+            'warranty_unit' => $this->warranty_unit,
+            'options' => $this->options,
+            'combinations' => $this->combinations,
         ];
     }
 }

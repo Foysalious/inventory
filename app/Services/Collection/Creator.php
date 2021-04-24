@@ -5,22 +5,27 @@ namespace App\Services\Collection;
 
 
 use App\Interfaces\CollectionRepositoryInterface;
+use App\Services\FileManagers\CdnFileManager;
+use App\Services\FileManagers\FileManager;
 use App\Traits\ModificationFields;
-use Illuminate\Http\UploadedFile;
+use App\Services\Collection\ImageCreator;
 
 class Creator
 {
-    use ModificationFields;
+    use ModificationFields, FileManager, CdnFileManager;
 
+    protected $collection_image_links = array();
     protected $collectionRepositoryInterface;
+    protected $image_creator;
+    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $products;
 
-    protected $name, $description, $partner_id, $is_published, $thumb, $banner, $app_thumb, $app_banner, $modify_by;
 
     private $data = [];
 
-    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface)
+    public function __construct(CollectionRepositoryInterface $collectionRepositoryInterface, ImageCreator $image_creator)
     {
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
+        $this->image_creator = $image_creator;
     }
 
     /**
@@ -114,33 +119,39 @@ class Creator
     }
 
     /**
-     * @param mixed $modify_by
+     * @param mixed $products
      * @return Creator
      */
-    public function setModifyBy($modify_by)
+    public function setProducts($products)
     {
-        $this->modify_by = $modify_by;
+        $this->products = $products;
         return $this;
     }
 
+
     public function create()
     {
-        $this->setModifier($this->modify_by);
-        return $this->collectionRepositoryInterface->insert($this->makeDataForInsert());
+        $this->collection_image_links = $this->image_creator->saveImages($this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
+        $collection = $this->collectionRepositoryInterface->create($this->makeDataForInsert());
+        return $this->products ? $this->collectionRepositoryInterface->find($collection->id)->products()->attach(json_decode($this->products)) : null;
     }
 
     public function makeDataForInsert() : array
     {
+        /*
+         * config('s3.url') will give us the S3 basic url and
+         * getCollectionDefaultThumb() will give the rest of the URL after s3.url -> basic url.
+         */
         return [
-            'name' => $this->name,
-            'description' => $this->description,
-            'thumb' => $this->thumb,
-            'banner' => $this->banner,
-            'app_thumb' => $this->app_thumb,
-            'app_banner' => $this->app_banner,
-            'partner_id' => $this->partner_id,
-            'is_published' => $this->is_published
-        ] + $this->modificationFields(true, false);
+                'name' => $this->name,
+                'description' => $this->description,
+                'thumb' => $this->collection_image_links['thumb_link'] ?? config('s3.url').getCollectionDefaultThumb(),
+                'banner' => $this->collection_image_links['banner_link'] ?? config('s3.url').getCollectionDefaultBanner(),
+                'app_thumb' => $this->collection_image_links['app_thumb_link'] ?? config('s3.url').getCollectionDefaultAppThumb(),
+                'app_banner' => $this->collection_image_links['app_banner_link'] ?? config('s3.url').getCollectionDefaultAppBanner(),
+                'partner_id' => $this->partner_id,
+                'is_published' => $this->is_published
+            ] + $this->modificationFields(true, false);
     }
 
 }

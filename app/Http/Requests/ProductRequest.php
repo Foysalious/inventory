@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Http\Requests;
+<?php namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -27,7 +25,8 @@ class ProductRequest extends FormRequest
             'category_id' => 'required|numeric',
             'name' => 'required|string',
             'discount_amount' => 'sometimes|required|numeric',
-            'discount_end_date'=> 'date|required_with:discount_amount'
+            'discount_end_date'=> 'date|required_with:discount_amount',
+            'product_details' => 'required'
         ];
     }
 }

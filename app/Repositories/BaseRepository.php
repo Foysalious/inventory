@@ -24,6 +24,11 @@ abstract class BaseRepository implements BaseRepositoryInterface
         return $this->model->create($data);
     }
 
+    public function firstOrCreate($data)
+    {
+        return $this->model->firstOrCreate($data);
+    }
+
     public function insert(array $data)
     {
         $insert_data = array_map(function ($value) {

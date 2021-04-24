@@ -6,10 +6,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 class CategoryResource extends JsonResource
 {
     private $partnerId;
-    public function __construct($resource, $partnerId) {
-        parent::__construct($resource);
-        $this->partnerId = $partnerId;
-    }
+
 
     public function toArray($request)
     {
@@ -22,7 +19,10 @@ class CategoryResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'is_published_for_sheba' => $this->is_published_for_sheba,
-            'total_items' => $total_services
+            'total_items' => $total_services,
+            'icon'=>$this->app_thumb,
+            'thumb' => $this->thumb,
+            'banner'=> $this->banner,
         ];
     }
 

@@ -30,3 +30,34 @@ if (!function_exists('getPosServiceImageGalleryFolder')) {
         return $url . 'partner/pos-service-image-gallery/';
     }
 }
+
+
+if (!function_exists('getProductDefaultThumb')) {
+
+    /**
+     * Get Service default Thumb file name.
+     *
+     * @return string
+     */
+    function getProductDefaultThumb()
+    {
+        return getProductThumbFolder(true) . 'default.jpg';
+    }
+}
+
+if (!function_exists('getProductThumbFolder')) {
+
+    /**
+     * Get Service Thumb Folder.
+     *
+     * @param bool $with_base_url
+     * @return string
+     */
+    function getProductThumbFolder($with_base_url = false)
+    {
+        $url = '';
+        if ($with_base_url) $url = config('s3.url');
+
+        return $url . 'images/pos/services/thumbs/';
+    }
+}

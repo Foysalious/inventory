@@ -3,10 +3,13 @@
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryProductController;
 use App\Http\Controllers\OptionController;
+use App\Http\Controllers\SkuController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
+use App\Http\Controllers\ChannelController;
+use App\Http\Controllers\WarrantyUnitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -24,8 +27,22 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-Route::get('allCategory', [CategoryController::class, 'getMasterSubCat']);
+
 Route::group(['prefix'=>'v1'], function(){
+
+    Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
+    Route::group(['prefix'=>'partners/{partner_id}'], function() {
+        Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
+        Route::group(['prefix' => 'categories'], function () {
+            Route::get('/', [CategoryController::class, 'index']);
+            Route::post('/', [CategoryController::class, 'store']);
+            Route::post('{category_id}', [CategoryController::class, 'update']);
+
+        });
+        Route::apiResource('collection', CollectionController::class);
+        Route::get('warranty-unit', [WarrantyUnitController::class, 'index']);
+    });
+
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
     Route::apiResource('partners.values', ValueController::class)->only('update');
@@ -38,6 +55,7 @@ Route::group(['prefix'=>'v1'], function(){
         Route::get('/', [UnitController::class, 'index']);
     });
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
-    Route::apiResource('collection', CollectionController::class);
-
+    Route::get('/channels', [ChannelController::class, 'index']);
+    Route::post('/get-skus-by-product-ids', [SkuController::class, 'getSkusByProductIds']);
+    Route::apiResource('partners.skus', SkuController::class);
 });

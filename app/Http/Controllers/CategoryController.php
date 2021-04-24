@@ -35,13 +35,25 @@ class CategoryController extends Controller
         return $this->categoryService->getCategoriesByPartner($partner_id);
     }
 
+    public function getCategoryProduct($category_id,Request $request)
+    {
+        return $this->categoryService->getCategoryByID($category_id,$request);
+
+    }
+
+    public function getMasterSubCat($partner_id)
+    {
+        return $this->categoryService->getCategory($partner_id);
+    }
+
     /**
      * @param CategoryRequest $request
      * @return JsonResponse
      */
     public function store($partner,CategoryRequest $request)
     {
-        return $this->categoryService->create($request);
+        return $this->categoryService->create($request, $partner);
+
     }
 
     public function update($partner, $category,CategoryRequest $request)
@@ -53,14 +65,4 @@ class CategoryController extends Controller
     {
         return $this->categoryService->delete($request);
     }
-
-    public function getMasterSubCat(Request $request)
-    {
-
-        return $this->categoryService->getCategory();
-
-    }
-
-
-
 }
