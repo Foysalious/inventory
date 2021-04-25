@@ -30,9 +30,9 @@ class ProductSkuResource extends JsonResource
             'discount_percentage' => 3.33,
             'rating' => 5,
             'count_rating' => 72,
-            'icon' => 'sdsd',
-            'thumb' => 'thumb',
-            'banner' => 'banner'
+            'icon' => 'https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/default.jpg',
+            'thumb' => 'https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/default.jpg',
+            'banner' => 'https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/default.jpg'
 
 
 
