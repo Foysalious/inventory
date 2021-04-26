@@ -86,8 +86,12 @@ class CategoryService extends BaseService
      */
     public function create(CategoryRequest $request, $partner_id)
     {
-        $category = $this->creator->setModifyBy($request->modifier)->setPartner($partner_id)->setName($request->name)->create();
-        return $this->success("Successful", ['category' => $category], 201);
+        $category = $this->creator->setModifyBy($request->modifier)
+            ->setPartner($partner_id)
+            ->setName($request->name)
+            ->setThumb($request->thumb)
+            ->create();
+        return $this->success("Successful", ['category' => $category],201);
     }
 
     /**

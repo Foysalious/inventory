@@ -169,7 +169,7 @@ class Updater
     public function update($request)
     {
         $this->collection_updated_image_links = $this->collection_image_updater->updateImages($request, $this->partner_id, $this->collection_id, $this->thumb, $this->banner, $this->app_thumb, $this->app_banner);
-        if($this->products != null) {
+        if($this->products) {
             $this->collectionRepositoryInterface->findOrFail($this->collection_id)->products()->detach();
             $this->collectionRepositoryInterface->findOrFail($this->collection_id)->products()->attach(json_decode($this->products));
         }

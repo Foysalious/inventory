@@ -6,7 +6,6 @@ use App\Interfaces\CollectionProductsRepositoryInterface;
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Collection;
-use Illuminate\Support\Facades\DB;
 
 class CollectionRepository extends BaseRepository implements CollectionRepositoryInterface
 {
