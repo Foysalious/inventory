@@ -2,14 +2,17 @@
 
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
+use App\Services\FileManagers\CdnFileManager;
+use App\Services\FileManagers\FileManager;
 use App\Traits\ModificationFields;
 
 class Creator
 {
-    use ModificationFields;
+    use ModificationFields, FileManager, CdnFileManager;
+
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
     protected CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface;
-    protected string $categoryName;
+    protected string $categoryName, $thumb, $thumb_link;
     protected int $partnerId;
     protected $modifyBy;
 
@@ -37,13 +40,27 @@ class Creator
         return $this;
     }
 
+    public function setThumb($thumb)
+    {
+        $this->thumb = $thumb;
+        return $this;
+    }
+
     public function create()
     {
         $this->setModifier($this->modifyBy);
         $master_category = $this->createMasterCategory();
         $sub_category = $this->createSubCategory($master_category->id);
+        if(isset($this->thumb)) {
+            $this->thumb_link = $this->makeThumb();
+        }
         return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
+    }
 
+    public function makeThumb()
+    {
+        list($file, $fileName) = $this->prepareCollectionImage($thumb, '_' . getFileName($thumb) . '_collection_thumb');
+        $collection_images['thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
     }
 
     public function createMasterCategory()

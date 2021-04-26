@@ -36,7 +36,7 @@ Route::group(['prefix'=>'v1'], function(){
             Route::post('{category_id}', [CategoryController::class, 'update']);
 
         });
-        Route::apiResource('collection', CollectionController::class);
+        Route::apiResource('collections', CollectionController::class);
     });
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
