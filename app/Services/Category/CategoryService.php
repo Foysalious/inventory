@@ -105,10 +105,10 @@ class CategoryService extends BaseService
         $category = $this->categoryRepositoryInterface->find($category);
         if (!$category)
             throw new ModelNotFoundException();
-        if ($category->is_published_for_sheba)
-            return $this->error("Not allowed to update this category", 403);
-        $this->updater->setModifyBy($request->modifier)->setCategory($category)->setName($request->name)->update();
-        return $this->success("Successful", ['category' => $category], 200);
+        if($category->is_published_for_sheba)
+        return $this->error("Not allowed to update this category", 403);
+        $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->update();
+        return $this->success("Successful", ['category' => $category],200);
     }
 
     /**
