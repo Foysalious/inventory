@@ -3,15 +3,20 @@
 
 use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Resources\CategoryProductResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CategorySubResource;
+use App\Http\Resources\CategoryWiseProductResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Services\BaseService;
+
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class CategoryService extends BaseService
 {
@@ -34,7 +39,7 @@ class CategoryService extends BaseService
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
     private $productRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository,CategoryRepositoryInterface $categoryRepositoryInterface,CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater,ProductRepositoryInterface $productRepositoryInterface)
+    public function __construct(CategoryRepository $categoryRepository, CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater, ProductRepositoryInterface $productRepositoryInterface)
 
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
@@ -58,9 +63,20 @@ class CategoryService extends BaseService
         $resource = CategoryResource::collection($master_categories);
         $data = [];
         $data['total_category'] = count($master_categories);
-        $data['categories'] = $resource;
+        $data['category'] = $resource;
 
-        return $this->success("Successful", ['categories' => $data]);
+        return $this->success("Successful", ['data' => $data]);
+    }
+
+    public function getCategoryByID($category_id,Request $request)
+    {
+        $products= $this->productRepositoryInterface->getProductsByCategoryId($category_id);
+        $categories = $this->categoryRepositoryInterface->getProductsByCategoryId($category_id);
+
+        $request->merge(['products' => $products]);
+        $resource = CategoryWiseProductResource::collection($categories);
+        if (count($resource) > 0) return $this->success("Successful", ['data' => $resource]);
+        throw new NotFoundHttpException("No Category Found ");
     }
 
 
@@ -68,7 +84,7 @@ class CategoryService extends BaseService
      * @param CategoryRequest $request
      * @return JsonResponse
      */
-    public function create(CategoryRequest $request,$partner_id)
+    public function create(CategoryRequest $request, $partner_id)
     {
         $this->creator->setModifyBy($request->modifier)
             ->setPartner($partner_id)
@@ -87,11 +103,11 @@ class CategoryService extends BaseService
     public function update(CategoryRequest $request, $partner, $category)
     {
         $category = $this->categoryRepositoryInterface->find($category);
-        if(!$category)
+        if (!$category)
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
         return $this->error("Not allowed to update this category", 403);
-        $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->update();
+        $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
 
