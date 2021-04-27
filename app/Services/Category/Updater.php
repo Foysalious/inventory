@@ -92,8 +92,8 @@ class Updater
     public function updateThumb()
     {
         //$fileName = $this->getDeletionFileNameFromCDN($this->category, $this->category_id, 'thumb');
-        dd($this->category->thumb);
-        $this->deleteImageFromCDN($this->category->thumb);
+        //dd($this->category->thumb);
+        $this->deleteImageFromCDN(substr($this->category->thumb, strlen(config('s3.url'))));
         list($file, $fileName) = [$this->thumb, $this->uniqueFileName($this->thumb, '_' . getFileName($this->thumb) . '_category_thumb')];
         return $this->saveFileToCDN($file, substr(getCategoryThumbFolder(), strlen(config('s3.url'))), $fileName);
     }
