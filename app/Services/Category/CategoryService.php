@@ -70,7 +70,7 @@ class CategoryService extends BaseService
      */
     public function create(CategoryRequest $request,$partner_id)
     {
-        $category = $this->creator->setModifyBy($request->modifier)
+        $this->creator->setModifyBy($request->modifier)
             ->setPartner($partner_id)
             ->setName($request->name)
             ->setThumb($request->thumb ?? null)
@@ -91,7 +91,7 @@ class CategoryService extends BaseService
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
         return $this->error("Not allowed to update this category", 403);
-        $this->updater->setModifyBy($request->modifier)->setCategory($category)->setName($request->name)->update();
+        $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
 
