@@ -5,11 +5,12 @@ use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Models\Category;
 use App\Services\FileManagers\CdnFileManager;
+use App\Services\FileManagers\FileManager;
 use App\Traits\ModificationFields;
 
 class Updater
 {
-    use ModificationFields, CdnFileManager;
+    use ModificationFields, CdnFileManager, FileManager;
     /**
      * @var CategoryRepositoryInterface
      */
