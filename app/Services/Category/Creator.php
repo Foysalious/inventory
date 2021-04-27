@@ -12,7 +12,8 @@ class Creator
 
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
     protected CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface;
-    protected string $categoryName, $thumb, $thumb_link;
+    protected string $categoryName, $thumb_link;
+    protected $thumb;
     protected int $partnerId;
     protected $modifyBy;
 
@@ -53,14 +54,15 @@ class Creator
         $sub_category = $this->createSubCategory($master_category->id);
         if(isset($this->thumb)) {
             $this->thumb_link = $this->makeThumb();
+            dd($this->thumb_link);
         }
         return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
     }
 
     public function makeThumb()
     {
-        list($file, $fileName) = $this->prepareCollectionImage($thumb, '_' . getFileName($thumb) . '_collection_thumb');
-        $collection_images['thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
+        list($file, $fileName) = [$this->thumb, $this->uniqueFileName($this->thumb, '_' . getFileName($this->thumb) . '_category_thumb')];
+        return $this->saveFileToCDN($file, substr(getCategoryThumbFolder(), strlen(config('s3.url'))), $fileName);
     }
 
     public function createMasterCategory()
