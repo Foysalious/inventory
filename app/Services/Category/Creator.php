@@ -54,7 +54,6 @@ class Creator
         $sub_category = $this->createSubCategory($master_category->id);
         if(isset($this->thumb)) {
             $this->thumb_link = $this->makeThumb();
-            dd($this->thumb_link);
         }
         return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
     }
@@ -72,6 +71,7 @@ class Creator
             'name' => $this->categoryName,
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
+            'thumb' => isset($this->thumb_link) ? $this->thumb_link : null
         ] + $this->modificationFields(true, false);
 
        return  $this->categoryRepositoryInterface->create($master_category_data);
