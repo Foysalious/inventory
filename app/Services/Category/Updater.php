@@ -76,10 +76,10 @@ class Updater
      */
     public function makeData()
     {
-        return [
-            'name' => $this->name,
-            'thumb' => isset($this->updated_thumb) ? $this->updated_thumb : getCategoryDefaultThumb()
-        ] + $this->modificationFields(false, true);
+        $data =[];
+        $data['name'] = $this->name;
+        if(isset($this->updated_thumb)) $data['thumb'] = $this->updated_thumb;
+        return $data + $this->modificationFields(false, true);
     }
 
     public function update()
@@ -91,9 +91,7 @@ class Updater
 
     public function updateThumb()
     {
-        //$fileName = $this->getDeletionFileNameFromCDN($this->category, $this->category_id, 'thumb');
-        //dd($this->category->thumb);
-        $this->deleteImageFromCDN(substr($this->category->thumb, strlen(config('s3.url'))));
+        $this->deleteFileFromCDNPath($this->category->thumb);
         list($file, $fileName) = [$this->thumb, $this->uniqueFileName($this->thumb, '_' . getFileName($this->thumb) . '_category_thumb')];
         return $this->saveFileToCDN($file, substr(getCategoryThumbFolder(), strlen(config('s3.url'))), $fileName);
     }
