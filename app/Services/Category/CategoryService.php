@@ -91,7 +91,7 @@ class CategoryService extends BaseService
             ->setName($request->name)
             ->setThumb($request->thumb ?? null)
             ->create();
-        return $this->success("Successful", ['category' => $category],201);
+        return $this->success("Successful", null,201);
     }
 
     /**
