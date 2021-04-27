@@ -23,7 +23,7 @@ class Updater
      * @var Category
      */
     protected Category $category;
-    protected $modifyBy, $thumb, $category_id;
+    protected $modifyBy, $thumb, $category_id, $updated_thumb;
 
 
     public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface)
@@ -77,12 +77,13 @@ class Updater
     {
         return [
             'name' => $this->name,
+            'thumb' => isset($this->updated_thumb) ? $this->updated_thumb : getCategoryDefaultThumb()
         ] + $this->modificationFields(false, true);
     }
 
     public function update()
     {
-        if(isset($this->thumb)) $this->updateThumb();
+        if(isset($this->thumb)) $this->updated_thumb = $this->updateThumb();
         $this->setModifier($this->modifyBy);
         return $this->categoryRepositoryInterface->update($this->category, $this->makeData());
     }
@@ -90,7 +91,8 @@ class Updater
     public function updateThumb()
     {
         $fileName = $this->getDeletionFileNameFromCDN($this->category, $this->category_id, 'thumb');
-        dd($fileName);
         $this->deleteImageFromCDN($fileName);
+        list($file, $fileName) = [$this->thumb, $this->uniqueFileName($this->thumb, '_' . getFileName($this->thumb) . '_category_thumb')];
+        return $this->saveFileToCDN($file, substr(getCategoryThumbFolder(), strlen(config('s3.url'))), $fileName);
     }
 }
