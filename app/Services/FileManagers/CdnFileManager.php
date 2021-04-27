@@ -45,7 +45,7 @@ trait CdnFileManager
 
     protected function getDeletionFileNameFromCDN($model, $id, $column_name) : string
     {
-        return $model->where('id', $id)->first()[$column_name] ?? '';
+        return $model[$column_name] ?? '';
     }
 
     protected function deleteFileFromCDN($filename)
