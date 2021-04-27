@@ -76,10 +76,10 @@ class Updater
      */
     public function makeData()
     {
-        return [
-            'name' => $this->name,
-            'thumb' => isset($this->updated_thumb) ? $this->updated_thumb : getCategoryDefaultThumb()
-        ] + $this->modificationFields(false, true);
+        $data =[];
+        $data['name'] = $this->name;
+        if(isset($this->updated_thumb)) $data['thumb'] = $this->updated_thumb;
+        return $data + $this->modificationFields(false, true);
     }
 
     public function update()
