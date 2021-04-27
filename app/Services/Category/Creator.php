@@ -69,7 +69,7 @@ class Creator
             'name' => $this->categoryName,
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
-            'thumb' => isset($this->thumb_link) ? $this->thumb_link : null
+            'thumb' => isset($this->thumb_link) ? $this->thumb_link : getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
 
        return  $this->categoryRepositoryInterface->create($master_category_data);
@@ -82,7 +82,7 @@ class Creator
             'name' => 'Sub None Category',
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
-            'thumb' => isset($this->thumb_link) ? $this->thumb_link : null
+            'thumb' => isset($this->thumb_link) ? $this->thumb_link : getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
         return  $this->categoryRepositoryInterface->create($sub_category_data);
 
