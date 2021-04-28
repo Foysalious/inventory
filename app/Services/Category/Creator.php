@@ -2,14 +2,18 @@
 
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
+use App\Services\FileManagers\CdnFileManager;
+use App\Services\FileManagers\FileManager;
 use App\Traits\ModificationFields;
 
 class Creator
 {
-    use ModificationFields;
+    use ModificationFields, FileManager, CdnFileManager;
+
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
     protected CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface;
-    protected string $categoryName;
+    protected string $categoryName, $thumb_link;
+    protected $thumb;
     protected int $partnerId;
     protected $modifyBy;
 
@@ -37,13 +41,25 @@ class Creator
         return $this;
     }
 
+    public function setThumb($thumb)
+    {
+        $this->thumb = $thumb;
+        return $this;
+    }
+
     public function create()
     {
         $this->setModifier($this->modifyBy);
+        if(isset($this->thumb)) $this->thumb_link = $this->makeThumb();
         $master_category = $this->createMasterCategory();
         $sub_category = $this->createSubCategory($master_category->id);
         return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
+    }
 
+    public function makeThumb()
+    {
+        list($file, $fileName) = [$this->thumb, $this->uniqueFileName($this->thumb, '_' . getFileName($this->thumb) . '_category_thumb')];
+        return $this->saveFileToCDN($file, substr(getCategoryThumbFolder(), strlen(config('s3.url'))), $fileName);
     }
 
     public function createMasterCategory()
@@ -53,6 +69,7 @@ class Creator
             'name' => $this->categoryName,
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
+            'thumb' => isset($this->thumb_link) ? $this->thumb_link : getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
 
        return  $this->categoryRepositoryInterface->create($master_category_data);
@@ -65,6 +82,7 @@ class Creator
             'name' => 'Sub None Category',
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
+            'thumb' => isset($this->thumb_link) ? $this->thumb_link : getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
         return  $this->categoryRepositoryInterface->create($sub_category_data);
 
