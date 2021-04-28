@@ -14,7 +14,7 @@ class OptionRepository extends BaseRepository implements OptionRepositoryInterfa
     public function getAllWithOptions($offset = 0, $limit = 50)
     {
         return $this->model->with(['values' => function ($q) use($offset, $limit) {
-            $q->select('id', 'name', 'option_id');
+            $q->select('id', 'name', 'details', 'option_id');
         }])->skip($offset)->take($limit)->get();
     }
 }
