@@ -39,8 +39,6 @@ class CategoryProductService extends BaseService
         $request->merge(['products' => $products]);
         $items = collect([]);
         $items->total_items = $products->count();
-        $items->total_buying_price = 219801610.5;
-        $items->items_with_buying_price = 81;
         $resource = new CategoryProductResource($items);
         return $this->success("Successful", ['category_products' => $resource]);
     }
