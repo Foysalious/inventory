@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProductController;
 use App\Services\Product\ProductCalculator;
+use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +17,11 @@ class Product extends BaseModel
     public function skus()
     {
         return $this->hasMany(Sku::class);
+    }
+
+    public function category()
+    {
+        return $this->belongsTo(Category::class)->withTrashed();
     }
 
     public function toSearchableArray()
@@ -103,5 +109,11 @@ class Product extends BaseModel
         if ($discount->is_amount_percentage)
             return $discount->amount;
         return round((($discount->amount / $original_price) * 100), 1);
+    }
+
+    public function combinations()
+    {
+        list($options,$combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationData();
+        return $combinations;
     }
 }

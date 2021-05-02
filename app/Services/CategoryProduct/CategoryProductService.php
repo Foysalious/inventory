@@ -2,9 +2,11 @@
 
 
 use App\Http\Resources\CategoryProductResource;
+use App\Http\Resources\PosProductsResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Models\Category;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,14 +27,21 @@ class CategoryProductService extends BaseService
 
     public function getProducts($partner_id, Request $request)
     {
-
-        $products = $this->productRepository->where('partner_id', $partner_id)->get();
-        $master_categories = $this->categoryRepository->builder()->whereHas('children', function ($q) use ($products) {
-            $q->whereIn('id', $products->pluck('category_id')->unique()->toArray());
-        })->get();
+        $products = $this->productRepository->where('partner_id', $partner_id);
+        if ($request->has('category_id')) $products = $products->where('category_id', $request->category_id);
+        if ($request->has('updated_after')) {
+            $products = $products->where(function ($q) use ($request) {
+                $q->where('updated_at', '>=', $request->updated_after);
+                $q->orWhere('created_at', '>=', $request->updated_after);
+            });
+        }
+        $products = $products->get();
         $request->merge(['products' => $products]);
-        $resource = CategoryProductResource::collection($master_categories);
-        if (count($resource) > 0) return $this->success("Successful", ['category_products' => $resource]);
-        throw new NotFoundHttpException("Not found");
+        $items = collect([]);
+        $items->total_items = $products->count();
+        $items->total_buying_price = 219801610.5;
+        $items->items_with_buying_price = 81;
+        $resource = new CategoryProductResource($items);
+        return $this->success("Successful", ['category_products' => $resource]);
     }
 }

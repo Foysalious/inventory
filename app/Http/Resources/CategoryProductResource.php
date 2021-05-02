@@ -17,11 +17,10 @@ class CategoryProductResource extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'products' => ProductResource::collection($request->products),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'total_items' => $this->total_items,
+            'total_buying_price' => $this->total_buying_price,
+            'items_with_buying_price' => $this->items_with_buying_price,
+            'products' => PosProductResource::collection($request->products),
         ];
     }
 }
