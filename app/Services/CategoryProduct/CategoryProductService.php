@@ -6,7 +6,6 @@ use App\Http\Resources\PosProductsResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
-use App\Models\Category;
 use App\Services\BaseService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -29,6 +28,13 @@ class CategoryProductService extends BaseService
     {
         list($offset, $limit) = calculatePagination($request);
         $products = $this->productRepository->where('partner_id', $partner_id);
+        $count = $products->count();
+        if ($request->has('master_category_id')) {
+            $category = $this->categoryRepository->find($request->master_category_id);
+            $category_ids = $category->children()->pluck('id');
+            $category_ids->push($category->id);
+            $products = $products->whereIn('category_id', $category_ids);
+        }
         if ($request->has('category_id')) $products = $products->where('category_id', $request->category_id);
         if ($request->has('updated_after')) {
             $products = $products->where(function ($q) use ($request) {
@@ -39,7 +45,7 @@ class CategoryProductService extends BaseService
         $products = $products->offset($offset)->limit($limit)->get();
         $request->merge(['products' => $products]);
         $items = collect([]);
-        $items->total_items = $products->count();
+        $items->total_items = $count;
         $resource = new CategoryProductResource($items);
         return $this->success("Successful", ['category_products' => $resource]);
     }
