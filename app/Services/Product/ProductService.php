@@ -26,14 +26,17 @@ class ProductService extends BaseService
     protected $valueRepositoryInterface;
     protected $productOptionRepositoryInterface;
     protected $skuRepositoryInterface;
+    /** @var ProductCombinationService */
+    private ProductCombinationService $productCombinationService;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionRepositoryInterface $productOptionRepositoryInterface, Creator $creator, Updater $updater,SkuRepositoryInterface $skuRepositoryInterface)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionRepositoryInterface $productOptionRepositoryInterface, Creator $creator, Updater $updater,SkuRepositoryInterface $skuRepositoryInterface, ProductCombinationService $productCombinationService)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
         $this->creator = $creator;
         $this->updater = $updater;
         $this->skuRepositoryInterface = $skuRepositoryInterface;
+        $this->productCombinationService = $productCombinationService;
     }
 
     /**
@@ -48,7 +51,30 @@ class ProductService extends BaseService
         $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner, $offset, $limit);
         if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $products = ProductResource::collection($resource);
+        if ($request->has('filter_by'))
+            $products = $this->filterProducts($products, $request->filter_by, $request->filter_values);
+        if ($request->has('order_by')) {
+            $order = ($request->order == 'desc') ? 'sortByDesc' : 'sortBy';
+            $products = $products->$order($request->order_by, SORT_NATURAL | SORT_FLAG_CASE);
+        }
         return $this->success('Successful', ['products' => $products], 200);
+    }
+
+    /**
+     * @param $products
+     * @param $by
+     * @param $values
+     * @return string
+     */
+    private function filterProducts($products, $by, $values)
+    {
+        switch ($by) {
+            case 'category': return $products->whereIn('category_id',json_decode($values));
+            case 'collection': return $products->whereIn('collection_id',json_decode($values));
+            case 'price': return $products->whereBetween('original_price', json_decode($values));
+            case 'rating': return $products->whereIn('rating', json_decode($values));
+            default: return '';
+        }
     }
 
     /**
@@ -58,62 +84,11 @@ class ProductService extends BaseService
     public function getDetails($product)
     {
         $general_details = $this->productRepositoryInterface->findOrFail($product);
-        list($options,$combinations) = $this->getCombinationData($general_details);
+        list($options,$combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
         $general_details->options = collect($options);
         $general_details->combinations = collect($combinations);
         $product = new ProductResource($general_details);
         return $this->success('Successful', ['product' => $product], 200);
-    }
-
-    /**
-     * @param $product
-     * @return array
-     */
-    private function getCombinationData($product)
-    {
-        $data = [];
-        $options = $this->productOptionRepositoryInterface->where('product_id',$product->id)->pluck('name');
-        $skus = $this->skuRepositoryInterface->where('product_id', $product->id)->with('combinations')->get();
-
-        foreach ($skus as $sku) {
-            $sku_data = [];
-            $temp = [];
-            if($sku->combinations)
-            {
-                $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
-                    $product_option_value = $combination->productOptionValue;
-                    array_push($temp, [
-                        'option_id' => $product_option_value->productOption->id,
-                        'option_name' => $product_option_value->productOption->name,
-                        'option_value_id' => $product_option_value->id,
-                        'option_value_name' => $product_option_value->name
-                    ]);
-                });
-            }
-
-            if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
-            $sku_data['combination'] = !empty($temp)? $temp :null;
-            if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
-            $sku_data['stock'] = $sku->stock;
-            $temp = [];
-            if($sku->skuChannels)
-            {
-                $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
-                    array_push($temp, [
-                        "sku_channel_id" => $sku_channel->id,
-                        "channel_id" => $sku_channel->channel_id,
-                        "cost" => $sku_channel->cost,
-                        "price" => $sku_channel->price,
-                        "wholesale_price" => $sku_channel->wholesale_price
-                    ]);
-                });
-            }
-
-            if (!isset($sku_data['channel_data'])) $sku_data['channel_data'] = [];
-            $sku_data['channel_data'] = !empty($temp)? $temp :null;
-            array_push($data, $sku_data);
-        }
-        return [$options,$data];
     }
 
     /**
