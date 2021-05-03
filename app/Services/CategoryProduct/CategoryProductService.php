@@ -28,7 +28,7 @@ class CategoryProductService extends BaseService
     {
         list($offset, $limit) = calculatePagination($request);
         $products = $this->productRepository->where('partner_id', $partner_id);
-        $deleted_products = $this->productRepository->where('partner_id', $partner_id)->onlyTrashed()->limit($limit)->select('id')->get();
+        $deleted_products = $this->productRepository->where('partner_id', $partner_id)->onlyTrashed();
         $count = $products->count();
         if ($request->has('master_category_id')) {
             $category = $this->categoryRepository->find($request->master_category_id);
@@ -42,8 +42,10 @@ class CategoryProductService extends BaseService
                 $q->where('updated_at', '>=', $request->updated_after);
                 $q->orWhere('created_at', '>=', $request->updated_after);
             });
+            $deleted_products = $deleted_products->where('deleted_at', '>=', $request->updated_after);
         }
         $products = $products->offset($offset)->limit($limit)->get();
+        $deleted_products = $deleted_products->select('id')->get();
         $request->merge(['products' => $products, 'deleted_products' => $deleted_products]);
         $items = collect([]);
         $items->total_items = $count;
