@@ -27,6 +27,7 @@ class CategoryProductService extends BaseService
 
     public function getProducts($partner_id, Request $request)
     {
+        list($offset, $limit) = calculatePagination($request);
         $products = $this->productRepository->where('partner_id', $partner_id);
         if ($request->has('category_id')) $products = $products->where('category_id', $request->category_id);
         if ($request->has('updated_after')) {
@@ -35,7 +36,7 @@ class CategoryProductService extends BaseService
                 $q->orWhere('created_at', '>=', $request->updated_after);
             });
         }
-        $products = $products->get();
+        $products = $products->offset($offset)->limit($limit)->get();
         $request->merge(['products' => $products]);
         $items = collect([]);
         $items->total_items = $products->count();
