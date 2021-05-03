@@ -26,7 +26,7 @@ class PosProductResource extends JsonResource
             'vat_included_price' => $original_price + ($original_price * $this->vat_percentage) / 100,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
-            'stock' => $this->stock,
+            'stock' => $this->getStock(),
             'discount_applicable' => 1,
             'discounted_amount' => $this->getDiscountedAmount(),
             'discount_percentage' => $this->getDiscountPercentage(),

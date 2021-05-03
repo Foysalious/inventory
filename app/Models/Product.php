@@ -116,4 +116,13 @@ class Product extends BaseModel
         list($options,$combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationData();
         return $combinations;
     }
+
+    public function getStock(){
+        $total_stock = 0;
+        $combinations = $this->combinations();
+        foreach ($combinations as $combination){
+            $total_stock += $combination['stock'];
+        }
+        return (string) $total_stock;
+    }
 }
