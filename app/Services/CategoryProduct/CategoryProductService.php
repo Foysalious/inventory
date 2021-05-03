@@ -2,7 +2,6 @@
 
 
 use App\Http\Resources\CategoryProductResource;
-use App\Http\Resources\PosProductsResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -30,13 +29,20 @@ class CategoryProductService extends BaseService
         $products = $this->productRepository->where('partner_id', $partner_id);
         $deleted_products = $this->productRepository->where('partner_id', $partner_id)->onlyTrashed();
         $count = $products->count();
-        if ($request->has('master_category_id')) {
-            $category = $this->categoryRepository->find($request->master_category_id);
-            $category_ids = $category->children()->pluck('id');
-            $category_ids->push($category->id);
+        if ($request->has('master_category_ids')) {
+            $master_category_ids = json_decode($request->master_category_ids);
+            $category_ids = collect([]);
+            foreach ($master_category_ids as $master_category_id) {
+                $category = $this->categoryRepository->find($master_category_id);
+                $category_ids->push($category->children()->pluck('id'));
+                $category_ids->push($category->id);
+            }
             $products = $products->whereIn('category_id', $category_ids);
         }
-        if ($request->has('category_id')) $products = $products->where('category_id', $request->category_id);
+        if ($request->has('category_ids')) {
+            $category_ids = json_decode($request->category_ids);
+            $products = $products->whereIn('category_id', $category_ids);
+        }
         if ($request->has('updated_after')) {
             $products = $products->where(function ($q) use ($request) {
                 $q->where('updated_at', '>=', $request->updated_after);
