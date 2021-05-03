@@ -25,6 +25,7 @@ class CategoryProductResource extends JsonResource
             'total_buying_price' => $total_buying_price,
             'items_with_buying_price' => $items_with_buying_price,
             'products' => $products,
+            'deleted_products' => $request->deleted_products,
         ];
     }
 
