@@ -29,7 +29,6 @@ class CategoryProductService extends BaseService
         list($offset, $limit) = calculatePagination($request);
         $products = $this->productRepository->where('partner_id', $partner_id);
         $deleted_products = $this->productRepository->where('partner_id', $partner_id)->onlyTrashed();
-        $count = $products->count();
         if ($request->has('master_category_ids')) {
             $master_category_ids = json_decode($request->master_category_ids);
             $category_ids = collect([]);
@@ -51,13 +50,13 @@ class CategoryProductService extends BaseService
             });
             $deleted_products = $deleted_products->where('deleted_at', '>=', $request->updated_after);
         }
-        $products = $products->offset($offset)->limit($limit)->get();
         if ($request->has('is_published_for_webstore')) {
-            $products = $this->filterWebStoreByPublicationsStatus($products, $request);
+            $products = $this->filterByPublicationsStatus($products, $request);
         }
+        $products = $products->offset($offset)->limit($limit)->get();
         $deleted_products = $deleted_products->select('id')->get();
         $request->merge(['products' => $products, 'deleted_products' => $deleted_products]);
-        if ($request->products->isEmpty() && $request->deleted_products->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
+        if ($request->products->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $items = collect([]);
         $resource = new CategoryProductResource($items);
         return $this->success("Successful", ['category_products' => $resource]);
@@ -68,16 +67,13 @@ class CategoryProductService extends BaseService
      * @param $request
      * @return \Illuminate\Support\Collection
      */
-    private function filterWebStoreByPublicationsStatus ($products, $request)
+    private function filterByPublicationsStatus ($products, $request, $channel='webstore')
     {
-        $filtered_products = collect([]);
-        foreach ($products as $product) {
-            $webstore_channel = $product->productChannels()
-                ->where('channel_id', 2)
-                ->where('is_published', $request->is_published_for_webstore)
-                ->get();
-            if (! $webstore_channel->isEmpty()) $filtered_products->push($product);
-        }
-        return $filtered_products;
+        return $products->whereHas('productChannels', function ($query) use ($request,$channel) {
+            $query->whereHas('channel', function ($q) use ($request, $channel){
+                $q->where('name', $channel);
+                $q->where('is_published', $request->is_published_for_webstore);
+            });
+        });
     }
 }

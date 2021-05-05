@@ -9,4 +9,9 @@ class ProductChannel extends BaseModel
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    public function channel()
+    {
+        return $this->belongsTo(Channel::class,'channel_id');
+    }
 }
