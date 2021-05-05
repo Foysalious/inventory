@@ -22,7 +22,7 @@ class PosProductResource extends JsonResource
             'category_id' => $this->category_id,
             'master_category_id' => $this->getMasterCategory($this->category),
             'name' => $this->name,
-            'original_price' =>   $original_price,
+            'original_price' =>   (double) $original_price,
             'vat_included_price' => $original_price + ($original_price * $this->vat_percentage) / 100,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
