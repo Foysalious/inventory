@@ -20,7 +20,6 @@ class PosProductResource extends JsonResource
         return [
             'id' => $this->id,
             'category_id' => $this->category_id,
-            'master_category_id' => $this->getMasterCategory($this->category),
             'name' => $this->name,
             'original_price' =>   (double) $original_price,
             'vat_included_price' => $original_price + ($original_price * $this->vat_percentage) / 100,
@@ -34,12 +33,5 @@ class PosProductResource extends JsonResource
             'combinations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
-    }
-
-    private function getMasterCategory($category)
-    {
-        if ($category->parent_id == null) return $category->id;
-        $parent = Category::withTrashed()->find($category->parent_id);
-        return $this->getMasterCategory($parent);
     }
 }
