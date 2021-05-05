@@ -61,7 +61,7 @@ class FeatureTestCase extends TestCase
             Partner::class
         ]);
         $this->partner =  Partner::factory()->create();
-        dd($this->partner);
+        //dd($this->partner);
     }
     protected function truncateTable($table)
     {
