@@ -12,4 +12,9 @@ class Channel extends Model
 
     protected $guarded = ['id'];
     protected $table = 'channels';
+
+    public function products()
+    {
+        return $this->hasMany(ProductChannel::class,'channel_id');
+    }
 }
