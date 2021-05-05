@@ -130,6 +130,6 @@ class Product extends BaseModel
         foreach ($combinations as $combination){
             $total_stock += $combination['stock'];
         }
-        return (string) $total_stock;
+        return $total_stock;
     }
 }
