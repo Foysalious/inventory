@@ -12,7 +12,7 @@ elif [[ $1 = "local" ]]; then
   extra="-f $compose_folder/docker-compose.local.yml"
 fi
 
-compose="$compose $extra up --build --force-recreate"
+compose="$compose $extra up"
 
 # shellcheck disable=SC2206
 all_args=($@)

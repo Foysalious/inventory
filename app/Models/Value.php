@@ -8,4 +8,9 @@ class Value extends BaseModel
     use HasFactory;
 
     protected $guarded = ['id'];
+
+    public function getDetailsAttribute($details)
+    {
+        return json_decode($details);
+    }
 }

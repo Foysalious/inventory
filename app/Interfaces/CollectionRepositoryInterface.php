@@ -9,5 +9,5 @@ use Illuminate\Http\Request;
 interface CollectionRepositoryInterface extends BaseRepositoryInterface
 {
     public function getAllCollection($offset, $limit, $partner_id);
-    public function getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+    public function getDeletionFileNameFromCDN($partner_id, $collection_id, $column_name);
 }

@@ -1,7 +1,6 @@
 <?php namespace App\Http\Resources;
 
 
-use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -16,12 +15,52 @@ class CategoryProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        $products = PosProductResource::collection($request->products);
+        list($total_buying_price, $items_with_buying_price, $total_items)
+            = $this->get_buyingPrice_totalItems_itemsWithPrice(collect($products));
+
         return [
-            'id' => $this->id,
-            'name' => $this->name,
-            'products' => ProductResource::collection($request->products),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'total_items' => $total_items,
+            'total_buying_price' => $total_buying_price,
+            'items_with_buying_price' => $items_with_buying_price,
+            'products' => $products,
+            'deleted_products' => $request->deleted_products,
+        ];
+    }
+
+    /**
+     * @param $products
+     * @return array
+     */
+    private function get_buyingPrice_totalItems_itemsWithPrice($products):array
+    {
+        $items_with_buying_price = 0;
+        $total_items = 0;
+        $total_buying_price = $products->sum(function ($each_product) use (&$items_with_buying_price, &$total_items){
+            $each_product_total_buying_cost = 0;
+            if (!array_key_exists('combination', $each_product['combinations'])){
+                foreach ($each_product['combinations'] as $each_combination){
+                    $total_items++;
+                    if (array_key_exists( 'channel_data', $each_combination)){
+                        $each_product_total_buying_cost += $each_combination['stock'] * $each_combination['channel_data'][0]['cost'];
+                        $items_with_buying_price++;
+                    }
+                }
+
+            } else {
+                $total_items++;
+                if (array_key_exists( 'channel_data', $each_product['combinations'])){
+                    $each_product_total_buying_cost += $each_product['combinations']['stock'] * $each_product['combinations']['channel_data'][0]['cost'];
+                    $items_with_buying_price++;
+                }
+            }
+            return $each_product_total_buying_cost;
+        });
+
+        return [
+            $total_buying_price,
+            $items_with_buying_price,
+            $total_items,
         ];
     }
 }
