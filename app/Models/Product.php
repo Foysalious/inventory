@@ -118,11 +118,11 @@ class Product extends BaseModel
         return round((($discount->amount / $original_price) * 100), 1);
     }
 
-//    public function combinations()
-//    {
-//        list($options,$combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationData();
-//        return $combinations;
-//    }
+    public function combinations()
+    {
+        list($options,$combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationData();
+        return $combinations;
+    }
 
     public function getStock(){
         $total_stock = 0;
