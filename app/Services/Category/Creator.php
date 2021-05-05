@@ -15,6 +15,7 @@ class Creator
     protected string $categoryName, $thumb_link;
     protected $thumb;
     protected int $partnerId;
+    protected int|null $parentId;
     protected $modifyBy;
 
     public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface)
@@ -47,13 +48,30 @@ class Creator
         return $this;
     }
 
+    /**
+     * @param int|null $parentId
+     * @return Creator
+     */
+    public function setParentId(?int $parentId)
+    {
+        $this->parentId = $parentId;
+        return $this;
+    }
+
+
     public function create()
     {
         $this->setModifier($this->modifyBy);
         if(isset($this->thumb)) $this->thumb_link = $this->makeThumb();
-        $master_category = $this->createMasterCategory();
-        $sub_category = $this->createSubCategory($master_category->id);
-        return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
+        if ($this->parentId !== null) {
+            $sub_category = $this->createSubCategory($this->parentId);
+            return  $this->createPartnerSubCategory($this->partnerId, $sub_category->id);
+        } else {
+            $master_category = $this->createMasterCategory();
+            $sub_category = $this->createSubCategory($master_category->id);
+            return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
+        }
+
     }
 
     public function makeThumb()
@@ -79,7 +97,7 @@ class Creator
     {
         $sub_category_data = [
             'parent_id' => $master_category_id,
-            'name' => 'Sub None Category',
+            'name' => ($this->parentId === null) ? 'Sub None Category' : $this->categoryName,
             'publication_status' => 1,
             'is_published_for_sheba' => 0,
             'thumb' => isset($this->thumb_link) ? $this->thumb_link : getCategoryDefaultThumb()
@@ -107,7 +125,14 @@ class Creator
 
     }
 
-
-
+    public function createPartnerSubCategory($partner_id, $sub_category_id)
+    {
+        $sub_category_data = [
+                'partner_id' => $partner_id,
+                'category_id' => $sub_category_id,
+            ] + $this->modificationFields(true, false)
+        ;
+        return $this->partnerCategoryRepositoryInterface->insert($sub_category_data);
+    }
 
 }

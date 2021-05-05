@@ -82,6 +82,7 @@ class CategoryService extends BaseService
 
     /**
      * @param CategoryRequest $request
+     * @param $partner_id
      * @return JsonResponse
      */
     public function create(CategoryRequest $request, $partner_id)
@@ -90,6 +91,7 @@ class CategoryService extends BaseService
             ->setPartner($partner_id)
             ->setName($request->name)
             ->setThumb($request->thumb ?? null)
+            ->setParentId($request->parent_id ?? null)
             ->create();
         return $this->success("Successful", null,201);
     }
