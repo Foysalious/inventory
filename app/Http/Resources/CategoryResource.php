@@ -23,7 +23,17 @@ class CategoryResource extends JsonResource
             'icon'=>$this->app_thumb,
             'thumb' => $this->thumb,
             'banner'=> $this->banner,
+            'sub_category' => $this->getSubCategory($this->children),
         ];
+    }
+
+    private function getSubCategory($sub_categories)
+    {
+        $filtered_data = collect([]);
+        $sub_categories->each(function ($each) use (&$filtered_data){
+            $filtered_data [] =  $each->only('id', 'parent_id', 'name','thumb', 'banner', 'app_thumb', 'app_banner');
+        });
+        return $filtered_data;
     }
 
 
