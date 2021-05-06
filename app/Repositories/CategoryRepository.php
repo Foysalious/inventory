@@ -27,7 +27,7 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
                 });
             });
         })->with(['children' => function ($q) {
-            $q->select('id', 'name', 'parent_id');
+            $q->select('id', 'name', 'parent_id', 'app_thumb as icon');
         }])->where('parent_id', NULL)->get();
 
 

@@ -19,7 +19,8 @@ class CategorySubResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'sub_cat' => $this->children
+            'icon'=>$this->app_thumb,
+            'sub_cat' => $this->children,
 
         ];
     }
