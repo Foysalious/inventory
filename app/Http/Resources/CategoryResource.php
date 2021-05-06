@@ -23,7 +23,7 @@ class CategoryResource extends JsonResource
             'icon'=>$this->app_thumb,
             'thumb' => $this->thumb,
             'banner'=> $this->banner,
-            'sub_category' => $this->getSubCategory($this->children),
+            'sub_categories' => $this->getSubCategory($this->children),
         ];
     }
 
