@@ -34,7 +34,7 @@ class ProductResource extends JsonResource
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
-            'combinations' => $this->combinations,
+            'combinations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
     }
