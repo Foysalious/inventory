@@ -4,7 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CategoryProductResource extends JsonResource
+class ProductsInfoResource extends JsonResource
 {
 
     /**
@@ -15,16 +15,14 @@ class CategoryProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        $products = PosProductResource::collection($request->products);
-        list($total_buying_price, $items_with_buying_price, $total_items)
-            = $this->get_buyingPrice_totalItems_itemsWithPrice(collect($products));
-
+        $products = ProductResource::collection($this->products);
+        list($total_buying_price, $items_with_buying_price, $total_items) = $this->getProductsInfo(collect($products));
         return [
             'total_items' => $total_items,
             'total_buying_price' => $total_buying_price,
             'items_with_buying_price' => $items_with_buying_price,
             'products' => $products,
-            'deleted_products' => $request->deleted_products,
+            'deleted_products' => $this->deleted_products,
         ];
     }
 
@@ -32,7 +30,7 @@ class CategoryProductResource extends JsonResource
      * @param $products
      * @return array
      */
-    private function get_buyingPrice_totalItems_itemsWithPrice($products):array
+    private function getProductsInfo($products):array
     {
         $items_with_buying_price = 0;
         $total_items = 0;
@@ -42,7 +40,7 @@ class CategoryProductResource extends JsonResource
                 foreach ($each_product['combinations'] as $each_combination){
                     $total_items++;
                     if (array_key_exists( 'channel_data', $each_combination)){
-                        $each_product_total_buying_cost += $each_combination['stock'] * $each_combination['channel_data'][0]['cost'];
+                        $each_product_total_buying_cost += $each_combination['stock'] * $each_combination['channel_data'][0]['purchase_price'];
                         $items_with_buying_price++;
                     }
                 }
@@ -50,7 +48,7 @@ class CategoryProductResource extends JsonResource
             } else {
                 $total_items++;
                 if (array_key_exists( 'channel_data', $each_product['combinations'])){
-                    $each_product_total_buying_cost += $each_product['combinations']['stock'] * $each_product['combinations']['channel_data'][0]['cost'];
+                    $each_product_total_buying_cost += $each_product['combinations']['stock'] * $each_product['combinations']['channel_data'][0]['purchase_price'];
                     $items_with_buying_price++;
                 }
             }

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CategoryProductController;
+use App\Http\Controllers\DataMigrationController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\SkuController;
 use App\Http\Controllers\UnitController;
@@ -28,16 +29,17 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
-
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
         Route::group(['prefix' => 'categories'], function () {
             Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);
             Route::post('{category_id}', [CategoryController::class, 'update']);
-
         });
         Route::apiResource('collection', CollectionController::class);
+        Route::group(['prefix'=>'webstore'], function() {
+            Route::get('products', [ProductController::class, 'getWebstoreProducts']);
+        });
     });
     Route::apiResource('partners.options', OptionController::class);
     Route::apiResource('partners.options.values', ValueController::class)->only('store');
@@ -46,7 +48,7 @@ Route::group(['prefix'=>'v1'], function(){
     Route::apiResource('options', OptionController::class);
     Route::apiResource('options.values', ValueController::class)->shallow();
     Route::apiResource('partners.categories', CategoryController::class);
-    Route::apiResource('partners.migrate', \App\Http\Controllers\DataMigrationController::class)->only('store');
+    Route::apiResource('partners.migrate', DataMigrationController::class)->only('store');
     Route::group(['prefix' => 'units'], function () {
         Route::get('/', [UnitController::class, 'index']);
     });

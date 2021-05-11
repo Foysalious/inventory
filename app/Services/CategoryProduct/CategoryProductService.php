@@ -2,18 +2,18 @@
 
 
 use App\Exceptions\ProductNotFoundException;
-use App\Http\Resources\CategoryProductResource;
+use App\Http\Resources\ProductsInfoResource;
 use App\Services\BaseService;
-use App\Sheba\Product\ProductListWithCategory;
+use App\Services\Product\ProductList;
 use Illuminate\Http\Request;
 
 class CategoryProductService extends BaseService
 {
-    private ProductListWithCategory $productList;
+    private ProductList $productList;
 
-    public function __construct(ProductListWithCategory $productListWithCategory)
+    public function __construct(ProductList $productList)
     {
-        $this->productList = $productListWithCategory;
+        $this->productList = $productList;
     }
 
 
@@ -32,7 +32,7 @@ class CategoryProductService extends BaseService
         if ($request->products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $items = collect([]);
-        $resource = new CategoryProductResource($items);
+        $resource = new ProductsInfoResource($items);
         return $this->success("Successful", ['category_products' => $resource]);
     }
 

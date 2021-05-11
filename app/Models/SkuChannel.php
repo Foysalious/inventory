@@ -8,4 +8,5 @@ class SkuChannel extends BaseModel
 {
     use HasFactory,SoftDeletes;
     protected $guarded = ['id'];
+    protected $casts = ['cost' => 'double', 'price' => 'double', 'wholesale_price' => 'double'];
 }

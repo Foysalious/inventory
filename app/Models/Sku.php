@@ -8,6 +8,7 @@ class Sku extends BaseModel
 {
     use HasFactory,SoftDeletes;
     protected $guarded = ['id'];
+    protected $casts = ['stock' => 'double'];
 
     public function skuChannels()
     {

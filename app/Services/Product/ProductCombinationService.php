@@ -62,8 +62,11 @@ class ProductCombinationService
                     array_push($temp, [
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,
-                        "cost" => $sku_channel->cost,
-                        "price" => $sku_channel->price,
+                        "purchase_price" => $sku_channel->cost,
+                        "original_price" => $sku_channel->price,
+                        "discounted_price" => $sku_channel->price - 5,
+                        "discount" => 5,
+                        "is_discount_percentage" => 0,
                         "wholesale_price" => $sku_channel->wholesale_price
                     ]);
                 });

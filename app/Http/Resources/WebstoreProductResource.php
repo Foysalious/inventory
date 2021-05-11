@@ -1,10 +1,9 @@
 <?php namespace App\Http\Resources;
 
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProductResource extends JsonResource
+class WebstoreProductResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,16 +13,21 @@ class ProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        /** @var $this Product */
-        $original_price = $this->getOriginalPrice();
         return [
             'id' => $this->id,
-            'sub_category_id' => $this->category_id,
+            'category_id' => $this->category_id,
+            'collection_id' => $this->collection_id,
             'name' => $this->name,
+            'description' => $this->description,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
-            'stock' => $this->getStock(),
+            'stock' => $this->stock,
+            'rating' => 5,
+            'count_rating' => 7,
             'app_thumb'=> "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/1608693744_jacket.jpeg",
+            'warranty' => $this->warranty,
+            'warranty_unit' => $this->warranty_unit,
+            'options' => $this->options,
             'combinations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
