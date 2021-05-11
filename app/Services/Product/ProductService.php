@@ -48,7 +48,7 @@ class ProductService extends BaseService
     public function getProductList($partner, Request $request)
     {
         list($offset, $limit) = calculatePagination($request);
-        $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner, $offset, $limit);
+        $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner, $offset, $limit, $request->q);
         if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $products = ProductResource::collection($resource);
         if ($request->has('filter_by'))
