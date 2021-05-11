@@ -27,6 +27,18 @@ class CategoryController extends Controller
 
 
     /**
+     *
+     * * @OA\Get(
+     *      path="/api/v1/partners/{partner}/category-tree",
+     *      operationId="getCategory",
+     *      tags={"Partners Category API"},
+     *      summary="Get Category Tree List by Partner",
+     *      description="",
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
+     *      @OA\Response(response=404, description="message: কোন ক্যাটাগরি যোগ করা হয়নি!"),
+     *      @OA\Response(response=403, description="Forbidden")
+     *     )
      * @param $partner_id
      * @return JsonResponse
      */
