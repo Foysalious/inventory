@@ -109,6 +109,9 @@ class CategoryService extends BaseService
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
         return $this->error("Not allowed to update this category", 403);
+        $partner_category =  $category->categoryPartner->where('partner_id',$partner)->first();
+        if(!$partner_category)
+            return $this->error("Not allowed to delete this category", 403);
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
@@ -117,7 +120,7 @@ class CategoryService extends BaseService
      * @param $request
      * @return JsonResponse
      */
-    public function delete($request)
+    public function delete($partner,$request)
     {
         $category_id = $request->category;
         $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
@@ -126,6 +129,9 @@ class CategoryService extends BaseService
         if (!$category)
             return $this->error("Not Found", 404);
         if ($category->is_published_for_sheba)
+            return $this->error("Not allowed to delete this category", 403);
+        $partner_category =  $category->categoryPartner->where('partner_id',$partner)->first();
+        if(!$partner_category)
             return $this->error("Not allowed to delete this category", 403);
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children, [$category->id]);

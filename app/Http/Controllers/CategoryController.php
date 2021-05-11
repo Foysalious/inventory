@@ -128,6 +128,6 @@ class CategoryController extends Controller
 
     public function destroy($partner, $category,Request $request)
     {
-        return $this->categoryService->delete($request);
+        return $this->categoryService->delete($partner,$request);
     }
 }
