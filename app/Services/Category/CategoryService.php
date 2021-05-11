@@ -108,10 +108,10 @@ class CategoryService extends BaseService
         if (!$category)
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba)
-        return $this->error("Not allowed to update this category", 403);
+            return $this->error("Not allowed to update this category", 403);
         $partner_category =  $category->categoryPartner->where('partner_id',$partner)->first();
         if(!$partner_category)
-            return $this->error("Not allowed to delete this category", 403);
+            return $this->error("This category does not belong to this partner", 403);
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
@@ -132,7 +132,7 @@ class CategoryService extends BaseService
             return $this->error("Not allowed to delete this category", 403);
         $partner_category =  $category->categoryPartner->where('partner_id',$partner)->first();
         if(!$partner_category)
-            return $this->error("Not allowed to delete this category", 403);
+            return $this->error("This category does not belong to this partner", 403);
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children, [$category->id]);
         $this->categoryRepositoryInterface->whereIn('id', $master_cat_with_children)->delete();

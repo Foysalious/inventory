@@ -46,7 +46,7 @@ class ProductController extends Controller
      */
     public function show($partner, $product)
     {
-        return $this->productService->getDetails($product);
+        return $this->productService->getDetails($partner, $product);
     }
 
     /**
@@ -57,11 +57,11 @@ class ProductController extends Controller
      */
     public function update($partner, $product, ProductUpdateRequest $request)
     {
-        return $this->productService->update($product, $request);
+        return $this->productService->update($product, $request, $partner);
     }
 
     public function destroy($partner, $product)
     {
-        return $this->productService->delete($product);
+        return $this->productService->delete($partner,$product);
     }
 }

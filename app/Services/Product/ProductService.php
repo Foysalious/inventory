@@ -81,9 +81,11 @@ class ProductService extends BaseService
      * @param $product
      * @return JsonResponse
      */
-    public function getDetails($product)
+    public function getDetails($partner, $product)
     {
         $general_details = $this->productRepositoryInterface->findOrFail($product);
+        if($general_details->partner_id != $partner)
+            return $this->error("This product does not belongs to this partner", 403);
         list($options,$combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
         $general_details->options = collect($options);
         $general_details->combinations = collect($combinations);
@@ -123,9 +125,11 @@ class ProductService extends BaseService
      * @param ProductUpdateRequest $request
      * @return JsonResponse
      */
-    public function update($productId, ProductUpdateRequest $request)
+    public function update($productId, ProductUpdateRequest $request, $partner)
     {
         $product = $this->productRepositoryInterface->findOrFail($productId);
+        if($product->partner_id != $partner)
+            return $this->error("This product does not belong this partner", 403);
         list($has_variant,$product_update_request_objs) =  app(ProductUpdateRequestObjects::class)->setProductDetails($request->product_details)->get();
         $this->updater->setProduct($product)
             ->setCategoryId($request->category_id)
@@ -146,9 +150,12 @@ class ProductService extends BaseService
         return $this->success("Successful", ['product' => $product],200);
     }
 
-    public function delete($productId)
+    public function delete($partner,$productId)
     {
-        $product = $this->productRepositoryInterface->findOrFail($productId)->delete();
+        $product = $this->productRepositoryInterface->findOrFail($productId);
+        if($product->partner_id != $partner)
+            return $this->error("This product does not belong to this partner", 403);
+        $product->delete();
         return $this->success("Successful", ['product' => $product],200, false);
     }
 }
