@@ -41,11 +41,6 @@ class CategoryController extends Controller
 
     }
 
-    public function getMasterSubCat($partner_id)
-    {
-        return $this->categoryService->getCategory($partner_id);
-    }
-
     /**
      * @param CategoryRequest $request
      * @return JsonResponse

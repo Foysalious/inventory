@@ -5,7 +5,6 @@ use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Resources\CategoryProductResource;
 use App\Http\Resources\CategoryResource;
-use App\Http\Resources\CategorySubResource;
 use App\Http\Resources\CategoryWiseProductResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -57,15 +56,13 @@ class CategoryService extends BaseService
      */
     public function getCategoriesByPartner($partner_id)
     {
-        $master_categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
-        if ($master_categories->isEmpty())
+        $categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
+        if ($categories->isEmpty())
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
-        $resource = CategoryResource::collection($master_categories);
-        $data = [];
-        $data['total_category'] = count($master_categories);
+        $resource = CategoryResource::collection($categories);
+        $data['total_category'] = count($categories);
         $data['category'] = $resource;
-
-        return $this->success("Successful", ['data' => $data]);
+        return $this->success("Successful", $data);
     }
 
     public function getCategoryByID($category_id,Request $request)
@@ -135,15 +132,6 @@ class CategoryService extends BaseService
         $this->productRepositoryInterface->whereIn('category_id', $children)->delete();
 
         return $this->success("Successful", null, 200, false);
-    }
-
-    public function getCategory($partner_id)
-    {
-        $master_categories = $this->categoryRepositoryInterface->getCategory($partner_id);
-        if ($master_categories->isEmpty())
-            throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
-        $resource = CategorySubResource::collection($master_categories, $partner_id);
-        return $this->success("Successful", ['categories' => $resource]);
     }
 
 
