@@ -15,9 +15,15 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         parent::__construct($model);
     }
 
-    public function getProductsByPartnerId($partnerId, $offset = 0, $limit = 50)
+    public function getProductsByPartnerId($partnerId, $offset = 0, $limit = 50, $searchKey = null)
     {
-        return $this->model->where('partner_id', $partnerId)->skip($offset)->take($limit)->get();
+        $q = $this->model->where('partner_id', $partnerId);
+        if($searchKey)
+            $q->where(function ($query) use ($searchKey) {
+                $query->where('name', 'LIKE', '%' . $searchKey . '%')
+                    ->orWhere('description', 'LIKE', '%' . $searchKey . '%');
+            });
+        return $q->skip($offset)->take($limit)->get();
     }
 
     public function productChannelPrice($productId)
