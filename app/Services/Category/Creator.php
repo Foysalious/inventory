@@ -95,7 +95,6 @@ class Creator
         $master_category_data = [
             'parent_id' => null,
             'name' => $this->categoryName,
-            'publication_status' => 1,
             'is_published_for_sheba' => 0,
             'thumb' => $this->thumb_link ?? getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
@@ -108,7 +107,6 @@ class Creator
         $sub_category_data = [
             'parent_id' => $master_category_id,
             'name' => ($this->parentId === null) ? 'Sub None Category' : $this->categoryName,
-            'publication_status' => 1,
             'is_published_for_sheba' => 0,
             'thumb' => $this->thumb_link ?? getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
@@ -122,10 +120,12 @@ class Creator
             [
                 'partner_id' => $partner_id,
                 'category_id' => $master_category_id,
+                'is_default' => 0,
             ] + $this->modificationFields(true, false),
             [
                 'partner_id' => $partner_id,
                 'category_id' => $sub_category_id,
+                'is_default' => $this->parentId === null ? 1 : 0,
             ] + $this->modificationFields(true, false)
 
         ];
@@ -139,6 +139,7 @@ class Creator
         $sub_category_data = [
                 'partner_id' => $partner_id,
                 'category_id' => $sub_category_id,
+                'is_default' => 0,
             ] + $this->modificationFields(true, false);
 
         return $this->partnerCategoryRepositoryInterface->insert($sub_category_data);
