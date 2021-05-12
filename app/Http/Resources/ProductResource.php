@@ -15,7 +15,6 @@ class ProductResource extends JsonResource
     public function toArray($request)
     {
         /** @var $this Product */
-        $original_price = $this->getOriginalPrice();
         return [
             'id' => $this->id,
             'sub_category_id' => $this->category_id,
@@ -24,7 +23,7 @@ class ProductResource extends JsonResource
             'unit' => $this->unit ?: null,
             'stock' => $this->getStock(),
             'app_thumb'=> "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/1608693744_jacket.jpeg",
-            'combinations' => $this->combinations(),
+            'variations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
     }

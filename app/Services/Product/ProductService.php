@@ -87,7 +87,7 @@ class ProductService extends BaseService
             ->setOffset($offset)
             ->setLimit($limit);
         $products = $this->productList->get();
-        return $this->success("Successful", ['products_info' => $products]);
+        return $this->success("Successful", ['data' => $products]);
     }
 
     /**

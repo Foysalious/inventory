@@ -28,7 +28,7 @@ class WebstoreProductResource extends JsonResource
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
-            'combinations' => $this->combinations(),
+            'variations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
     }
