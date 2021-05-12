@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Services\Product\ProductService;
@@ -20,10 +21,22 @@ class ProductController extends Controller
      * @param $partner
      * @param Request $request
      * @return JsonResponse
+     * @throws ProductNotFoundException
      */
     public function index($partner, Request $request)
     {
-        return $this->productService->getProductList($partner, $request);
+        return $this->productService->getProducts($partner, $request);
+    }
+
+    /**
+     * @param $partner
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ProductNotFoundException
+     */
+    public function getWebstoreProducts($partner, Request $request)
+    {
+        return $this->productService->getWebstoreProducts($partner, $request);
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php namespace App\Services\Sku;
 
-use App\Http\Resources\ProductResource;
+use App\Http\Resources\WebstoreProductResource;
 use App\Http\Resources\SkuResource;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Services\BaseService;
