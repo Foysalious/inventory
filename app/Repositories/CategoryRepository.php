@@ -14,13 +14,13 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     public function getCategoriesByPartner($partner_id)
     {
         return $this->model->where(function ($q) use ($partner_id) {
-            $q->whereIn('is_published_for_sheba', [0, 1])
-                ->whereHas('categoryPartner', function ($q) use ($partner_id) {
+                $q->whereHas('categoryPartner', function ($q) use ($partner_id) {
                     $q->where('partner_id', $partner_id);
                 });
-        })->with(['children' => function ($q) {
-            $q->select('id', 'name', 'parent_id', 'thumb as icon');
-        }])->where('parent_id', NULL)->get();
+        })->with('children', function ($q) {
+            $q->leftJoin('category_partner', 'category_partner.category_id', '=', 'categories.id')
+                ->select('categories.id', 'categories.name', 'categories.parent_id', 'categories.thumb as icon', 'categories.is_published_for_sheba', 'category_partner.is_default');
+        })->where('parent_id', NULL)->get();
 
     }
 
