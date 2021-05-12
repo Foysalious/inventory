@@ -134,9 +134,10 @@ class ProductList
     private function filterByCategories($products_query, $categoryIds)
     {
         $subCategoryIds = collect([]);
-        foreach ($this->categoryIds as $categoryId) {
+        foreach ($categoryIds as $categoryId) {
             $category = $this->categoryRepository->find($categoryId);
-            $subCategoryIds->push($category->children()->pluck('id'));
+            $children = $category->children()->pluck('id');
+            if (!$children->isEmpty()) $subCategoryIds->push($children);
             $subCategoryIds->push($category->id);
         }
         return $products_query->whereIn('category_id', $subCategoryIds);
