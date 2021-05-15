@@ -33,6 +33,7 @@ Route::group(['prefix'=>'v1'], function(){
     Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
+        Route::post('category-with-sub-category', [CategoryController::class, 'createCategoryWithSubCategory']);
         Route::group(['prefix' => 'categories'], function () {
             Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);

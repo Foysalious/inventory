@@ -3,6 +3,7 @@
 
 use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\CategoryWithSubCategory;
 use App\Http\Resources\CategoryProductResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CategorySubResource;
@@ -145,6 +146,11 @@ class CategoryService extends BaseService
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
         $resource = CategorySubResource::collection($master_categories, $partner_id);
         return $this->success("Successful", ['categories' => $resource]);
+    }
+
+    public function createCategoryWithSubCategory(CategoryWithSubCategory $request, $partner_id)
+    {
+        dd($request->all());
     }
 
 
