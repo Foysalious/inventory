@@ -102,17 +102,14 @@ class CategoryService extends BaseService
      * @param $category
      * @return JsonResponse
      */
-    public function update(CategoryRequest $request, $partner, $category)
+    public function update(CategoryRequest $request, $partner_id, $category_id)
     {
-        $category = $this->categoryRepositoryInterface->find($category);
+        $category = $this->categoryRepositoryInterface->find($category_id);
         $category_partner = $category->categoryPartner()->get()->first();
-        $partner_id = $category_partner->partner_id;
-        $is_default_category = $category_partner->is_default;
-
-        if (!$category || $partner_id != $partner)
-        throw new ModelNotFoundException();
-        if($category->is_published_for_sheba || $is_default_category)
-        return $this->error("Not allowed to update this category", 403);
+        if ( !$category || $partner_id != $category_partner->partner_id )
+            throw new ModelNotFoundException();
+        if($category->is_published_for_sheba || $category_partner->is_default)
+            return $this->error("Not allowed to update this category", 403);
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
