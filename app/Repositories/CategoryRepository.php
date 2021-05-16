@@ -19,7 +19,7 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
                 });
         })->with('children', function ($q) {
             $q->leftJoin('category_partner', 'category_partner.category_id', '=', 'categories.id')
-                ->select('categories.id', 'categories.name', 'categories.parent_id', 'categories.thumb as app_thumb', 'categories.is_published_for_sheba', 'category_partner.is_default');
+                ->select('categories.id', 'categories.name', 'categories.parent_id', 'categories.thumb as thumb', 'categories.is_published_for_sheba', 'category_partner.is_default');
         })->where('parent_id', NULL)->get();
 
     }

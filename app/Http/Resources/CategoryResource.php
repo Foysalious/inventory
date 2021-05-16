@@ -14,7 +14,7 @@ class CategoryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'app_thumb'=>$this->thumb,
+            'thumb'=>$this->thumb,
             'is_default' => $this->categoryPartner()->get()->pluck('is_default')->first(),
             'is_published_for_sheba' => $this->is_published_for_sheba,
             'sub_categories' => $this->children,
