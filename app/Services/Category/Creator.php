@@ -63,14 +63,11 @@ class Creator
     {
         $this->setModifier($this->modifyBy);
         if(isset($this->thumb)) $this->thumb_link = $this->makeThumb();
-        if ($this->parentId !== null) {
-            $sub_category = $this->createSubCategory($this->parentId);
-            return  $this->createPartnerSubCategory($this->partnerId, $sub_category->id);
-        } else {
-            $master_category = $this->createMasterCategory();
-            $sub_category = $this->createSubCategory($master_category->id);
-            return  $this->createPartnerCategory($this->partnerId, $master_category->id, $sub_category->id);
-        }
+
+        if ($this->parentId === null)
+            return $this->createMasterWithDefaultSubCategory();
+        else
+            return $this->createOnlySubCategory();
 
     }
 
@@ -80,12 +77,24 @@ class Creator
         return $this->saveFileToCDN($file, substr(getCategoryThumbFolder(), strlen(config('s3.url'))), $fileName);
     }
 
+    private function createMasterWithDefaultSubCategory()
+    {
+        $master_category = $this->createMasterCategory();
+        $sub_category = $this->createSubCategory($master_category->id);
+        return  $this->createPartnerCategoryForNewMasterCategory($this->partnerId, $master_category->id, $sub_category->id);
+    }
+
+    private function createOnlySubCategory()
+    {
+        $sub_category = $this->createSubCategory($this->parentId);
+        return  $this->createPartnerCategoryForNewSubCategory($this->partnerId, $sub_category->id);
+    }
+
     public function createMasterCategory()
     {
         $master_category_data = [
             'parent_id' => null,
             'name' => $this->categoryName,
-            'publication_status' => 1,
             'is_published_for_sheba' => 0,
             'thumb' => $this->thumb_link ?? getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
@@ -98,7 +107,6 @@ class Creator
         $sub_category_data = [
             'parent_id' => $master_category_id,
             'name' => ($this->parentId === null) ? 'Sub None Category' : $this->categoryName,
-            'publication_status' => 1,
             'is_published_for_sheba' => 0,
             'thumb' => $this->thumb_link ?? getCategoryDefaultThumb()
         ] + $this->modificationFields(true, false);
@@ -106,17 +114,18 @@ class Creator
 
     }
 
-
-    public function createPartnerCategory($partner_id, $master_category_id, $sub_category_id)
+    public function createPartnerCategoryForNewMasterCategory($partner_id, $master_category_id, $sub_category_id)
     {
         $sub_category_data = [
             [
                 'partner_id' => $partner_id,
                 'category_id' => $master_category_id,
+                'is_default' => 0,
             ] + $this->modificationFields(true, false),
             [
                 'partner_id' => $partner_id,
                 'category_id' => $sub_category_id,
+                'is_default' => $this->parentId === null ? 1 : 0,
             ] + $this->modificationFields(true, false)
 
         ];
@@ -125,13 +134,14 @@ class Creator
 
     }
 
-    public function createPartnerSubCategory($partner_id, $sub_category_id)
+    private function createPartnerCategoryForNewSubCategory($partner_id, $sub_category_id)
     {
         $sub_category_data = [
                 'partner_id' => $partner_id,
                 'category_id' => $sub_category_id,
-            ] + $this->modificationFields(true, false)
-        ;
+                'is_default' => 0,
+            ] + $this->modificationFields(true, false);
+
         return $this->partnerCategoryRepositoryInterface->insert($sub_category_data);
     }
 
