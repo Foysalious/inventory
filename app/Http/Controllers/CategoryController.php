@@ -2,6 +2,7 @@
 
 
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\CategoryWithSubCategory;
 use App\Models\Category;
 use App\Services\Category\CategoryService;
 use App\Traits\ModificationFields;
@@ -136,5 +137,10 @@ class CategoryController extends Controller
     public function destroy($partner, $category,Request $request)
     {
         return $this->categoryService->delete($partner,$request);
+    }
+
+    public function createCategoryWithSubCategory($partner, CategoryWithSubCategory $request)
+    {
+        return $this->categoryService->createCategoryWithSubCategory($request, $partner);
     }
 }

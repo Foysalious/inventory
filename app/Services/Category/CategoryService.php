@@ -3,6 +3,7 @@
 
 use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
+use App\Http\Requests\CategoryWithSubCategory;
 use App\Http\Resources\CategoryProductResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CategoryWiseProductResource;
@@ -30,6 +31,8 @@ class CategoryService extends BaseService
      */
     private Creator $creator;
 
+    private CategoryWithSubCategoryCreator $categoryWithSubCategoryCreator;
+
     private $partnerCategoryRepositoryInterface;
 
     /**
@@ -38,7 +41,13 @@ class CategoryService extends BaseService
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
     private $productRepositoryInterface;
 
-    public function __construct(CategoryRepository $categoryRepository, CategoryRepositoryInterface $categoryRepositoryInterface, CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface, Creator $creator, Updater $updater, ProductRepositoryInterface $productRepositoryInterface)
+    public function __construct(CategoryRepository $categoryRepository,
+                                CategoryRepositoryInterface $categoryRepositoryInterface,
+                                CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface,
+                                Creator $creator, Updater $updater,
+                                ProductRepositoryInterface $productRepositoryInterface,
+                                CategoryWithSubCategoryCreator $categoryWithSubCategoryCreator
+    )
 
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
@@ -47,6 +56,7 @@ class CategoryService extends BaseService
         $this->updater = $updater;
         $this->categoryRepository = $categoryRepository;
         $this->productRepositoryInterface = $productRepositoryInterface;
+        $this->categoryWithSubCategoryCreator = $categoryWithSubCategoryCreator;
     }
 
     /**
@@ -136,6 +146,18 @@ class CategoryService extends BaseService
         $this->productRepositoryInterface->whereIn('category_id', $children)->delete();
 
         return $this->success("Successful", null, 200, false);
+    }
+
+    public function createCategoryWithSubCategory(CategoryWithSubCategory $request, $partner_id)
+    {
+        $this->categoryWithSubCategoryCreator->setModifyBy($request->modifier)
+            ->setPartner($partner_id)
+            ->setName($request->category_name)
+            ->setThumb($request->category_thumb ?? null)
+            ->setParentId($request->parent_id ?? null)
+            ->setSubCategory($request->sub_category)
+            ->create();
+        return $this->success("Successful", null,201);
     }
 
 
