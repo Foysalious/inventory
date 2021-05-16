@@ -105,8 +105,8 @@ class CategoryService extends BaseService
     public function update(CategoryRequest $request, $partner_id, $category_id)
     {
         $category = $this->categoryRepositoryInterface->find($category_id);
-        $category_partner = $category->categoryPartner()->get()->first();
-        if ( !$category || $partner_id != $category_partner->partner_id )
+        $category_partner = $category ? $category->categoryPartner()->where('partner_id', $partner_id)->where('category_id', $category_id)->get()->first() : null;
+        if ( !$category || !$category_partner )
             throw new ModelNotFoundException();
         if($category->is_published_for_sheba || $category_partner->is_default)
             return $this->error("Not allowed to update this category", 403);
