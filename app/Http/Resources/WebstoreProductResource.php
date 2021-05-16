@@ -24,10 +24,11 @@ class WebstoreProductResource extends JsonResource
             'stock' => $this->stock,
             'rating' => 5,
             'count_rating' => 7,
-            'app_thumb'=> "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/1608693744_jacket.jpeg",
+            'app_thumb'=> $this->app_thumb,
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
+            'price'=> $this->getOriginalPrice(),
             'variations' => $this->combinations(),
             'created_at' => $this->created_at
         ];

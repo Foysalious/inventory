@@ -30,6 +30,11 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         return $this->model->where('category_id', $category_id)->get();
     }
 
+    public function productInformation($productId)
+    {
+        return $this->model->where('id', $productId)->get();
+    }
+
     public function productChannelPrice($productId)
     {
         $sku_channel_price_array = array();

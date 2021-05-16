@@ -35,6 +35,7 @@ class ProductCombinationService
         $options = $this->productOptionRepositoryInterface->where('product_id',$this->product->id)->pluck('name');
         $skus = $this->skuRepositoryInterface->where('product_id', $this->product->id)->with('combinations')->get();
 
+
         foreach ($skus as $sku) {
             $sku_data = [];
             $temp = [];
@@ -42,8 +43,11 @@ class ProductCombinationService
             {
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
                     $product_option_value = $combination->productOptionValue;
+                    $product_option=$product_option_value->productOption;
+
                     array_push($temp, [
-                        'option_id' => $product_option_value->productOption->id,
+//                        dd($product_option_value->productOption->name),
+                        'option_id' => $product_option->name,
                         'option_name' => $product_option_value->productOption->name,
                         'option_value_id' => $product_option_value->id,
                         'option_value_name' => $product_option_value->name
