@@ -1,6 +1,5 @@
 <?php namespace App\Repositories;
 
-
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use App\Models\SkuChannel;
@@ -40,6 +39,20 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             array_push($sku_channel_price_array, $sku_channel_price);
         }
         return $sku_channel_price_array;
+    }
+
+    public function searchProductFromWebstore($searchKey, $partnerId, $limit = 10, $offset = 0)
+    {
+        return $this->searchWebstoreProductsFromDB($searchKey, $partnerId)
+            ->select('id', 'partner_id', 'category_id', 'name', 'description'/*, 'is_published_for_shop', 'publication_status'*/)
+            ->skip($offset)->take($limit)->get();
+    }
+
+    private function searchWebstoreProductsFromDB($searchKey, $partnerId)
+    {
+        return $this->model->where(function ($q) use ($searchKey) {
+            $q->where('name', 'LIKE', '%' . $searchKey . '%')->orWhere('description', 'LIKE', '%' . $searchKey . '%');
+        })->where([/*['is_published_for_shop', 1],*/ ['partner_id', $partnerId]/*, ['stock', '>', 0]*/]);
     }
 
 }

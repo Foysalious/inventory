@@ -7,6 +7,7 @@ use App\Http\Controllers\OptionController;
 use App\Http\Controllers\SkuController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\Webstore\ProductController as WebstoreProductController;
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ChannelController;
@@ -30,7 +31,9 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
-
+    Route::group(['prefix'=>'partners'], function() {
+        Route::get('search', [WebstoreProductController::class, 'search']);
+    });
     Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
         Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
