@@ -5,6 +5,7 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Warranty\Units;
+use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
 
 class Creator
@@ -430,7 +431,7 @@ class Creator
             'name' => $this->name,
             'description' => $this->description,
             'warranty' => $this->warranty ?: 0,
-            'warranty_unit' => $this->warrantyUnit ?: Units::DAY,
+            'warranty_unit' => $this->warrantyUnit ?: WarrantyUnits::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
             'unit_id' => $this->unitId,
         ];
