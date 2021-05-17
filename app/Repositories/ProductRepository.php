@@ -3,6 +3,7 @@
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use App\Models\SkuChannel;
+use App\Services\Channel\Channels;
 use Illuminate\Support\Facades\DB;
 
 class ProductRepository extends BaseRepository implements ProductRepositoryInterface
@@ -50,7 +51,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     public function searchProductFromWebstore($searchKey, $partnerId, $limit = 10, $offset = 0)
     {
         return $this->searchWebstoreProductsFromDB($searchKey, $partnerId)
-            ->select('id', 'partner_id', 'category_id', 'name', 'description'/*, 'is_published_for_shop', 'publication_status'*/)
+            ->select('id', 'partner_id', 'category_id', 'name', 'description')
             ->skip($offset)->take($limit)->get();
     }
 
@@ -63,7 +64,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             $q->select(DB::raw('SUM(stock) as total_stock'))
                 ->havingRaw('total_stock > 0');
         })->whereHas('skuChannels', function ($q) {
-            $q->where('channel_id', 2);
+            $q->where('channel_id', Channels::WEBSTORE);
         });
     }
 
