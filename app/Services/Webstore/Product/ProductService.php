@@ -40,6 +40,7 @@ class ProductService
 //        $general_details->options = collect($options);
 //        $general_details->combinations = collect($combinations);
 //        return $this->producRatingReviews();
+        $this->producRatingReviews();
         $product = new WebstoreProductResource($general_details);
 
 

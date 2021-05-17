@@ -43,12 +43,13 @@ class ProductCalculator
         try {
             // $response = Http::get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
             $client = new Client();
-            $request = json_decode($client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc')->getBody()->getContents(),true);
-          //  $response = $request->getBody()->getContents();
-            dd($request);
-            return $response;
-        }
-        catch (GuzzleException $exception){
+            $request = $client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews');
+            $response = json_decode($request->getBody()->getContents(), true);
+
+            $phones = array_column($response['reviews'], 'rating');
+            dd($phones);
+//            return $response;
+        } catch (GuzzleException $exception) {
             dd($exception);
         }
 
