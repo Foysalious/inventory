@@ -14,9 +14,9 @@ class ProductService
         $this->productRepositoryInterface = $productRepositoryInterface;
     }
 
-    public function search($searchKey, $partnerId, $limit = 5, $offset = 0)
+    public function search($searchKey, $partnerId, $limit = 5)
     {
-        $products =  $this->productRepositoryInterface->searchProductFromWebstore($searchKey, +$partnerId, 5);
+        $products =  $this->productRepositoryInterface->searchProductFromWebstore($searchKey, +$partnerId, $limit);
         if (count($products->toArray()) > 0) return $this->success("Successful", ['products' => $products->toArray()]);
         return $this->error("No products found", 404);
     }
