@@ -3,6 +3,7 @@
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Product;
 use App\Models\SkuChannel;
+use Illuminate\Support\Facades\DB;
 
 class ProductRepository extends BaseRepository implements ProductRepositoryInterface
 {
@@ -57,7 +58,12 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
     {
         return $this->model->where(function ($q) use ($searchKey) {
             $q->where('name', 'LIKE', '%' . $searchKey . '%')->orWhere('description', 'LIKE', '%' . $searchKey . '%');
-        })->where([/*['is_published_for_shop', 1],*/ ['partner_id', $partnerId]/*, ['stock', '>', 0]*/]);
+        })->where([/*['is_published_for_shop', 1],*/ ['partner_id', $partnerId]])
+            ->whereHas('skus', function ($q) {
+                $q->select(DB::raw('SUM(stock) as total_stock'))
+                    ->havingRaw('total_stock > 0');
+            });
+
     }
 
 }
