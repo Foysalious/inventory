@@ -3,6 +3,7 @@
 
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
+use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
 class ProductCalculator
@@ -41,10 +42,10 @@ class ProductCalculator
         // $response = Http::get('https://pos-order.dev-sheba.xyz/api/v1/products/15/reviews?rating=4&order_by=desc');
         try {
             // $response = Http::get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
-            $client = new \GuzzleHttp\Client();
-            $request = $client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
-            $response = $request->getBody();
-            dd($response);
+            $client = new Client();
+            $request = json_decode($client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc')->getBody()->getContents(),true);
+          //  $response = $request->getBody()->getContents();
+            dd($request);
             return $response;
         }
         catch (GuzzleException $exception){

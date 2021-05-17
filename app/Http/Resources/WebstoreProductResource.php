@@ -13,7 +13,7 @@ class WebstoreProductResource extends JsonResource
      */
     public function toArray($request)
     {
-        list($rating,$count_rating)=$this->getRatingandCount();
+        list($rating,$count_rating) = $this->getRatingandCount();
         return [
             'id' => $this->id,
             'category_id' => $this->category_id,
