@@ -3,6 +3,7 @@
 
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Models\Category;
+use function PHPUnit\Framework\isEmpty;
 
 class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
 {
@@ -45,9 +46,11 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
             $q->where('is_published_for_sheba', 1)->orWhere(function ($q) use ($partner_id) {
                 $q->where('is_published_for_sheba', 0)->whereHas('categoryPartner', function ($q) use ($partner_id) {
                     $q->where('partner_id', $partner_id);
+                })->whereHas('products',function ($q)use ($partner_id){
+
                 });
             });
-        })->select('id', 'name')->where('parent_id', NULL)->get();
+        })->select('id', 'name')->where('parent_id', NULL)->get();;
 
 
         return $master_categories;

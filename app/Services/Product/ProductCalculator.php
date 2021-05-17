@@ -39,16 +39,19 @@ class ProductCalculator
     public function getProductRatingReview()
     {
 
-        // $response = Http::get('https://pos-order.dev-sheba.xyz/api/v1/products/15/reviews?rating=4&order_by=desc');
+
         try {
-            // $response = Http::get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
+
             $client = new Client();
-            $request = $client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews');
+            $request = $client->get('https://pos-order.dev-sheba.xyz/api/v1/products/15/reviews');
             $response = json_decode($request->getBody()->getContents(), true);
 
-            $phones = array_column($response['reviews'], 'rating');
-            dd($phones);
-//            return $response;
+            $rating = array_column($response['reviews'], 'rating');
+            $count_rating = count($rating);
+            $sum_rating = array_sum($rating);
+            $average_rating= $sum_rating/$count_rating;
+
+            return [$average_rating,$count_rating];
         } catch (GuzzleException $exception) {
             dd($exception);
         }
