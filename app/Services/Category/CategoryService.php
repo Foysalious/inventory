@@ -40,13 +40,14 @@ class CategoryService extends BaseService
      */
     private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
     private $productRepositoryInterface;
+    private $authorization;
 
     public function __construct(CategoryRepository $categoryRepository,
                                 CategoryRepositoryInterface $categoryRepositoryInterface,
                                 CategoryPartnerRepositoryInterface $partnerCategoryRepositoryInterface,
                                 Creator $creator, Updater $updater,
                                 ProductRepositoryInterface $productRepositoryInterface,
-                                CategoryWithSubCategoryCreator $categoryWithSubCategoryCreator
+                                CategoryWithSubCategoryCreator $categoryWithSubCategoryCreator,Authorization $authorization
     )
 
     {
@@ -57,6 +58,8 @@ class CategoryService extends BaseService
         $this->categoryRepository = $categoryRepository;
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->categoryWithSubCategoryCreator = $categoryWithSubCategoryCreator;
+        $this->authorization = $authorization;
+
     }
 
     /**
@@ -79,7 +82,6 @@ class CategoryService extends BaseService
     {
         $products= $this->productRepositoryInterface->getProductsByCategoryId($category_id);
         $categories = $this->categoryRepositoryInterface->getProductsByCategoryId($category_id);
-
         $request->merge(['products' => $products]);
         $resource = CategoryWiseProductResource::collection($categories);
         if (count($resource) > 0) return $this->success("Successful", ['data' => $resource]);
@@ -115,8 +117,7 @@ class CategoryService extends BaseService
         $category_partner = $category ? $category->categoryPartner()->where('partner_id', $partner_id)->where('category_id', $category_id)->get()->first() : null;
         if ( !$category || !$category_partner )
             throw new ModelNotFoundException();
-        if($category->is_published_for_sheba || $category_partner->is_default)
-            return $this->error("Not allowed to update this category", 403);
+        $this->authorization->setPartner($partner_id)->setCategory($category)->setType('update')->check();
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
@@ -129,15 +130,11 @@ class CategoryService extends BaseService
     {
         $category_id = $request->category;
         $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
-            $query->select('id', 'parent_id');
+            $query->select('id', 'parent_id','is_published_for_sheba');
         }])->select('id')->first();
         if (!$category)
             return $this->error("Not Found", 404);
-        if ($category->is_published_for_sheba)
-            return $this->error("Not allowed to delete this category", 403);
-        $partner_category =  $category->categoryPartner->where('partner_id',$partner)->first();
-        if(!$partner_category)
-            return $this->error("This category does not belong to this partner", 403);
+        $this->authorization->setPartner($partner)->setCategory($category)->setType('delete')->check();
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children, [$category->id]);
         $this->categoryRepositoryInterface->whereIn('id', $master_cat_with_children)->delete();
