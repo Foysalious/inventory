@@ -29,8 +29,8 @@ class PosServerClient
             $res = $e->getResponse();
             $http_code = $res->getStatusCode();
             $message = $res->getBody()->getContents();
-            if ($http_code > 399 && $http_code < 500) throw new InventoryServiceServerError($message, $http_code);
-            throw new InventoryServiceServerError($e->getMessage(), $http_code);
+            if ($http_code > 399 && $http_code < 500) throw new PosServerError($message, $http_code);
+            throw new PosServerError($e->getMessage(), $http_code);
         }
     }
 

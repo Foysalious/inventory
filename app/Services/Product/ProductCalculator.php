@@ -1,6 +1,6 @@
 <?php namespace App\Services\Product;
 
-
+use App\Services\Webstore\PosServerClient;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
 use GuzzleHttp\Client;
@@ -12,9 +12,10 @@ class ProductCalculator
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
     private $channel;
 
-    public function __construct(SkuChannelRepositoryInterface $skuChannelRepositoryInterface)
+    public function __construct(SkuChannelRepositoryInterface $skuChannelRepositoryInterface,PosServerClient $client)
     {
         $this->skuChannelRepositoryInterface = $skuChannelRepositoryInterface;
+        $this->client = $client;
     }
 
     public function setProduct(Product $product)
@@ -44,15 +45,15 @@ class ProductCalculator
 
             $client = new Client();
 
-            $request = $client->get('https://pos-order.dev-sheba.xyz/api/v1/products/' . $product->partner_id . '/reviews');
+            $request = $client->get('https://pos-order.dev-sheba.xyz/api/v1/products/'.$product->partner_id.'/reviews');
             $response = json_decode($request->getBody()->getContents(), true);
 
             $rating = array_column($response['reviews'], 'rating');
             $count_rating = count($rating);
             $sum_rating = array_sum($rating);
-            $average_rating = $sum_rating / $count_rating;
+            $average_rating= $sum_rating/$count_rating;
 
-            return [$average_rating, $count_rating];
+            return [$average_rating,$count_rating];
         } catch (GuzzleException $exception) {
 
         }
