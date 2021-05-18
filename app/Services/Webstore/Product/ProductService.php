@@ -5,6 +5,8 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+
 
 class ProductService
 {
@@ -26,7 +28,7 @@ class ProductService
         return $this->error("No products found", 404);
     }
 
-    public function getProductInformation($request,$partner_id,$product_id)
+    public function getProductInformation($request, $partner_id, $product_id)
     {
 
 
@@ -35,10 +37,23 @@ class ProductService
         if ($general_details->partner_id != $partner_id)
             return $this->error("This product does not belongs to this partner", 403);
         list($options, $combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
-        $general_details->options = collect($options);
-        $general_details->combinations = collect($combinations);
+
+        $this->producRatingReviews();
         $product = new WebstoreProductResource($general_details);
+
+
         return $this->success('Successful', ['product' => $product], 200);
+    }
+
+    public function producRatingReviews()
+    {
+       // $response = Http::get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
+        $client = new \GuzzleHttp\Client();
+        $request = $client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
+        $response = $request->getBody();
+        return $response;
+
+
     }
 
 }

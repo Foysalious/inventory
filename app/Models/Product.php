@@ -63,6 +63,10 @@ class Product extends BaseModel
     {
       return  app(ProductCalculator::class)->setProduct($this)->setChannel($channel)->getOriginalPrice();
     }
+    public function getRatingandCount()
+    {
+        return  app(ProductCalculator::class)->getProductRatingReview();
+    }
 
     public function getVatIncludedPrice()
     {

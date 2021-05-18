@@ -25,7 +25,13 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
         return $this->model->where('partner_id', $partner_id)->offset($offset)->limit($limit)->latest()->get();
     }
 
-    public function getDeletionFileNameFromCDN($partner_id, $collection_id, $column_name) : string
+    public function getAllCollectionForWebstore($offset, $limit, $partner_id)
+    {
+        return $this->model->where('partner_id', $partner_id)->has('products')->offset($offset)->limit($limit)->latest()->get();
+
+    }
+
+    public function getDeletionFileNameFromCDN($partner_id, $collection_id, $column_name): string
     {
         return $this->model->where('partner_id', $partner_id)->where('id', $collection_id)->first()[$column_name] ?? '';
     }
