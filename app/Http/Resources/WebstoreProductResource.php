@@ -29,7 +29,7 @@ class WebstoreProductResource extends JsonResource
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
-            'orginal_price'=> $this->getOriginalPrice(),
+            'orginal_price'=> (double) $this->getOriginalPrice(),
             'variations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
