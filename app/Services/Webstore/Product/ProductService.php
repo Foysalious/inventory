@@ -38,22 +38,13 @@ class ProductService
             return $this->error("This product does not belongs to this partner", 403);
         list($options, $combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
 
-        $this->producRatingReviews();
+
         $product = new WebstoreProductResource($general_details);
 
 
         return $this->success('Successful', ['product' => $product], 200);
     }
 
-    public function producRatingReviews()
-    {
-       // $response = Http::get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
-        $client = new \GuzzleHttp\Client();
-        $request = $client->get('https://api-smanager-webstore.dev-sheba.xyz/api/v1/product/15/reviews?rating=4&order_by=desc');
-        $response = $request->getBody();
-        return $response;
 
-
-    }
 
 }

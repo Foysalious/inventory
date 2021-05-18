@@ -65,7 +65,7 @@ class Product extends BaseModel
     }
     public function getRatingandCount()
     {
-        return  app(ProductCalculator::class)->getProductRatingReview();
+        return  app(ProductCalculator::class)->getProductRatingReview($this);
     }
 
     public function getVatIncludedPrice()

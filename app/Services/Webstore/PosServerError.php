@@ -2,7 +2,7 @@
 use App\Exceptions\HttpException;
 use Throwable;
 
-class PosServerError
+class PosServerError extends HttpException
 {
     public function __construct($message = "", $code = 402, Throwable $previous = null)
     {
