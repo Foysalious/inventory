@@ -7,6 +7,7 @@ class Authorization
     private $category;
     private $partner;
     private $type;
+    private $categoryPartner;
 
     public function setPartner($partner)
     {
@@ -26,9 +27,15 @@ class Authorization
         return $this;
     }
 
+    public function setCategoryPartner($categoryPartner)
+    {
+        $this->categoryPartner = $categoryPartner;
+        return $this;
+    }
+
     public function check()
     {
-        if($this->category->is_published_for_sheba)
+        if($this->category->is_published_for_sheba || $this->categoryPartner->is_default)
              throw new AuthorizationException("Not allowed to ". $this->type . " this category", 403);
         $partner_category =  $this->category->categoryPartner->where('partner_id',$this->partner)->first();
         if(!$partner_category)

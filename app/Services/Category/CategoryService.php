@@ -117,7 +117,7 @@ class CategoryService extends BaseService
         $category_partner = $category ? $category->categoryPartner()->where('partner_id', $partner_id)->where('category_id', $category_id)->get()->first() : null;
         if ( !$category || !$category_partner )
             throw new ModelNotFoundException();
-        $this->authorization->setPartner($partner_id)->setCategory($category)->setType('update')->check();
+        $this->authorization->setPartner($partner_id)->setCategory($category)->setCategoryPartner($category_partner)->setType('update')->check();
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
@@ -126,7 +126,7 @@ class CategoryService extends BaseService
      * @param $request
      * @return JsonResponse
      */
-    public function delete($partner,$request)
+    public function delete($partner_id,$request)
     {
         $category_id = $request->category;
         $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
@@ -134,14 +134,13 @@ class CategoryService extends BaseService
         }])->select('id')->first();
         if (!$category)
             return $this->error("Not Found", 404);
-        $this->authorization->setPartner($partner)->setCategory($category)->setType('delete')->check();
+        $category_partner = $category ? $category->categoryPartner()->where('partner_id', $partner_id)->where('category_id', $category_id)->get()->first() : null;
+        $this->authorization->setPartner($partner_id)->setCategory($category)->setCategoryPartner($category_partner)->setType('delete')->check();
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children, [$category->id]);
         $this->categoryRepositoryInterface->whereIn('id', $master_cat_with_children)->delete();
-
         $this->partnerCategoryRepositoryInterface->whereIn('category_id', $master_cat_with_children)->delete();
         $this->productRepositoryInterface->whereIn('category_id', $children)->delete();
-
         return $this->success("Successful", null, 200, false);
     }
 
