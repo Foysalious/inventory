@@ -9,6 +9,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Webstore\ProductController as WebstoreProductController;
 use App\Http\Controllers\Webstore\CategoryController as WebstoreCategoryController;
+use App\Http\Controllers\Webstore\CollectionController as WebstoreCollectionController;
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ChannelController;
@@ -37,6 +38,7 @@ Route::group(['prefix'=>'v1'], function(){
         Route::get('search', [WebstoreProductController::class, 'search']);
         Route::get('{partner_id}/product-details/{product_id}', [WebstoreProductController::class, 'getProductInformation']);
         Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);
+        Route::get('{partner_id}/webstore-collection', [WebstoreCollectionController::class, 'getAllCollection']);
 
     });
     Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);

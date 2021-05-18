@@ -52,7 +52,7 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
                         ->havingRaw('total_product > 0');
                 });
             });
-        })->select('id', 'name')->where('parent_id', NULL)->get();;
+        })->select('id', 'name')->where('parent_id', NULL)->get();
 
 
         return $master_categories;
