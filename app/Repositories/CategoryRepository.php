@@ -3,6 +3,7 @@
 
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Models\Category;
+use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\isEmpty;
 
 class CategoryRepository extends BaseRepository implements CategoryRepositoryInterface
@@ -46,8 +47,9 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
             $q->where('is_published_for_sheba', 1)->orWhere(function ($q) use ($partner_id) {
                 $q->where('is_published_for_sheba', 0)->whereHas('categoryPartner', function ($q) use ($partner_id) {
                     $q->where('partner_id', $partner_id);
-                })->whereHas('products',function ($q)use ($partner_id){
-
+                })->whereHas('products',function ($q){
+                    $q->select(DB::raw('SUM(id) as total_product'))
+                        ->havingRaw('total_product > 0');
                 });
             });
         })->select('id', 'name')->where('parent_id', NULL)->get();;
