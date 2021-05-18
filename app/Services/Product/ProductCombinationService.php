@@ -62,15 +62,18 @@ class ProductCombinationService
             if($sku->skuChannels)
             {
                 $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                    /** @var  $priceCalculation PriceCalculation */
+                    $priceCalculation = app(PriceCalculation::class);
+                    $priceCalculation->setSkuChannel($sku_channel);
                     array_push($temp, [
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,
-                        "purchase_price" => $sku_channel->cost,
-                        "original_price" => $sku_channel->price,
-                        "discounted_price" => $sku_channel->price - 5,
-                        "discount" => 5,
-                        "is_discount_percentage" => 0,
-                        "wholesale_price" => $sku_channel->wholesale_price
+                        "purchase_price" => $priceCalculation->getPurchasePrice(),
+                        "original_price" => $priceCalculation->getOriginalUnitPriceWithVat(),
+                        "discounted_price" => $priceCalculation->getDiscountedUnitPrice(),
+                        "discount" => $priceCalculation->getDiscountAmount(),
+                        "is_discount_percentage" => $priceCalculation->isDiscountPercentage(),
+                        "wholesale_price" => $priceCalculation->getWholesalePriceWithVat()
                     ]);
                 });
             }
