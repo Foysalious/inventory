@@ -46,8 +46,7 @@ class ProductCombinationService
                     $product_option=$product_option_value->productOption;
 
                     array_push($temp, [
-//                        dd($product_option_value->productOption->name),
-                        'option_id' => $product_option->name,
+                        'option_id' => $product_option_value->productOption->id,
                         'option_name' => $product_option_value->productOption->name,
                         'option_value_id' => $product_option_value->id,
                         'option_value_name' => $product_option_value->name
