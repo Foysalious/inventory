@@ -18,9 +18,22 @@ class ProductController extends Controller
     }
 
     /**
+     *
+     * * @OA\Get(
+     *      path="/api/v1/partners/{partner}/products",
+     *      operationId="getProducts",
+     *      tags={"Partners Products API"},
+     *      summary="Get Products List for POS by Partner",
+     *      description="",
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
+     *      @OA\Response(response=404, description="message: স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।"),
+     *      @OA\Response(response=403, description="Forbidden")
+     *     )
      * @param $partner
      * @param Request $request
      * @return JsonResponse
+     *
      * @throws ProductNotFoundException
      */
     public function index($partner, Request $request)
