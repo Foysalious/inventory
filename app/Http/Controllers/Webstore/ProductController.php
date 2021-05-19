@@ -17,10 +17,10 @@ class ProductController extends Controller
     /**
      *
      * * @OA\Get(
-     *      path="api/v1/partners/{partner}/product-details/{product}",
+     *      path="/api/v1/partners/{partner}/product-details/{product}",
      *      operationId="getCategory",
      *      tags={"Partners Category API"},
-     *      summary="Get Category Tree List by Partner",
+     *      summary="Get Product Information By Partner and Product ID",
      *      description="",
      *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Parameter(name="product", description="product id", required=true, in="path", @OA\Schema(type="integer")),
