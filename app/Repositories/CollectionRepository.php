@@ -27,12 +27,12 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function getAllCollectionForWebstore($offset, $limit, $partner_id)
     {
-        return $this->model->where('partner_id', $partner_id)->whereHas('products', function ($q) {
+
+        return $this->model->where('is_published', 1)->where('partner_id', $partner_id)->whereHas('products', function ($q) {
             $q->whereHas('skuChannels', function ($q) {
                 $q->select(DB::raw('SUM(stock) as total_stock'))
                     ->havingRaw('total_stock > 0');
-
-                    })->whereHas('skuChannels', function ($q) {
+            })->whereHas('skuChannels', function ($q) {
                 $q->where('channel_id', Channels::WEBSTORE);
             });
         })->offset($offset)->limit($limit)->latest()->get();
