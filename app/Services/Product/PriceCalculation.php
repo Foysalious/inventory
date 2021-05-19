@@ -14,7 +14,7 @@ class PriceCalculation extends BaseService
     private Channel $channel;
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
     private SkuChannel $skuChannel;
-    private $discount;
+    private ?Discount $discount = null;
 
     /**
      * PriceCalculation constructor.
@@ -116,7 +116,7 @@ class PriceCalculation extends BaseService
     public function isDiscountPercentage()
     {
         $this->calculateDiscount();
-        return $this->discount ? $this->discount->is_discount_percentage : 0;
+        return $this->discount ? $this->discount->is_amount_percentage : 0;
     }
 
     public function getDiscountedUnitPrice()
