@@ -25,8 +25,8 @@ class SkuChannel extends BaseModel
 
     public function scopeValidDiscounts()
     {
-        return $this->with(['discounts' => function ($query) {
+        return $this->discounts()->where(function ($query) {
             return $query->valid();
-        }]);
+        });
     }
 }
