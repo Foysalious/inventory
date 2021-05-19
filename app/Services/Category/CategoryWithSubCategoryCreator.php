@@ -34,6 +34,8 @@ class CategoryWithSubCategoryCreator extends Creator
 
     public function create()
     {
+        $this->setModifier($this->modifyBy);
+        if(isset($this->thumb)) $this->thumb_link = $this->makeThumb();
         $category = $this->createMasterCategory();
         $this->addPartnerCategoryData($category->id);
         $default_sub_category = $this->createSubCategory($category->id);
@@ -57,7 +59,7 @@ class CategoryWithSubCategoryCreator extends Creator
     {
         foreach ($this->subCategory as $each) {
             $this->setName($each['name']);
-            $this->setThumb($each['thumb'] ?? getCategoryDefaultThumb());
+            $this->setThumbForSubCategory($each);
             $sub_category = $this->createSubCategory($category_id);
             $this->addPartnerCategoryData($sub_category->id);
         }
@@ -69,4 +71,13 @@ class CategoryWithSubCategoryCreator extends Creator
     }
 
 
+    private function setThumbForSubCategory($sub_category)
+    {
+        if (isset($sub_category['thumb'])){
+            $this->thumb = $sub_category['thumb'];
+            $this->thumb_link = $this->makeThumb();
+        }
+        else
+            $this->thumb_link = '';
+    }
 }
