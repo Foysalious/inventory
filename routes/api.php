@@ -8,6 +8,8 @@ use App\Http\Controllers\SkuController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Webstore\ProductController as WebstoreProductController;
+use App\Http\Controllers\Webstore\CategoryController as WebstoreCategoryController;
+use App\Http\Controllers\Webstore\CollectionController as WebstoreCollectionController;
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ChannelController;
@@ -33,12 +35,16 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::group(['prefix'=>'v1'], function(){
     Route::group(['prefix'=>'partners/{partner_id}/products'], function() {
         Route::get('search', [WebstoreProductController::class, 'search']);
+        Route::get('{partner_id}/product-details/{product_id}', [WebstoreProductController::class, 'getProductInformation']);
+        Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);
+        Route::get('{partner_id}/webstore-collection', [WebstoreCollectionController::class, 'index']);
+
     });
     Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
-        Route::get('category-tree', [CategoryController::class, 'getMasterSubCat']);
+        Route::get('category-tree', [CategoryController::class, 'index']);
+        Route::post('category-with-sub-category', [CategoryController::class, 'createCategoryWithSubCategory']);
         Route::group(['prefix' => 'categories'], function () {
-            Route::get('/', [CategoryController::class, 'index']);
             Route::post('/', [CategoryController::class, 'store']);
             Route::post('{category_id}', [CategoryController::class, 'update']);
         });

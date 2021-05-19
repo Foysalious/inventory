@@ -1,10 +1,11 @@
-<?php namespace App\Http\Resources;
+<?php namespace App\Http\Resources\Webstore;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class WebstoreProductResource extends JsonResource
 {
+
     /**
      * Transform the resource into an array.
      *
@@ -29,7 +30,7 @@ class WebstoreProductResource extends JsonResource
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
-            'orginal_price'=> (double) $this->getOriginalPrice(),
+            'orginal_price'=> $this->getOriginalPrice(),
             'variations' => $this->combinations(),
             'created_at' => $this->created_at
         ];
