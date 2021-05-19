@@ -14,7 +14,7 @@ class PriceCalculation extends BaseService
     private Channel $channel;
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
     private SkuChannel $skuChannel;
-    private $discount;
+    private Discount $discount;
 
     /**
      * PriceCalculation constructor.
@@ -55,7 +55,7 @@ class PriceCalculation extends BaseService
         return $this;
     }
 
-    private function getSkuChannel()
+    private function calculateSkuChannel()
     {
         if (!$this->skuChannel instanceof SkuChannel) {
             $this->skuChannel = $this->skuChannelRepositoryInterface
@@ -63,12 +63,11 @@ class PriceCalculation extends BaseService
                 ->where('channel_id', $this->channel)
                 ->first();
         }
-        return $this->skuChannel;
     }
 
     public function getOriginalUnitPrice()
     {
-        $this->getSkuChannel();
+        $this->calculateSkuChannel();
         return $this->skuChannel->price;
     }
 
@@ -79,19 +78,19 @@ class PriceCalculation extends BaseService
 
     public function getVatPercentage()
     {
-        $this->getSkuChannel();
+        $this->calculateSkuChannel();
         return $this->skuChannel->sku->product->vat_percentage;
     }
 
-    public function getPurchasePrice()
+    public function getPurchaseUnitPrice()
     {
-        $this->getSkuChannel();
+        $this->calculateSkuChannel();
         return $this->skuChannel->cost;
     }
 
     public function getWholesalePrice()
     {
-        $this->getSkuChannel();
+        $this->calculateSkuChannel();
         return $this->skuChannel->wholesale_price;
     }
 
@@ -100,34 +99,33 @@ class PriceCalculation extends BaseService
         return $this->skuChannel->wholesale_price + (($this->skuChannel->wholesale_price * $this->getVatPercentage()) / 100);
     }
 
-    public function getDiscount()
+    public function calculateDiscount()
     {
-        $this->getSkuChannel();
+        $this->calculateSkuChannel();
         if (!$this->discount instanceof Discount) {
-            $this->discount = $this->skuChannel->discounts()->first();
+            $this->discount = $this->skuChannel::validDiscounts()->orderBy('created_at', 'desc')->first();
         }
-        return $this->discount;
     }
 
     public function getDiscountAmount()
     {
-        $discount = $this->getDiscount();
-        return $discount ? $discount->amount : 0;
+        $this->calculateDiscount();
+        return $this->discount ? $this->discount->amount : 0;
     }
 
     public function isDiscountPercentage()
     {
-        $discount = $this->getDiscount();
-        return $discount ? $discount->is_discount_percentage : 0;
+        $this->calculateDiscount();
+        return $this->discount ? $this->discount->is_discount_percentage : 0;
     }
 
     public function getDiscountedUnitPrice()
     {
-        $discount = $this->getDiscount();
-        if (!$discount) return $this->getOriginalUnitPriceWithVat();
-        if (!$discount->is_amount_percentage)
-            return $this->getOriginalUnitPriceWithVat() - $discount->amount;
-        return $this->getOriginalUnitPriceWithVat() - (($this->getOriginalUnitPriceWithVat() * $discount->amount) / 100);
+        $this->calculateDiscount();
+        if (!$this->discount) return $this->getOriginalUnitPriceWithVat();
+        if (!$this->discount->is_amount_percentage)
+            return $this->getOriginalUnitPriceWithVat() - $this->discount->amount;
+        return $this->getOriginalUnitPriceWithVat() - (($this->getOriginalUnitPriceWithVat() * $this->discount->amount) / 100);
     }
 
 }

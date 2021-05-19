@@ -5,6 +5,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+Relation::morphMap(['sku_channel'=>'App\Models\SkuChannel']);
+
 class SkuChannel extends BaseModel
 {
     use HasFactory,SoftDeletes;
@@ -18,7 +20,13 @@ class SkuChannel extends BaseModel
 
     public function discounts()
     {
-        Relation::morphMap(['sku_channel'=>'App\Models\SkuChannel']);
         return $this->morphMany(Discount::class, 'type', 'type', 'type_id');
+    }
+
+    public function scopeValidDiscounts()
+    {
+        return $this->with(['discounts' => function ($query) {
+            return $query->valid();
+        }]);
     }
 }
