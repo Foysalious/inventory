@@ -19,12 +19,12 @@ class ProductController extends Controller
      *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Parameter(name="search_key", description="search key", required=true, in="query", @OA\Schema(type="string")),
      *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
-     *     )
+     *    git )
      *  */
     public function search(Request $request ,$partner_id, ProductService $productService)
     {
         $this->validate($request, ['search_key' => 'required|string']);
-        return $productService->search($request->search_key, (int)$partner_id);
+        return $productService->search($request->search_key, +$partner_id);
     }
 
     /**
