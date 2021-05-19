@@ -8,10 +8,23 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    /**
+     *
+     * * @OA\Get(
+     *      path="/api/v1/partners/{partner}/products/search",
+     *      operationId="search",
+     *      tags={"Product Search API"},
+     *      summary="search by partnerId and searchKey",
+     *      description="",
+     *      @OA\Parameter(name="partner_id", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="search_key", description="search id", required=true, in="query", @OA\Schema(type="string")),
+     *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
+     *     )
+     *  */
     public function search(Request $request ,$partner_id, ProductService $productService)
     {
         $this->validate($request, ['search_key' => 'required|string']);
-        return $productService->search($request->search_key, $partner_id);
+        return $productService->search($request->search_key, (int)$partner_id);
     }
 
     /**
