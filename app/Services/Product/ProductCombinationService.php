@@ -46,7 +46,6 @@ class ProductCombinationService
                     $product_option=$product_option_value->productOption;
 
                     array_push($temp, [
-//
                         'option_id' => $product_option_value->productOption->id,
                         'option_name' => $product_option_value->productOption->name,
                         'option_value_id' => $product_option_value->id,
@@ -63,6 +62,9 @@ class ProductCombinationService
             if($sku->skuChannels)
             {
                 $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                    /** @var  $priceCalculation PriceCalculation */
+                    $priceCalculation = app(PriceCalculation::class);
+                    $priceCalculation->setSkuChannel($sku_channel);
                     array_push($temp, [
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,

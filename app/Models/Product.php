@@ -19,6 +19,11 @@ class Product extends BaseModel
         return $this->hasMany(Sku::class);
     }
 
+    public function skuChannels()
+    {
+        return $this->hasManyThrough(SkuChannel::class,Sku::class);
+    }
+
     public function category()
     {
         return $this->belongsTo(Category::class)->withTrashed();
