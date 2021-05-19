@@ -16,8 +16,8 @@ class ProductController extends Controller
      *      tags={"Product Search API"},
      *      summary="search by partnerId and searchKey",
      *      description="",
-     *      @OA\Parameter(name="partner_id", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
-     *      @OA\Parameter(name="search_key", description="search id", required=true, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="search_key", description="search key", required=true, in="query", @OA\Schema(type="string")),
      *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
      *     )
      *  */
