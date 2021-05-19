@@ -26,6 +26,12 @@ class ProductController extends Controller
      *      summary="Get Products List for POS by Partner",
      *      description="",
      *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="master_category_ids", description="master category ids", required=false, in="query", @OA\Schema(type="array", @OA\Items(type="integer")) ),
+     *      @OA\Parameter(name="category_ids", description="category ids", required=false, in="query", @OA\Schema(type="array", @OA\Items(type="integer")) ),
+     *      @OA\Parameter(name="updated_after", description="products updated after date", required=false, in="query", @OA\Schema(type="string") ),
+     *      @OA\Parameter(name="offset", description="pagination offset", required=false, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="limit", description="pagination limit", required=false, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="is_published_for_webstore", description="publication filter for webstore", required=false, in="query", @OA\Schema(type="integer", enum={0,1}) ),
      *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
      *      @OA\Response(response=404, description="message: স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।"),
      *      @OA\Response(response=403, description="Forbidden")
