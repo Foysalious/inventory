@@ -7,10 +7,10 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function search(Request $request , ProductService $productService)
+    public function search(Request $request ,$partner_id, ProductService $productService)
     {
-        $this->validate($request, ['search' => 'required|string', 'partner_id' => 'required|numeric']);
-        return $productService->search($request->search, +$request->partner_id);
+        $this->validate($request, ['search' => 'required|string']);
+        return $productService->search($request->search, $partner_id);
     }
 
 }
