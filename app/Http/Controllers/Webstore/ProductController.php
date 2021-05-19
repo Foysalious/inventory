@@ -9,8 +9,8 @@ class ProductController extends Controller
 {
     public function search(Request $request ,$partner_id, ProductService $productService)
     {
-        $this->validate($request, ['search' => 'required|string']);
-        return $productService->search($request->search, $partner_id);
+        $this->validate($request, ['search_key' => 'required|string']);
+        return $productService->search($request->search_key, $partner_id);
     }
 
 }
