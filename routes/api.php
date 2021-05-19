@@ -33,8 +33,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
-
-    Route::group(['prefix'=>'partners'], function() {
+    Route::group(['prefix'=>'partners/{partner_id}/products'], function() {
         Route::get('search', [WebstoreProductController::class, 'search']);
         Route::get('{partner_id}/product-details/{product_id}', [WebstoreProductController::class, 'getProductInformation']);
         Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);

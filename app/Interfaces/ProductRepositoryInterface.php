@@ -7,5 +7,5 @@ interface ProductRepositoryInterface extends BaseRepositoryInterface
     public function getProductsByCategoryId($category_id);
     public function productChannelPrice($productId);
     public function productInformation($productId);
-    public function searchProductFromWebstore($searchKey, $partnerId, $limit = 10, $offset = 0);
+    public function searchProductFromWebstore(string $searchKey, int $partnerId, $limit = 10, $offset = 0);
 }

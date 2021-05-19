@@ -48,7 +48,7 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         return $sku_channel_price_array;
     }
 
-    public function searchProductFromWebstore($searchKey, $partnerId, $limit = 10, $offset = 0)
+    public function searchProductFromWebstore(string $searchKey, int $partnerId, $limit = 10, $offset = 0)
     {
         return $this->searchWebstoreProductsFromDB($searchKey, $partnerId)
             ->select('id', 'partner_id', 'category_id', 'name', 'description')
