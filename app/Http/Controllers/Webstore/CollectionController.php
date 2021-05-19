@@ -19,7 +19,7 @@ class CollectionController extends Controller
     /**
      *
      * * @OA\Get(
-     *      path="api/v1/partners/{partner}/webstore-collection",
+     *      path="/api/v1/partners/{partner}/webstore-collection",
      *      operationId="getCollection",
      *      tags={"Partners Collection API"},
      *      summary="Get Collection By Partner ID",
