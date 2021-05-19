@@ -1,11 +1,11 @@
-<?php
-
-namespace App\Repositories;
+<?php namespace App\Repositories;
 
 use App\Interfaces\CollectionProductsRepositoryInterface;
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Collection;
+use Illuminate\Support\Facades\DB;
+use App\Services\Channel\Channels;
 
 class CollectionRepository extends BaseRepository implements CollectionRepositoryInterface
 {
@@ -27,8 +27,15 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function getAllCollectionForWebstore($offset, $limit, $partner_id)
     {
-        return $this->model->where('partner_id', $partner_id)->has('products')->offset($offset)->limit($limit)->latest()->get();
+        return $this->model->where('partner_id', $partner_id)->whereHas('products', function ($q) {
+            $q->whereHas('skuChannels', function ($q) {
+                $q->select(DB::raw('SUM(stock) as total_stock'))
+                    ->havingRaw('total_stock > 0');
 
+                    })->whereHas('skuChannels', function ($q) {
+                $q->where('channel_id', Channels::WEBSTORE);
+            });
+        })->offset($offset)->limit($limit)->latest()->get();
     }
 
     public function getDeletionFileNameFromCDN($partner_id, $collection_id, $column_name): string

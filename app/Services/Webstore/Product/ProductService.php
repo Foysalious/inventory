@@ -1,6 +1,6 @@
 <?php namespace App\Services\Webstore\Product;
 
-use App\Http\Resources\WebstoreProductResource;
+use App\Http\Resources\Webstore\WebstoreProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
 use App\Traits\ResponseAPI;
