@@ -68,7 +68,7 @@ class ProductCombinationService
                     array_push($temp, [
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,
-                        "purchase_price" => $priceCalculation->getPurchasePrice(),
+                        "purchase_price" => $priceCalculation->getPurchaseUnitPrice(),
                         "original_price" => $priceCalculation->getOriginalUnitPriceWithVat(),
                         "discounted_price" => $priceCalculation->getDiscountedUnitPrice(),
                         "discount" => $priceCalculation->getDiscountAmount(),

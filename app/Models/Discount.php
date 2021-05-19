@@ -2,6 +2,7 @@
 
 
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 
@@ -22,5 +23,10 @@ class Discount extends BaseModel
     public function type()
     {
         return $this->morphTo();
+    }
+
+    public function scopeValid($query)
+    {
+        return $query->where([['start_date', '<=', Carbon::now()], ['end_date', '>=', Carbon::now()]]);
     }
 }
