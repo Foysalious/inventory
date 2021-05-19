@@ -14,7 +14,7 @@ class PriceCalculation extends BaseService
     private Channel $channel;
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
     private SkuChannel $skuChannel;
-    private Discount $discount;
+    private $discount;
 
     /**
      * PriceCalculation constructor.
