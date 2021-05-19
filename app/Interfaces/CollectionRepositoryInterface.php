@@ -1,10 +1,5 @@
-<?php
+<?php namespace App\Interfaces;
 
-
-namespace App\Interfaces;
-
-
-use Illuminate\Http\Request;
 
 interface CollectionRepositoryInterface extends BaseRepositoryInterface
 {

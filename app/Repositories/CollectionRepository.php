@@ -1,6 +1,4 @@
-<?php
-
-namespace App\Repositories;
+<?php namespace App\Repositories;
 
 use App\Interfaces\CollectionProductsRepositoryInterface;
 use App\Interfaces\CollectionRepositoryInterface;

@@ -16,8 +16,8 @@ class CollectionController extends Controller
         $this->collectionService = $collectionService;
     }
 
-    public function getAllCollection(Request $request,$partner_id)
+    public function index(Request $request,$partner_id)
     {
-        return $this->collectionService->getAllAccordingToPartnerID($request, $partner_id);
+        return $this->collectionService->getCollectionByPartner($request, $partner_id);
     }
 }
