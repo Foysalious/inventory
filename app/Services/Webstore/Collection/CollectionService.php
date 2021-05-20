@@ -21,6 +21,7 @@ class CollectionService
         $resource = $this->collectionRepositoryInterface->getAllCollectionforWebstore($offset, $limit,$partner_id);
         if(!$resource) return $this->error("Collection not found!", 404);
         $collections = WebstoreCollectionResource::collection($resource);
+
         return $this->success("Successful", ['collections' => $collections], 200);
     }
 }
