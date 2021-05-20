@@ -32,7 +32,7 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         return $this->model->where('id', $category_id)->get();
     }
 
-    public function getMasterCategoryWebstore($partner_id)
+    public function getCategoriesForWebstore($partner_id)
     {
         $master_categories = $this->model->where(function ($q) use ($partner_id) {
             $q->where('is_published_for_sheba', 1)->orWhere(function ($q) use ($partner_id) {

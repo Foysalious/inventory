@@ -19,7 +19,7 @@ class CategoryService
 
     public function getCategoriesByPartner($partner_id)
     {
-        $master_categories = $this->categoryRepositoryInterface->getMasterCategoryWebstore($partner_id);
+        $master_categories = $this->categoryRepositoryInterface->getCategoriesForWebstore($partner_id);
         if ($master_categories->isEmpty())
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
         return $master_categories;
