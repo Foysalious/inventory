@@ -16,9 +16,9 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     public function getCategoriesByPartner($partner_id)
     {
         return $this->model->where(function ($q) use ($partner_id) {
-                $q->whereHas('categoryPartner', function ($q) use ($partner_id) {
-                    $q->where('partner_id', $partner_id);
-                });
+            $q->whereHas('categoryPartner', function ($q) use ($partner_id) {
+                $q->where('partner_id', $partner_id);
+            });
         })->with('children', function ($q) {
             $q->leftJoin('category_partner', 'category_partner.category_id', '=', 'categories.id')
                 ->select('categories.id', 'categories.name', 'categories.parent_id', 'categories.thumb as thumb', 'categories.is_published_for_sheba', 'category_partner.is_default');
@@ -38,16 +38,23 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
             $q->where('is_published_for_sheba', 1)->orWhere(function ($q) use ($partner_id) {
                 $q->where('is_published_for_sheba', 0)->whereHas('categoryPartner', function ($q) use ($partner_id) {
                     $q->where('partner_id', $partner_id);
-                })->whereHas('products',function ($q){
-                    $q->select(DB::raw('SUM(id) as total_product'))
-                        ->havingRaw('total_product > 0');
                 });
+            })->whereHas('products', function ($q) {
+                $q->select(DB::raw('SUM(id) as total_product'))
+                    ->havingRaw('total_product > 0');
             });
         })->select('id', 'name')->where('parent_id', NULL)->get();
 
 
         return $master_categories;
-
+//        return $this->model->where('is_published', 1)->where('partner_id', $partner_id)->whereHas('products', function ($q) {
+//            $q->whereHas('skuChannels', function ($q) {
+//                $q->select(DB::raw('SUM(stock) as total_stock'))
+//                    ->havingRaw('total_stock > 0');
+//            })->whereHas('skuChannels', function ($q) {
+//                $q->where('channel_id', Channels::WEBSTORE);
+//            });
+//        })->offset($offset)->limit($limit)->latest()->get();
 
     }
 
