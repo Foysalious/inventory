@@ -1,5 +1,5 @@
 <?php namespace App\Services\Webstore\Collection;
-use App\Http\Resources\Webstore\WebstoreCollectionResource;
+use App\Http\Resources\Webstore\CollectionResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\Request;
@@ -20,7 +20,7 @@ class CollectionService
         list($offset, $limit) = calculatePagination($request);
         $resource = $this->collectionRepositoryInterface->getAllCollectionforWebstore($offset, $limit,$partner_id);
         if(!$resource) return $this->error("Collection not found!", 404);
-        $collections = WebstoreCollectionResource::collection($resource);
+        $collections = CollectionResource::collection($resource);
 
         return $this->success("Successful", ['collections' => $collections], 200);
     }
