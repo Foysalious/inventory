@@ -57,12 +57,11 @@ class PriceCalculation extends BaseService
 
     private function calculateSkuChannel()
     {
-        if (!$this->skuChannel instanceof SkuChannel) {
-            $this->skuChannel = $this->skuChannelRepositoryInterface
-                ->where('sku_id', $this->sku->id)
-                ->where('channel_id', $this->channel)
-                ->first();
-        }
+        if ($this->skuChannel instanceof SkuChannel) return;
+        $this->skuChannel = $this->skuChannelRepositoryInterface
+            ->where('sku_id', $this->sku->id)
+            ->where('channel_id', $this->channel)
+            ->first();
     }
 
     public function getOriginalUnitPrice()
@@ -101,8 +100,8 @@ class PriceCalculation extends BaseService
 
     public function calculateDiscount()
     {
-        $this->calculateSkuChannel();
         if ($this->discount instanceof Discount) return;
+        $this->calculateSkuChannel();
         $this->discount = $this->skuChannel->validDiscounts()->orderBy('created_at', 'desc')->first();
     }
 
