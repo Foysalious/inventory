@@ -16,12 +16,11 @@ class CollectionService
         $this->collectionRepositoryInterface = $collectionRepositoryInterface;
     }
 
-    public function getCollectionByPartner($request, $partner_id){
+    public function getCollectionsByPartner($request, int $partner_id){
         list($offset, $limit) = calculatePagination($request);
         $resource = $this->collectionRepositoryInterface->getAllCollectionforWebstore($offset, $limit,$partner_id);
-
+        if(!$resource) return $this->error("Collection not found!", 404);
         $collections = WebstoreCollectionResource::collection($resource);
-        if(!$collections) return $this->error("Collection not found!", 404);
         return $this->success("Successful", ['collections' => $collections], 200);
     }
 }
