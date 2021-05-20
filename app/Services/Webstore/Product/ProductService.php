@@ -1,7 +1,7 @@
 <?php namespace App\Services\Webstore\Product;
 
+use App\Http\Resources\Webstore\ProductResource;
 use App\Http\Resources\Webstore\ProductSearchResultResource;
-use App\Http\Resources\Webstore\WebstoreProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
 use App\Traits\ResponseAPI;
@@ -49,7 +49,7 @@ class ProductService
         list($options, $combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
 
 
-        $product = new WebstoreProductResource($general_details);
+        $product = new ProductResource($general_details);
 
 
         return $this->success('Successful', ['product' => $product], 200);

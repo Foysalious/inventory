@@ -32,6 +32,6 @@ class CollectionController extends Controller
      */
     public function index(Request $request,$partner_id)
     {
-        return $this->collectionService->getCollectionByPartner($request, $partner_id);
+        return $this->collectionService->getCollectionsByPartner($request, $partner_id);
     }
 }
