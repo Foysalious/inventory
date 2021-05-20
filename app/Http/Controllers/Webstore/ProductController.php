@@ -4,6 +4,7 @@ use App\Http\Controllers\Controller;
 use App\Services\Webstore\Product\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\ValidationException;
 
 
 class ProductController extends Controller
@@ -20,7 +21,9 @@ class ProductController extends Controller
      *      @OA\Parameter(name="search_key", description="search key", required=true, in="query", @OA\Schema(type="string")),
      *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
      *   )
-     *  */
+     *
+     * @throws ValidationException
+     */
     public function search(Request $request ,$partner_id, ProductService $productService): JsonResponse
     {
         $this->validate($request, ['search_key' => 'required|string']);
