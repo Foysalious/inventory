@@ -21,7 +21,7 @@ class ProductController extends Controller
      *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
      *   )
      *  */
-    public function search(Request $request ,$partner_id, ProductService $productService)
+    public function search(Request $request ,$partner_id, ProductService $productService): JsonResponse
     {
         $this->validate($request, ['search_key' => 'required|string']);
         return $productService->search($request->search_key, +$partner_id);

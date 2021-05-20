@@ -19,7 +19,6 @@ class CollectionService
     public function getCollectionByPartner($request, $partner_id){
         list($offset, $limit) = calculatePagination($request);
         $resource = $this->collectionRepositoryInterface->getAllCollectionforWebstore($offset, $limit,$partner_id);
-
         $collections = WebstoreCollectionResource::collection($resource);
         if(!$collections) return $this->error("Collection not found!", 404);
         return $this->success("Successful", ['collections' => $collections], 200);

@@ -1,9 +1,11 @@
 <?php namespace App\Services\Webstore\Product;
 
+use App\Http\Resources\Webstore\ProductSearchResultResource;
 use App\Http\Resources\Webstore\WebstoreProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
 use App\Traits\ResponseAPI;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
@@ -21,11 +23,19 @@ class ProductService
         $this->productCombinationService = $productCombinationService;
     }
 
-    public function search(string $searchKey, int $partnerId, $limit = 5)
+    /**
+     * @param string $searchKey
+     * @param int $partnerId
+     * @param int $limit
+     * @return JsonResponse
+     */
+    public function search(string $searchKey, int $partnerId, int $limit = 5): JsonResponse
     {
         $products =  $this->productRepositoryInterface->searchProductFromWebstore($searchKey, $partnerId, $limit);
-        if (count($products->toArray()) > 0) return $this->success("Successful", ['products' => $products->toArray()]);
-        return $this->error("No products found", 404);
+        if($products->isEmpty())
+            return $this->error("No products found", 404);
+        $products = ProductSearchResultResource::collection($products);
+        return $this->success("Successful", ['products' => $products]);
     }
 
     public function getProductInformation($request, $partner_id, $product_id)
