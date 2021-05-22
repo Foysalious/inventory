@@ -5,13 +5,13 @@ use Illuminate\Auth\Access\AuthorizationException;
 class Authorization
 {
     private $category;
-    private $partner;
+    private $partnerId;
     private $type;
     private $categoryPartner;
 
-    public function setPartner($partner)
+    public function setPartnerId($partnerId)
     {
-        $this->partner = $partner;
+        $this->partnerId = $partnerId;
         return $this;
     }
 
@@ -21,25 +21,23 @@ class Authorization
         return $this;
     }
 
-    public function setType($type)
-    {
-        $this->type = $type;
-        return $this;
-    }
-
     public function setCategoryPartner($categoryPartner)
     {
         $this->categoryPartner = $categoryPartner;
         return $this;
     }
 
-    public function check()
+    /**
+     * @throws AuthorizationException
+     */
+    public function canUpdateOrDeleteThisCategory()
     {
+        $this->categoryPartner =  $this->category->categoryPartner()->where('partner_id', $this->partnerId)->first();
         if($this->category->is_published_for_sheba || $this->categoryPartner->is_default)
-             throw new AuthorizationException("Not allowed to ". $this->type . " this category", 403);
-        $partner_category =  $this->category->categoryPartner->where('partner_id',$this->partner)->first();
+             throw new AuthorizationException("Not allowed to perform this action", 403);
+        $partner_category =  $this->category->categoryPartner->where('partner_id',$this->partnerId)->first();
         if(!$partner_category)
-             throw new AuthorizationException("This category does not belong to this partner", 403);
+             throw new AuthorizationException("Not allowed to perform this action", 403);
         return true;
     }
 }
