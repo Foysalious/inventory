@@ -22,4 +22,9 @@ class CategoryPartner extends BaseModel
         return $this->belongsTo(Partner::class);
     }
 
+    public function isDefault()
+    {
+        return $this->is_default;
+    }
+
 }
