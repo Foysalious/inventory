@@ -92,7 +92,7 @@ class CategoryController extends Controller
     /**
      * @param Request $request
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      *
      * @OA\Put (
      *      path="/api/v1/partners/37900/categories/10091",
@@ -134,7 +134,7 @@ class CategoryController extends Controller
         return $this->categoryService->update($request,$partner, $category);
     }
 
-    public function destroy($partner, $category,Request $request)
+    public function destroy($partner, $category, Request $request)
     {
         return $this->categoryService->delete($partner,$request);
     }

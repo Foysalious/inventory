@@ -113,7 +113,7 @@ class CategoryService extends BaseService
      * @return JsonResponse
      * @throws AuthorizationException
      */
-    public function update(CategoryRequest $request, $partner_id, $category_id)
+    public function update(CategoryRequest $request, $partner_id, $category_id): JsonResponse
     {
         $category = $this->categoryRepositoryInterface->find($category_id);
         if (!$category)
@@ -128,7 +128,7 @@ class CategoryService extends BaseService
      * @return JsonResponse
      * @throws AuthorizationException
      */
-    public function delete($partner_id,$request)
+    public function delete($partner_id,$request): JsonResponse
     {
         $category_id = $request->category;
         $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
