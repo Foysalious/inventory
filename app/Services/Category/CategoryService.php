@@ -13,6 +13,7 @@ use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Services\BaseService;
 
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -110,14 +111,14 @@ class CategoryService extends BaseService
      * @param $partner
      * @param $category
      * @return JsonResponse
+     * @throws AuthorizationException
      */
-    public function update(CategoryRequest $request, $partner_id, $category_id)
+    public function update(CategoryRequest $request, $partner_id, $category_id): JsonResponse
     {
         $category = $this->categoryRepositoryInterface->find($category_id);
-        $category_partner = $category ? $category->categoryPartner()->where('partner_id', $partner_id)->where('category_id', $category_id)->get()->first() : null;
-        if ( !$category || !$category_partner )
+        if (!$category)
             throw new ModelNotFoundException();
-        $this->authorization->setPartner($partner_id)->setCategory($category)->setCategoryPartner($category_partner)->setType('update')->check();
+        $this->authorization->setPartnerId($partner_id)->setCategory($category)->canUpdateOrDeleteThisCategory();
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);
     }
@@ -125,17 +126,17 @@ class CategoryService extends BaseService
     /**
      * @param $request
      * @return JsonResponse
+     * @throws AuthorizationException
      */
-    public function delete($partner_id,$request)
+    public function delete($partner_id,$request): JsonResponse
     {
         $category_id = $request->category;
         $category = $this->categoryRepositoryInterface->where('id', $category_id)->with(['children' => function ($query) {
             $query->select('id', 'parent_id','is_published_for_sheba');
         }])->select('id')->first();
         if (!$category)
-            return $this->error("Not Found", 404);
-        $category_partner = $category ? $category->categoryPartner()->where('partner_id', $partner_id)->where('category_id', $category_id)->get()->first() : null;
-        $this->authorization->setPartner($partner_id)->setCategory($category)->setCategoryPartner($category_partner)->setType('delete')->check();
+            throw new ModelNotFoundException();
+        $this->authorization->setPartnerId($partner_id)->setCategory($category)->canUpdateOrDeleteThisCategory();
         $children = $category->children->pluck('id')->toArray();
         $master_cat_with_children = array_merge($children, [$category->id]);
         $this->categoryRepositoryInterface->whereIn('id', $master_cat_with_children)->delete();
