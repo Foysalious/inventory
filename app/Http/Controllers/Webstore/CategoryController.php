@@ -20,7 +20,6 @@ class CategoryController extends Controller
      *
      * * @OA\Get(
      *      path="/api/v1/partners/{partner}/category",
-     *      operationId="getCategory,
      *      tags={"Partners Category API"},
      *      summary="Get Category By Partner ID",
      *      description="",
