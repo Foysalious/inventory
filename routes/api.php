@@ -32,12 +32,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix'=>'v1'], function(){
+Route::group(['prefix'=>'v1/webstore'], function(){
     Route::group(['prefix'=>'partners'], function() {
         Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
-        Route::get('{partner_id}/product/{product_id}', [WebstoreProductController::class, 'getProductInformation']);
+        Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
         Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);
-        Route::get('{partner_id}/webstore/collections', [WebstoreCollectionController::class, 'index']);
+        Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
 
     });
     Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
