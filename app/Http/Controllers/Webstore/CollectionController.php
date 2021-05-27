@@ -30,7 +30,7 @@ class CollectionController extends Controller
      * @param $partner_id
      * @return JsonResponse
      */
-    public function index(Request $request,$partner_id)
+    public function index(Request $request,int $partner_id)
     {
         return $this->collectionService->getCollectionsByPartner($request, $partner_id);
     }
