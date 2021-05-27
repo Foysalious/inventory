@@ -17,7 +17,7 @@ class CategoryService
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
     }
 
-    public function getCategoriesByPartner($partner_id)
+    public function getCategoriesByPartner(int $partner_id)
     {
         $master_categories = $this->categoryRepositoryInterface->getCategoriesForWebstore($partner_id);
         if ($master_categories->isEmpty())
