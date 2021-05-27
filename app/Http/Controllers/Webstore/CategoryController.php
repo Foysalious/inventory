@@ -29,7 +29,7 @@ class CategoryController extends Controller
      * @param $partner_id
      * @return JsonResponse
      */
-    public function getAllCategory($partner_id)
+    public function getAllCategory(int $partner_id)
     {
         return $this->categoryService->getCategoriesByPartner($partner_id);
     }
