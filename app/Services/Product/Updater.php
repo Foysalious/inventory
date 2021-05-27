@@ -232,7 +232,6 @@ class Updater
 
     public function update()
     {
-
         $oldProductDetails = clone $this->product;
         $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
         $this->productRepositoryInterface->update($this->product, $this->makeData());

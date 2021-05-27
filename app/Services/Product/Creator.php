@@ -45,7 +45,8 @@ class Creator
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
-                                DiscountCreator $discountCreator, ProductImageCreator $productImageCreator, ProductChannelCreator $productChannelCreator)
+                                DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
+                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -54,6 +55,7 @@ class Creator
         $this->productOptionValueCreator = $productOptionValueCreator;
         $this->combinationCreator = $combinationCreator;
         $this->productChannelCreator = $productChannelCreator;
+        $this->discountRepositoryInterface = $discountRepositoryInterface;
     }
 
 
@@ -346,6 +348,19 @@ class Creator
        return  $this->combinationCreator->setData($combinations->toArray())->store();
     }
 
+    private function setProductSkusDiscountData($skuChannelId, $skuChannelData) : array
+    {
+        return [
+            'type_id'               => $skuChannelId,
+            'type'                  => Types::SKU_CHANNEL,
+            'details'               => null,
+            'amount'                => $skuChannelData->getDiscount() ?: 0,
+            'is_amount_percentage'  => $skuChannelData->getIsPercentage() ?: 0,
+            'cap'                   => null,
+            'end_date'              => $skuChannelData->getDiscountEndDate() ?: null
+        ];
+    }
+
     /**
      * @param $sku
      * @param $channel_data
@@ -353,20 +368,22 @@ class Creator
      */
     private function createSkuChannels($sku, $channel_data)
     {
-        $data = [];
         $channels  = [];
         foreach($channel_data as $channel)
         {
-           array_push($data,[
-               'sku_id' => $sku->id,
-               'channel_id' => $channel->getChannelId(),
-               'cost' =>  $channel->getCost() ?: 0,
-               'price' => $channel->getPrice() ?: 0,
-               'wholesale_price' => $channel->getWholeSalePrice() ?: null
-           ]);
+           $productSkusDiscountData = [];
+           $data = [
+               'sku_id'             => $sku->id,
+               'channel_id'         => $channel->getChannelId(),
+               'cost'               => $channel->getCost() ?: 0,
+               'price'              => $channel->getPrice() ?: 0,
+               'wholesale_price'    => $channel->getWholeSalePrice() ?: null
+           ];
+           $skuChannelData = $sku->skuChannels()->create($data);
+           $productSkusDiscountData = $this->setProductSkusDiscountData($skuChannelData->id, $channel);
+           $this->discountRepositoryInterface->insert($productSkusDiscountData);
            array_push($channels,$channel->getChannelId());
         }
-         $sku->skuChannels()->insert($data);
         return $channels;
     }
 
@@ -399,7 +416,7 @@ class Creator
     {
         $stock = $this->productRequestObjects[0]->getStock();
         $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
-        $channels = $this->createSKUChannels($sku,$this->productRequestObjects[0]->getChannelData());
+        $channels = $this->createSKUChannels($sku, $this->productRequestObjects[0]->getChannelData());
         $this->createProductChannel($product->id,$channels);
     }
 
@@ -409,7 +426,11 @@ class Creator
      */
     private function createProductDiscount($product)
     {
-        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
+        $this->discountCreator->setDiscount($this->discountAmount)
+            ->setDiscountEndDate($this->discountEndDate)
+            ->setDiscountTypeId($product->id)
+            ->setDiscountType(Types::PRODUCT)
+            ->create();
     }
 
     /**

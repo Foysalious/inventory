@@ -10,6 +10,45 @@ class ProductDetailsObject
     private $stock;
     private $channelData;
     private $hasVariant;
+    public $isPercentage;
+    public $discount;
+
+    /**
+     * @param mixed $isPercentage
+     * @return ProductDetailsObject
+     */
+    public function setIsPercentage($isPercentage)
+    {
+        $this->isPercentage = $isPercentage;
+        return $this;
+    }
+
+    /**
+     * @param mixed $discount
+     * @return ProductDetailsObject
+     */
+    public function setDiscount($discount)
+    {
+        $this->discount = $discount;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsPercentage()
+    {
+        return $this->isPercentage;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
+
 
     public function setProductDetail($productDetail)
     {
