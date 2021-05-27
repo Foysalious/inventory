@@ -20,18 +20,18 @@ class CombinationDetailsObject
     {
         if(!$this->validate())
             throw new ProductDetailsPropertyValidationError();
-        $this->option = $this->combinationDetail->option;
-        $this->value = $this->combinationDetail->value;
-        $this->value_details = $this->combinationDetail->value_details;
+        $this->option = $this->combinationDetail->option_name;
+        $this->value = $this->combinationDetail->option_value_name;
+        $this->value_details = $this->combinationDetail->option_value_details;
         return $this;
 
     }
 
     public function validate()
     {
-        return (property_exists( $this->combinationDetail,'option'))
-            && (property_exists( $this->combinationDetail,'value')
-            && property_exists( $this->combinationDetail,'value_details'));
+        return (property_exists( $this->combinationDetail,'option_name'))
+            && (property_exists( $this->combinationDetail,'option_value_name')
+            && property_exists( $this->combinationDetail,'option_value_details'));
     }
 
 
