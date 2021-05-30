@@ -36,7 +36,7 @@ class ProductResource extends JsonResource
             'rating_statistics' => json_encode([
                 "5" => 110,
                 "4" => 82,
-                "3" => 10,
+                "3" => 0,
                 "2" => 0,
                 "1" => 0,
             ]),
