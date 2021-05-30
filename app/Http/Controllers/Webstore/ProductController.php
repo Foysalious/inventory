@@ -46,9 +46,9 @@ class ProductController extends Controller
      * @param $product_id
      * @return JsonResponse
      */
-    public function getProductInformation(Request $request, $partner_id, $product_id, ProductService $productService)
+    public function show(Request $request, $partner_id, $product_id, ProductService $productService)
     {
-        return $productService->getProductInformation($request, $partner_id, $product_id);
+        return $productService->getDetails($partner_id, $product_id);
     }
 
 }

@@ -50,7 +50,7 @@ class ProductCombinationService
                         'option_name' => $product_option_value->productOption->name,
                         'option_value_id' => $product_option_value->id,
                         'option_value_name' => $product_option_value->name,
-                        'option_value_details' => $product_option_value->details
+                        'option_value_details' => json_decode($product_option_value->details)
                     ]);
                 });
             }

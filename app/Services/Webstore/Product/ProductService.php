@@ -38,20 +38,13 @@ class ProductService
         return $this->success("Successful", ['products' => $products]);
     }
 
-    public function getProductInformation($request, $partner_id, $product_id)
+    public function getDetails($partner_id, $product_id)
     {
-
-
         $general_details = $this->productRepositoryInterface->find($product_id);
-
         if ($general_details->partner_id != $partner_id)
             return $this->error("This product does not belongs to this partner", 403);
         list($options, $combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
-
-
         $product = new ProductResource($general_details);
-
-
         return $this->success('Successful', ['product' => $product], 200);
     }
 
