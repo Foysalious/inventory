@@ -7,6 +7,7 @@ use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Warranty\Units;
 use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
+use Carbon\Carbon;
 
 class Creator
 {
@@ -277,6 +278,7 @@ class Creator
 
              $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
              $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
+             //dd($sku);
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
              //$this->createProductChannel($productDetailObject->getChannelData(),$product->id);
@@ -348,17 +350,15 @@ class Creator
        return  $this->combinationCreator->setData($combinations->toArray())->store();
     }
 
-    private function setProductSkusDiscountData($skuChannelId, $skuChannelData) : array
+    private function setProductSkusDiscountData($skuChannelId, $skuChannelData)
     {
-        return [
-            'type_id'               => $skuChannelId,
-            'type'                  => Types::SKU_CHANNEL,
-            'details'               => null,
-            'amount'                => $skuChannelData->getDiscount() ?: 0,
-            'is_amount_percentage'  => $skuChannelData->getIsPercentage() ?: 0,
-            'cap'                   => null,
-            'end_date'              => $skuChannelData->getDiscountEndDate() ?: null
-        ];
+        $this->discountCreator->setDiscount($skuChannelData->getDiscount())
+            ->setDiscountEndDate($skuChannelData->getDiscountEndDate())
+            ->setDiscountType(Types::SKU_CHANNEL)
+            ->setDiscountTypeId($skuChannelId)
+            ->setDiscountDetails($skuChannelData->getDetails())
+            ->setIsPercentage($skuChannelData->getIsPercentage())
+            ->createChannelSkuDiscount();
     }
 
     /**
@@ -371,7 +371,6 @@ class Creator
         $channels  = [];
         foreach($channel_data as $channel)
         {
-           $productSkusDiscountData = [];
            $data = [
                'sku_id'             => $sku->id,
                'channel_id'         => $channel->getChannelId(),
@@ -380,8 +379,7 @@ class Creator
                'wholesale_price'    => $channel->getWholeSalePrice() ?: null
            ];
            $skuChannelData = $sku->skuChannels()->create($data);
-           $productSkusDiscountData = $this->setProductSkusDiscountData($skuChannelData->id, $channel);
-           $this->discountRepositoryInterface->insert($productSkusDiscountData);
+           $this->setProductSkusDiscountData($skuChannelData->id, $channel);
            array_push($channels,$channel->getChannelId());
         }
         return $channels;

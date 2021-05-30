@@ -13,7 +13,25 @@ class ChannelDetailsObject
     private $channelId;
     private $isPercentage;
     private $discount;
+    private $details;
 
+    /**
+     * @param mixed $details
+     * @return ChannelDetailsObject
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
 
     /**
      * @param mixed $discountEndDate
@@ -114,6 +132,7 @@ class ChannelDetailsObject
         $this->price = $this->channelDetails->price;
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;
+        $this->details = $this->channelDetails->details;
         $this->isPercentage = $this->channelDetails->is_percentage;
         $this->discount = $this->channelDetails->discount;
         $this->discountEndDate = $this->channelDetails->discount_end_date;

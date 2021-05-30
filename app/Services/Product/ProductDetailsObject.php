@@ -10,8 +10,27 @@ class ProductDetailsObject
     private $stock;
     private $channelData;
     private $hasVariant;
-    public $isPercentage;
-    public $discount;
+    private $isPercentage;
+    private $discount;
+    private $details;
+
+    /**
+     * @param mixed $details
+     * @return ProductDetailsObject
+     */
+    public function setDetails($details)
+    {
+        $this->details = $details;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDetails()
+    {
+        return $this->details;
+    }
 
     /**
      * @param mixed $isPercentage

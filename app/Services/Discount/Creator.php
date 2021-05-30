@@ -13,6 +13,28 @@ class Creator
     protected $discountEndDate;
     protected $discountType;
     protected $discountTypeId;
+    protected $discountDetails;
+    protected $isPercentage;
+
+    /**
+     * @param mixed $isPercentage
+     * @return Creator
+     */
+    public function setIsPercentage($isPercentage)
+    {
+        $this->isPercentage = $isPercentage;
+        return $this;
+    }
+
+    /**
+     * @param mixed $discountDetails
+     * @return Creator
+     */
+    public function setDiscountDetails($discountDetails)
+    {
+        $this->discountDetails = $discountDetails;
+        return $this;
+    }
 
     public function __construct(DiscountRepositoryInterface $discountRepositoryInterface)
     {
@@ -30,8 +52,6 @@ class Creator
         $this->discountEndDate = $discount_end_date;
         return $this;
     }
-
-
 
     /**
      * @param mixed $discountType
@@ -56,6 +76,25 @@ class Creator
     public function create()
     {
         $this->discountRepositoryInterface->create($this->makeData());
+    }
+
+    public function createChannelSkuDiscount()
+    {
+        $this->discountRepositoryInterface->create($this->makeChannelSkuData());
+    }
+
+    private function makeChannelSkuData()
+    {
+        return [
+            'type_id'               => $this->discountTypeId,
+            'type'                  => $this->discountType,
+            'details'               => $this->discountDetails,
+            'amount'                => $this->discountAmount,
+            'is_amount_percentage'  => $this->isPercentage,
+            'cap'                   => null,
+            'start_date'            => Carbon::now(),
+            'end_date'              => $this->discountEndDate
+        ];
     }
 
     /**
