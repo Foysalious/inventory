@@ -16,6 +16,11 @@ class Creator
     protected $discountDetails;
     protected $isPercentage;
 
+    public function __construct(DiscountRepositoryInterface $discountRepositoryInterface)
+    {
+        $this->discountRepositoryInterface = $discountRepositoryInterface;
+    }
+
     /**
      * @param mixed $isPercentage
      * @return Creator
@@ -34,11 +39,6 @@ class Creator
     {
         $this->discountDetails = $discountDetails;
         return $this;
-    }
-
-    public function __construct(DiscountRepositoryInterface $discountRepositoryInterface)
-    {
-        $this->discountRepositoryInterface = $discountRepositoryInterface;
     }
 
     public function setDiscount($discount_amount)
@@ -80,7 +80,27 @@ class Creator
 
     public function createChannelSkuDiscount()
     {
-        $this->discountRepositoryInterface->create($this->makeChannelSkuData());
+        $validationResult = $this->validateDiscountData();
+        if($validationResult) $this->discountRepositoryInterface->create($this->makeChannelSkuData());
+    }
+
+    public function setProductSkusDiscountData($skuChannelId, $skuChannelData)
+    {
+        $this->setDiscount($skuChannelData->getDiscount())
+            ->setDiscountEndDate($skuChannelData->getDiscountEndDate())
+            ->setDiscountType(Types::SKU_CHANNEL)
+            ->setDiscountTypeId($skuChannelId)
+            ->setDiscountDetails($skuChannelData->getDetails())
+            ->setIsPercentage($skuChannelData->getIsPercentage())
+            ->createChannelSkuDiscount();
+    }
+
+    private function validateDiscountData()
+    {
+        $validationFlag = true;
+        if(!isset($this->discountAmount) || $this->discountAmount == 0) $validationFlag = false;
+        if(!isset($this->discountEndDate) || $this->discountEndDate == null) $validationFlag = false;
+        return $validationFlag;
     }
 
     private function makeChannelSkuData()

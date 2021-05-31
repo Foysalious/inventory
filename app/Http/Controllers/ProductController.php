@@ -169,6 +169,8 @@ class ProductController extends Controller
      * @param ProductRequest $request
      * @return JsonResponse
      */
+
+
     public function store($partner, ProductRequest $request)
     {
         return $this->productService->create($partner, $request);

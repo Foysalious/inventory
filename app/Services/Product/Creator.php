@@ -4,10 +4,8 @@ use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
-use App\Services\Warranty\Units;
 use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
-use Carbon\Carbon;
 
 class Creator
 {
@@ -41,8 +39,6 @@ class Creator
     private $productChannelCreator;
     private $productRequestObjects;
     private $hasVariants;
-
-
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
@@ -278,10 +274,8 @@ class Creator
 
              $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
              $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
-             //dd($sku);
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
-             //$this->createProductChannel($productDetailObject->getChannelData(),$product->id);
         }
         $all_channels = array_merge(...$all_channels);
         $this->createProductChannel($product->id,$all_channels);
@@ -318,23 +312,6 @@ class Creator
     }
 
     /**
-     * @param $channels
-     * @param $product_id
-     * @return mixed
-     */
-  /*  private function createProductChannel($channels, $product_id)
-    {
-        $product_channels =   collect($channels)->map(function($channel) use($product_id) {
-            return [
-                'product_id' => $product_id,
-                'channel_id' =>   $channel->getChannelId(),
-            ];
-        });
-
-        return $this->productChannelCreator->setData($product_channels->toArray())->store();
-    }*/
-
-    /**
      * @param $sku_id
      * @param $product_option_value_ids
      * @return mixed
@@ -348,17 +325,6 @@ class Creator
            ] ;
        });
        return  $this->combinationCreator->setData($combinations->toArray())->store();
-    }
-
-    private function setProductSkusDiscountData($skuChannelId, $skuChannelData)
-    {
-        $this->discountCreator->setDiscount($skuChannelData->getDiscount())
-            ->setDiscountEndDate($skuChannelData->getDiscountEndDate())
-            ->setDiscountType(Types::SKU_CHANNEL)
-            ->setDiscountTypeId($skuChannelId)
-            ->setDiscountDetails($skuChannelData->getDetails())
-            ->setIsPercentage($skuChannelData->getIsPercentage())
-            ->createChannelSkuDiscount();
     }
 
     /**
@@ -379,7 +345,7 @@ class Creator
                'wholesale_price'    => $channel->getWholeSalePrice() ?: null
            ];
            $skuChannelData = $sku->skuChannels()->create($data);
-           $this->setProductSkusDiscountData($skuChannelData->id, $channel);
+           $this->discountCreator->setProductSkusDiscountData($skuChannelData->id, $channel);
            array_push($channels,$channel->getChannelId());
         }
         return $channels;
