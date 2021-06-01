@@ -43,6 +43,10 @@ class Product extends BaseModel
 
         return $data;
     }
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class)->select(['id','image_link']);
+    }
 
     public function productOptions()
     {
