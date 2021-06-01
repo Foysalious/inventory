@@ -9,12 +9,12 @@ class ProductResource extends JsonResource
     /**
      * Transform the resource into an array.
      *
-     * @param  Request  $request
+     * @param Request $request
      * @return array
      */
     public function toArray($request)
     {
-        list($rating,$count_rating) = $this->getRatingandCount();
+        list($rating, $count_rating) = $this->getRatingandCount();
         return [
             'id' => $this->id,
             'category_id' => $this->category_id,
@@ -26,11 +26,12 @@ class ProductResource extends JsonResource
             'stock' => $this->stock,
             'rating' => $rating,
             'count_rating' => $count_rating,
-            'app_thumb'=> $this->app_thumb,
+            'app_thumb' => $this->app_thumb,
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
-            'orginal_price'=> $this->getOriginalPrice(),
+            'images' => $this->images,
+            'orginal_price' => $this->getOriginalPrice(),
             'variations' => $this->combinations(),
             'created_at' => $this->created_at,
             'rating_statistics' => json_encode([
