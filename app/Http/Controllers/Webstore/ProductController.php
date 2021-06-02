@@ -9,6 +9,18 @@ use Illuminate\Validation\ValidationException;
 
 class ProductController extends Controller
 {
+
+    private ProductService $productService;
+
+    public function __construct(ProductService $productService)
+    {
+        $this->productService = $productService;
+    }
+
+    public function index($partner, Request $request)
+    {
+        return $this->productService->getProducts($partner, $request);
+    }
     /**
      *
      * * @OA\Get(
