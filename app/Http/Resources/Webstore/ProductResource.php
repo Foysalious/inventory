@@ -33,14 +33,6 @@ class ProductResource extends JsonResource
             'images' => $this->images,
             'orginal_price' => $this->getOriginalPrice(),
             'variations' => $this->combinations(),
-            'created_at' => $this->created_at,
-            'rating_statistics' => json_encode([
-                "5" => 110,
-                "4" => 82,
-                "3" => 0,
-                "2" => 0,
-                "1" => 0,
-            ]),
         ];
     }
 }
