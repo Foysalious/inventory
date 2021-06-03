@@ -152,7 +152,14 @@ class Product extends BaseModel
         return $combinations;
     }
 
-    public function getStock(){
+    public function combinationsforWebstore()
+    {
+        list($options, $combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationDataForWebstore();
+        return $combinations;
+    }
+
+    public function getStock()
+    {
         $total_stock = 0;
         $combinations = $this->combinations();
         foreach ($combinations as $combination){
