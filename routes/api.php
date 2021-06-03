@@ -36,7 +36,7 @@ Route::group(['prefix'=>'v1'], function(){
     Route::group(['prefix'=>'webstore/partners'], function() {
         Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
         Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
-        Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);
+        Route::get('{partner_id}/categories', [WebstoreCategoryController::class, 'getAllCategory']);
         Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
 
     });
