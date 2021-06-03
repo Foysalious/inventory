@@ -160,7 +160,9 @@ class ProductService extends BaseService
         $product = $this->productRepositoryInterface->findOrFail($productId);
         if($product->partner_id != $partner)
             return $this->error("This product does not belong this partner", 403);
-        list($has_variant,$product_update_request_objs) =  app(ProductUpdateRequestObjects::class)->setProductDetails($request->product_details)->get();
+        list($has_variant,$product_update_request_objs) =  app(ProductUpdateRequestObjects::class)
+                                                            ->setProductDetails($request->product_details)
+                                                            ->get();
         $this->updater->setProduct($product)
             ->setCategoryId($request->category_id)
             ->setName($request->name)
