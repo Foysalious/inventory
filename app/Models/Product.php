@@ -21,7 +21,7 @@ class Product extends BaseModel
 
     public function skuChannels()
     {
-        return $this->hasManyThrough(SkuChannel::class,Sku::class);
+        return $this->hasManyThrough(SkuChannel::class, Sku::class);
     }
 
     public function category()
@@ -43,39 +43,41 @@ class Product extends BaseModel
 
         return $data;
     }
+
     public function images()
     {
-        return $this->hasMany(ProductImage::class)->select(['id','image_link']);
+        return $this->hasMany(ProductImage::class)->select(['id', 'image_link']);
     }
 
     public function productOptions()
     {
-        return $this->hasMany(ProductOption::class,'product_id');
+        return $this->hasMany(ProductOption::class, 'product_id');
     }
 
     public function productChannels()
     {
-        return $this->hasMany(ProductChannel::class,'product_id');
+        return $this->hasMany(ProductChannel::class, 'product_id');
     }
 
-    public function unit ()
+    public function unit()
     {
-        return $this->belongsTo(Unit::class,'unit_id')->select('id', 'name_bn', 'name_en');
+        return $this->belongsTo(Unit::class, 'unit_id')->select('id', 'name_bn', 'name_en');
     }
 
-    public function getOriginalPrice($channel=2)
+    public function getOriginalPrice($channel = 2)
     {
-      return  app(ProductCalculator::class)->setProduct($this)->setChannel($channel)->getOriginalPrice();
+        return app(ProductCalculator::class)->setProduct($this)->setChannel($channel)->getOriginalPrice();
     }
+
     public function getRatingandCount()
     {
-        return  app(ProductCalculator::class)->getProductRatingReview($this);
+        return app(ProductCalculator::class)->getProductRatingReview($this);
     }
 
     public function getVatIncludedPrice()
     {
         $price = $this->getOriginalPrice();
-        return  $price + ($price * $this->vat_percentage) / 100;
+        return $price + ($price * $this->vat_percentage) / 100;
     }
 
     public function getDiscountedAmount()
@@ -99,6 +101,7 @@ class Product extends BaseModel
 
         return ($amount < 0) ? 0 : (float)$amount;
     }
+
     public function discount()
     {
         return $this->runningDiscounts()->first();
@@ -121,7 +124,7 @@ class Product extends BaseModel
     {
         return 0;
         $original_price = $this->getOriginalPrice();
-        if($original_price == 0)
+        if ($original_price == 0)
             return 0;
         $discount = $this->discount();
         if ($discount->is_amount_percentage)
@@ -131,14 +134,21 @@ class Product extends BaseModel
 
     public function combinations()
     {
-        list($options,$combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationData();
+        list($options, $combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationData();
         return $combinations;
     }
 
-    public function getStock(){
+    public function combinationsforWebstore()
+    {
+        list($options, $combinations) = app(ProductCombinationService::class)->setProduct($this)->getCombinationDataForWebstore();
+        return $combinations;
+    }
+
+    public function getStock()
+    {
         $total_stock = 0;
         $combinations = $this->combinations();
-        foreach ($combinations as $combination){
+        foreach ($combinations as $combination) {
             $total_stock += $combination['stock'];
         }
         return $total_stock;

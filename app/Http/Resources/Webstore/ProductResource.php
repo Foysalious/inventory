@@ -32,7 +32,7 @@ class ProductResource extends JsonResource
             'options' => $this->options,
             'images' => $this->images,
             'orginal_price' => $this->getOriginalPrice(),
-            'variations' => $this->combinations(),
+            'variations' => $this->combinationsforWebstore(),
         ];
     }
 }
