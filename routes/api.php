@@ -33,12 +33,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function(){
-    Route::group(['prefix'=>'webstore/partners'], function() {
-        Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
-        Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
-        Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);
-        Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
-
+    Route::group(['prefix'=>'webstore'], function() {
+        Route::group(['prefix'=>'partners'], function() {
+            Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
+            Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
+            Route::get('{partner_id}/category', [WebstoreCategoryController::class, 'getAllCategory']);
+            Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
+        });
+        Route::apiResource('partners.products', WebstoreProductController::class);
     });
     Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
     Route::group(['prefix'=>'partners/{partner_id}'], function() {
@@ -69,6 +71,5 @@ Route::group(['prefix'=>'v1'], function(){
     Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
     Route::apiResource('collection', CollectionController::class);
     Route::get('/channels', [ChannelController::class, 'index']);
-    Route::post('/get-skus-by-product-ids', [SkuController::class, 'getSkusByProductIds']);
     Route::apiResource('partners.skus', SkuController::class);
 });

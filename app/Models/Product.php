@@ -63,19 +63,36 @@ class Product extends BaseModel
         return $this->belongsTo(Unit::class,'unit_id')->select('id', 'name_bn', 'name_en');
     }
 
-    public function getOriginalPrice($channel=2)
+    public function getOriginalPrice($channel = 2)
     {
-      return  app(ProductCalculator::class)->setProduct($this)->setChannel($channel)->getOriginalPrice();
+        /** @var  $productCalculator ProductCalculator */
+        $productCalculator = app(ProductCalculator::class);
+        return $productCalculator->setProduct($this)->setChannel($channel)->getOriginalPrice();
     }
+
+    public function getDiscountedPrice($channel = 2)
+    {
+        /** @var  $productCalculator ProductCalculator */
+        $productCalculator = app(ProductCalculator::class);
+        return $productCalculator->setProduct($this)->setChannel($channel)->getDiscountedPrice();
+    }
+
+
     public function getRatingandCount()
     {
         return  app(ProductCalculator::class)->getProductRatingReview($this);
     }
 
-    public function getVatIncludedPrice()
+    public function getOriginalPriceWithVat()
     {
         $price = $this->getOriginalPrice();
         return  $price + ($price * $this->vat_percentage) / 100;
+    }
+
+    public function getDiscountedPriceWithVat()
+    {
+        $discounted_price = $this->getDiscountedPrice();
+        return  $discounted_price + ($discounted_price * $this->vat_percentage) / 100;
     }
 
     public function getDiscountedAmount()

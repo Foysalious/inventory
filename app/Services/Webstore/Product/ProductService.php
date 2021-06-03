@@ -1,7 +1,10 @@
 <?php namespace App\Services\Webstore\Product;
 
+use App\Exceptions\ProductNotFoundException;
 use App\Http\Resources\Webstore\ProductResource;
 use App\Http\Resources\Webstore\ProductSearchResultResource;
+use App\Http\Resources\Webstore\ProductsResource;
+use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
 use App\Traits\ResponseAPI;
@@ -21,6 +24,39 @@ class ProductService
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productCombinationService = $productCombinationService;
+    }
+
+
+    /**
+     * @param $partner_id
+     * @param Request $request
+     * @return JsonResponse
+     * @throws ProductNotFoundException
+     */
+    public function getProducts(int $partner_id, Request $request): JsonResponse
+    {
+        list($offset, $limit) = calculatePagination($request);
+        $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner_id, $offset, $limit);
+        if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
+        $products = ProductsResource::collection($resource);
+        if ($request->has('filter_by'))
+            $products = $this->filterProducts($products, $request->filter_by, $request->filter_values);
+        if ($request->has('order_by')) {
+            $order = ($request->order == 'desc') ? 'sortByDesc' : 'sortBy';
+            $products = $products->$order($request->order_by, SORT_NATURAL | SORT_FLAG_CASE);
+        }
+        return $this->success('Successful', ['products' => $products], 200);
+    }
+
+    private function filterProducts($products, $by, $values)
+    {
+        switch ($by) {
+            case 'category': return $products->whereIn('category_id',json_decode($values));
+            case 'collection': return $products->whereIn('collection_id',json_decode($values));
+            case 'price': return $products->whereBetween('original_price', json_decode($values));
+            case 'rating': return $products->whereIn('rating', json_decode($values));
+            default: return '';
+        }
     }
 
     /**
