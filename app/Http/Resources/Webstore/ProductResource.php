@@ -25,7 +25,7 @@ class ProductResource extends JsonResource
             'unit' => $this->unit ?: null,
             'stock' => $this->stock,
             'rating' => $rating,
-            'count_rating' => $count_rating,
+            'rating_count' => $count_rating,
             'app_thumb' => $this->app_thumb,
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
