@@ -22,6 +22,6 @@ class CategoryService
         $master_categories = $this->categoryRepositoryInterface->getCategoriesForWebstore($partner_id);
         if ($master_categories->isEmpty())
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
-        return $this->success("Successful", ['data' => $master_categories]);
+        return $this->success("Successful", ['categories' => $master_categories]);
     }
 }
