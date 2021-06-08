@@ -7,7 +7,6 @@ class NonVariant extends ValuesUpdated
     {
         $sku = $this->skuRepository->where('product_id',$this->product->id)->first();
         $sku_channels = $this->updateDataObejects[0]->getChannelData();
-
         $this->updateSkuChannels($sku_channels,$sku->id);
         $this->resolveProductChannel();
     }

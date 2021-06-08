@@ -1,16 +1,19 @@
 <?php namespace App\Services\Product\Update\Operations;
 
 use App\Interfaces\CombinationRepositoryInterface;
+use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
+use App\Services\Discount\Types;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\UpdateNature;
+use Carbon\Carbon;
 
 
 class ValuesUpdated
@@ -44,7 +47,10 @@ class ValuesUpdated
     /**
      * @var Product $product
      */
+
     protected $product;
+
+    protected DiscountRepositoryInterface $discountRepository;
 
     protected $updateDataObejects;
 
@@ -53,6 +59,7 @@ class ValuesUpdated
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepository,
                                 CombinationRepositoryInterface $combinationRepository,
+                                DiscountRepositoryInterface $discountRepository,
                                 SkuRepositoryInterface $skuRepository, SkuChannelRepositoryInterface $skuChannelRepository,
                                 ProductOptionCreator $productOptionCreator, ProductOptionValueCreator $productOptionValueCreator,
                                 CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator)
@@ -66,7 +73,7 @@ class ValuesUpdated
         $this->productOptionValueCreator = $productOptionValueCreator;
         $this->combinationCreator = $combinationCreator;
         $this->productChannelCreator = $productChannelCreator;
-
+        $this->discountRepository = $discountRepository;
     }
     /**
      * @return Product
@@ -234,8 +241,10 @@ class ValuesUpdated
     protected function updateSkuChannels($sku_channels,$related_skus)
     {
         list($is_deleted,$deleted_sku_Channels) = $this->checkAndApplyOperationIfSkuChannelsDeleted($sku_channels,$related_skus);
-        if($is_deleted)
+        if($is_deleted) {
             $this->skuChannelRepository->whereIn('id',$deleted_sku_Channels)->delete();
+            $this->discountRepository->whereIn('type_id', $deleted_sku_Channels)->delete();
+        }
     }
 
     private function checkAndApplyOperationIfSkuChannelsDeleted($sku_channels,$related_skus)
@@ -253,6 +262,13 @@ class ValuesUpdated
                     'price' => $sku_channel->getPrice(),
                     'wholesale_price' => $sku_channel->getWholesalePrice()
                 ]);
+                $this->discountRepository->where('type_id', $sku_channel_id)->update([
+                    'type' => Types::SKU_CHANNEL,
+                    'details' => $sku_channel->getDiscountDetails(),
+                    'amount' => $sku_channel->getDiscount(),
+                    'is_amount_percentage' => $sku_channel->getIsPercentage(),
+                    'end_date' => $sku_channel->getDiscountEndDate()
+                ]);
             } else { //new sku_channel
                     $this->skuChannelRepository->create([
                         'sku_id' => $related_skus,
@@ -261,6 +277,16 @@ class ValuesUpdated
                         'price' => $sku_channel->getPrice(),
                         'wholesale_price' => $sku_channel->getWholesalePrice()
                     ]);
+
+                $this->discountRepository->create([
+                    'type_id' => $related_skus,
+                    'type' => Types::SKU_CHANNEL,
+                    'details' => $sku_channel->getDiscountDetails(),
+                    'amount' => $sku_channel->getDiscount(),
+                    'is_amount_percentage' => $sku_channel->getIsPercentage(),
+                    'start_date' => Carbon::now(),
+                    'end_date' => $sku_channel->getDiscountEndDate()
+                ]);
             }
         }
         $filtered_updated_sku_channels_ids = array_filter($updated_sku_channels_ids, function ($a) {

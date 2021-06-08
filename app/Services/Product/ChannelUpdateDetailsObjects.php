@@ -11,6 +11,26 @@ class ChannelUpdateDetailsObjects
     private $wholeSalePrice;
     private $channelId;
     private $skuChannelId;
+    private $isPercentage;
+    private $discount;
+    private $discount_end_date;
+    private $discount_details;
+
+    /**
+     * @return mixed
+     */
+    public function getDiscountEndDate()
+    {
+        return $this->discount_end_date;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDiscountDetails()
+    {
+        return $this->discount_details;
+    }
 
     /**
      * @param mixed $channelDetails
@@ -45,6 +65,19 @@ class ChannelUpdateDetailsObjects
         return $this->wholeSalePrice;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getIsPercentage()
+    {
+        return $this->isPercentage;
+    }
+
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
+
     public function getChannelId()
     {
         return $this->channelId;
@@ -68,6 +101,10 @@ class ChannelUpdateDetailsObjects
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;
         $this->skuChannelId = $this->channelDetails->sku_channel_id;
+        $this->isPercentage = $this->channelDetails->is_percentage;
+        $this->discount = $this->channelDetails->discount;
+        $this->discount_end_date = $this->channelDetails->discount_end_date;
+        $this->discount_details = $this->channelDetails->discount_details;
         return $this;
     }
 

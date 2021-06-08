@@ -1,6 +1,8 @@
 <?php namespace App\Services\Product\Update\Operations;
 
 
+use App\Services\Discount\Creator;
+
 class VariantsDiscard extends OptionsUpdated
 {
     public function apply()
@@ -32,8 +34,10 @@ class VariantsDiscard extends OptionsUpdated
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
             array_push($channels, $channel->getChannelId());
+            $skuChannelData = $sku->skuChannels()->create($data);
+            app(Creator::class)->setProductSkusDiscountData($skuChannelData->id, $channel);
         }
-        $sku->skuChannels()->insert($data);
+
         return $channels;
     }
 
