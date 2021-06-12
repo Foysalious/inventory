@@ -57,12 +57,14 @@ class SkuService extends BaseService
         $sku = $this->skuRepository->where('id', $request->id)->where('product_id', $request->product_id)->first();
         if ($request->operation == StockOperationType::DECREMENT) {
             $sku->stock = $sku->stock - $request->quantity;
-            $sku->save();
+            $updated = $sku->save();
         }
         if ($request->operation == StockOperationType::INCREMENT) {
             $sku->stock = $sku->stock + $request->quantity;
-            $sku->save();
+            $updated = $sku->save();
         }
-        return $this->success('Successful', null, 200);
+        if (isset($updated)) $data = ['stock_updated' => $updated];
+
+        return $this->success('Successful', $data ?? null, 200);
     }
 }

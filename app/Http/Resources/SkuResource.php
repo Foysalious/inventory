@@ -9,16 +9,26 @@ class SkuResource extends JsonResource
     {
 
         return [
+
             'id' => $this->id,
-            'product_name'  => $this->product->name,
+            'name'  => $this->name,
             'product_id' => $this->product_id,
-            'warranty' => $this->product->warranty,
-            'warranty_unit' => $this->product->warranty_unit,
-            'vat_percentage' => $this->product->vat_percentage,
-            'unit' => $this->product->unit,
-            'stock' => $this->stock,
+            'warranty' => $this->warranty,
+            'warranty_unit' => $this->warranty_unit,
             'sku_channel' => $this->skuChannels,
-            'combination' => $this->sku_details->combinations
+            'stock' => $this->stock,
+
+
+//            'id' => $this->id,
+//            'product_name'  => $this->product->name,
+//            'product_id' => $this->product_id,
+//            'warranty' => $this->product->warranty,
+//            'warranty_unit' => $this->product->warranty_unit,
+//            'vat_percentage' => $this->product->vat_percentage,
+//            'unit' => $this->product->unit,
+//            'stock' => $this->stock,
+//            'sku_channel' => $this->skuChannels,
+//            'combination' => $this->sku_details->combinations
         ];
     }
 
