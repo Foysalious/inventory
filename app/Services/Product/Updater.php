@@ -238,17 +238,54 @@ class Updater
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
 
         if($nature == UpdateNature::NON_VARIANT)
-            app(NonVariant::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        {
+            /** @var  $nonVariantClass NonVariant */
+            $nonVariantClass = app(NonVariant::class);
+            $nonVariantClass->setProduct($this->product)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->apply();
+        }
         elseif($nature == UpdateNature::VARIANTS_DISCARD)
-            app(VariantsDiscard::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        {
+            /** @var  $variantDiscard VariantsDiscard */
+            $variantDiscard = app(VariantsDiscard::class);
+            $variantDiscard->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        }
         elseif ($nature == UpdateNature::OPTIONS_UPDATED)
-            app(OptionsUpdated::class)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        {
+            /** @var  $optionsUpdated OptionsUpdated */
+            $optionsUpdated = app(OptionsUpdated::class);
+            $optionsUpdated->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        }
         elseif($nature == UpdateNature::VALUES_UPDATED)
-            app(ValuesUpdated::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        {
+            /** @var  $valuesUpdated ValuesUpdated */
+            $valuesUpdated = app(ValuesUpdated::class);
+            $valuesUpdated->setNature($nature)
+                ->setProduct($this->product)
+                ->setDeletedValues($deleted_values)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->apply();
+        }
         elseif($nature == UpdateNature::VALUE_ADD)
-            app(ValuesAdded::class)->setNature($nature)->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        {
+            /** @var  $valuesAdded ValuesUpdated */
+            $valuesAdded = app(ValuesAdded::class);
+            $valuesAdded->setNature($nature)
+                ->setProduct($this->product)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->apply();
+        }
         else
-            app(ValuesDeleted::class)->setNature($nature)->setProduct($this->product)->setDeletedValues($deleted_values)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
+        {
+            /** @var  $valuesDeleted ValuesDeleted */
+            $valuesDeleted = app(ValuesDeleted::class);
+            $valuesDeleted->setNature($nature)
+                ->setProduct($this->product)
+                ->setDeletedValues($deleted_values)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->apply();
+        }
         $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
     }
 
