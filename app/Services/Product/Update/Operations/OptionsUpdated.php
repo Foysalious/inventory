@@ -2,6 +2,7 @@
 
 
 use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
 use App\Services\Discount\Creator;
 use App\Services\Product\CombinationCreator;
@@ -40,9 +41,10 @@ class OptionsUpdated
     protected $hasVariants;
     /** @var Creator $discountCreator */
     protected $discountCreator;
+    protected $skuChannelRepository;
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductOptionCreator $productOptionCreator,
-                                ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator,
+                                ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator, SkuChannelRepositoryInterface $skuChannelRepository,
                                 ProductChannelCreator $productChannelCreator, Creator $discountCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -51,6 +53,7 @@ class OptionsUpdated
         $this->combinationCreator = $combinationCreator;
         $this->productChannelCreator = $productChannelCreator;
         $this->discountCreator = $discountCreator;
+        $this->skuChannelRepository = $skuChannelRepository;
     }
 
     /**
@@ -223,7 +226,7 @@ class OptionsUpdated
                 'wholesale_price'   => $channel->getWholeSalePrice() ?? $channel->wholesale_price
             ]);
             array_push($channels,$channel->getChannelId());
-            $skuChannelData = $sku->skuChannels()->create($data);
+            $skuChannelData = $this->skuChannelRepository->create($data[0]);
             $this->discountCreator->setProductSkusDiscountData($skuChannelData->id, $channel);
         }
         return $channels;

@@ -24,9 +24,9 @@ class VariantsDiscard extends OptionsUpdated
 
     private function createSkuChannels($sku, $channel_data)
     {
-        $data = [];
         $channels = [];
         foreach ($channel_data as $channel) {
+            $data = [];
             array_push($data, [
                 'sku_id' => $sku->id,
                 'channel_id' => $channel->getChannelId(),
@@ -35,10 +35,10 @@ class VariantsDiscard extends OptionsUpdated
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
             array_push($channels, $channel->getChannelId());
-            $skuChannelData = $sku->skuChannels()->create($data);
+            $skuChannelData = $this->skuChannelRepository->create($data[0]);
             /** @var $discountCreator Creator */
             $discountCreator = app(Creator::class);
-            $discountCreator->setDiscountType(Types::PRODUCT)->setProductSkusDiscountData($skuChannelData->id, $channel);
+            $discountCreator->setDiscountType(Types::SKU_CHANNEL)->setProductSkusDiscountData($skuChannelData->id, $channel);
         }
 
         return $channels;

@@ -7,6 +7,7 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
+use App\Services\Discount\Creator;
 use App\Services\Discount\Types;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
@@ -209,8 +210,8 @@ class ValuesUpdated
 
     private function createSkuChannels($sku, $channel_data)
     {
-        $data = [];
         foreach ($channel_data as $channel) {
+            $data = [];
             array_push($data, [
                 'sku_id' => $sku->id,
                 'channel_id' => $channel->getChannelId(),
@@ -219,8 +220,12 @@ class ValuesUpdated
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
             array_push($this->channels, $channel->getChannelId());
+            $skuChannelData = $this->skuChannelRepository->create($data[0]);
+            /** @var $discountCreator Creator */
+            $discountCreator = app(Creator::class);
+            $discountCreator->setDiscountType(Types::SKU_CHANNEL)->setProductSkusDiscountData($skuChannelData->id, $channel);
         }
-        return $sku->skuChannels()->insert($data);
+        return true;
     }
 
     private function createCombination($sku_id, $product_option_value_ids)
