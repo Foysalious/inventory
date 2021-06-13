@@ -58,6 +58,16 @@ class Product extends BaseModel
         return $this->hasMany(ProductChannel::class,'product_id');
     }
 
+    public function collections()
+    {
+        return $this->belongsToMany(Collection::class,'collection_products','collection_id','product_id')->withTimestamps();
+    }
+
+    public function collectionIds()
+    {
+        return $this->collection->pluck('id');
+    }
+
     public function unit ()
     {
         return $this->belongsTo(Unit::class,'unit_id')->select('id', 'name_bn', 'name_en');
