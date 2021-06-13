@@ -2,6 +2,7 @@
 
 
 use App\Services\Discount\Creator;
+use App\Services\Discount\Types;
 
 class VariantsDiscard extends OptionsUpdated
 {
@@ -35,7 +36,9 @@ class VariantsDiscard extends OptionsUpdated
             ]);
             array_push($channels, $channel->getChannelId());
             $skuChannelData = $sku->skuChannels()->create($data);
-            app(Creator::class)->setProductSkusDiscountData($skuChannelData->id, $channel);
+            /** @var $discountCreator Creator */
+            $discountCreator = app(Creator::class);
+            $discountCreator->setDiscountType(Types::PRODUCT)->setProductSkusDiscountData($skuChannelData->id, $channel);
         }
 
         return $channels;

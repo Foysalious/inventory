@@ -19,7 +19,7 @@ class ChannelDetailsObject
      * @param mixed $details
      * @return ChannelDetailsObject
      */
-    public function setDetails($discount_details)
+    public function setDiscountDetails($discount_details)
     {
         $this->discount_details = $discount_details;
         return $this;
@@ -28,7 +28,7 @@ class ChannelDetailsObject
     /**
      * @return mixed
      */
-    public function getDetails()
+    public function getDiscountDetails()
     {
         return $this->discount_details;
     }

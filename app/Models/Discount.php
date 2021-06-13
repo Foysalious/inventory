@@ -4,6 +4,7 @@
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 Relation::morphMap([
@@ -17,6 +18,8 @@ Relation::morphMap([
 
 class Discount extends BaseModel
 {
+    use SoftDeletes;
+
     protected $guarded = ['id'];
     protected $casts = ['amount' => 'double'];
 

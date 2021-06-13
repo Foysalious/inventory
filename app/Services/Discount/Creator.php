@@ -88,9 +88,9 @@ class Creator
     {
         $this->setDiscount($skuChannelData->getDiscount())
             ->setDiscountEndDate($skuChannelData->getDiscountEndDate())
-            ->setDiscountType(Types::SKU_CHANNEL)
+            ->setDiscountType($this->discountType ?? Types::SKU_CHANNEL)
             ->setDiscountTypeId($skuChannelId)
-            ->setDiscountDetails($skuChannelData->getDetails())
+            ->setDiscountDetails($skuChannelData->getDiscountDetails())
             ->setIsPercentage($skuChannelData->getIsPercentage())
             ->createChannelSkuDiscount();
     }

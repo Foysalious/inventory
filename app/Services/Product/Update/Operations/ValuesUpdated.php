@@ -50,6 +50,7 @@ class ValuesUpdated
 
     protected $product;
 
+    /** @var DiscountRepositoryInterface $discountRepository */
     protected DiscountRepositoryInterface $discountRepository;
 
     protected $updateDataObejects;
@@ -115,6 +116,23 @@ class ValuesUpdated
       return $this;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getDeletedValues()
+    {
+        return $this->deletedValues;
+    }
+
+    /**
+     * @param mixed $deletedValues
+     */
+    public function setDeletedValues($deletedValues)
+    {
+        $this->deletedValues = $deletedValues;
+        return $this;
+    }
+
     public function apply()
     {
         $this->deleteDiscardedCombinations();
@@ -145,7 +163,6 @@ class ValuesUpdated
             $combinations = $productDetailObject->getCombination();
             $sku_channels = $productDetailObject->getChannelData();
             $related_skus = $this->checkAndApplyOperationForOldCombination($combinations, $productDetailObject);
-
             $this->updateSkuChannels($sku_channels, $related_skus);
         }
     }
@@ -179,6 +196,7 @@ class ValuesUpdated
             $this->createCombination($sku->id, $product_option_value_ids);
         }
     }
+
     private function createSku($product, $values, $product_id, $stock)
     {
         $sku_data = [
@@ -269,15 +287,15 @@ class ValuesUpdated
                     'is_amount_percentage' => $sku_channel->getIsPercentage(),
                     'end_date' => $sku_channel->getDiscountEndDate()
                 ]);
-            } else { //new sku_channel
-                    $this->skuChannelRepository->create([
+            }
+            else { //new sku_channel
+                $this->skuChannelRepository->create([
                         'sku_id' => $related_skus,
                         'channel_id' => $sku_channel->getChannelId(),
                         'cost' => $sku_channel->getCost(),
                         'price' => $sku_channel->getPrice(),
                         'wholesale_price' => $sku_channel->getWholesalePrice()
                     ]);
-
                 $this->discountRepository->create([
                     'type_id' => $related_skus,
                     'type' => Types::SKU_CHANNEL,
@@ -335,25 +353,15 @@ class ValuesUpdated
     {
         $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
         $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
+        $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
         $this->skuRepository->whereIn('id', $skus_to_delete)->delete();
         $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->delete();
         $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->delete();
+        $this->deleteSkuChannelDiscount($skus_channels_to_delete);
     }
 
-    /**
-     * @return mixed
-     */
-    public function getDeletedValues()
+    protected function deleteSkuChannelDiscount($skus_channels_to_delete)
     {
-        return $this->deletedValues;
-    }
-
-    /**
-     * @param mixed $deletedValues
-     */
-    public function setDeletedValues($deletedValues)
-    {
-        $this->deletedValues = $deletedValues;
-        return $this;
+        $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->delete();
     }
 }

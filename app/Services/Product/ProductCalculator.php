@@ -39,12 +39,8 @@ class ProductCalculator
 
     public function getProductRatingReview($product)
     {
-
-
         try {
-
             $client = new Client();
-
             $request = $client->get('https://pos-order.dev-sheba.xyz/api/v1/products/'.$product->partner_id.'/reviews');
             $response = json_decode($request->getBody()->getContents(), true);
 
