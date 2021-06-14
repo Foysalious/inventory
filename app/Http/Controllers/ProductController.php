@@ -221,6 +221,36 @@ class ProductController extends Controller
      * @param ProductUpdateRequest $request
      * @return JsonResponse
      */
+
+    /**
+     *
+     * * @OA\PUT (
+     *      path="/api/v1/partners/{partner}/products/{product}",
+     *      operationId="putProducts",
+     *      tags={"Partners Products API"},
+     *      summary="Update Product with SKU Data",
+     *      description="Update a product with Sku data and discount",
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="product", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\MediaType(mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  @OA\Property(property="name", type="String"),
+     *                  @OA\Property(property="category_id", type="Integer"),
+     *                  @OA\Property(property="description", type="Text"),
+     *                  @OA\Property(property="warranty", type="Integer"),
+     *                  @OA\Property(property="warranty_unit", type="String"),
+     *                  @OA\Property(property="vat_percentage", type="Integer"),
+     *                  @OA\Property(property="product_details", type="JSON"),
+     *                  @OA\Property(property="image[0]", type="file")
+     *             )
+     *         )
+     *      ),
+     *      @OA\Response(response=200, description="Successful operation"),
+     *      @OA\Response(response=404, description="message: Partner Not Found!"),
+     *      @OA\Response(response=403, description="Forbidden")
+     *     )
+     **/
     public function update($partner, $product, ProductUpdateRequest $request)
     {
         return $this->productService->update($product, $request, $partner);

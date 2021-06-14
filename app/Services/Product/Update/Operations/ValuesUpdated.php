@@ -266,7 +266,7 @@ class ValuesUpdated
         list($is_deleted,$deleted_sku_Channels) = $this->checkAndApplyOperationIfSkuChannelsDeleted($sku_channels,$related_skus);
         if($is_deleted) {
             $this->skuChannelRepository->whereIn('id',$deleted_sku_Channels)->delete();
-            $this->discountRepository->whereIn('type_id', $deleted_sku_Channels)->delete();
+            $this->discountRepository->whereIn('type_id', $deleted_sku_Channels)->where('type', Types::SKU_CHANNEL)->delete();
         }
     }
 
@@ -367,6 +367,6 @@ class ValuesUpdated
 
     protected function deleteSkuChannelDiscount($skus_channels_to_delete)
     {
-        $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->delete();
+        $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
 }
