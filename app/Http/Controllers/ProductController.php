@@ -241,7 +241,7 @@ class ProductController extends Controller
      *                  @OA\Property(property="warranty", type="Integer"),
      *                  @OA\Property(property="warranty_unit", type="String"),
      *                  @OA\Property(property="vat_percentage", type="Integer"),
-     *                  @OA\Property(property="product_details", type="JSON"),
+     *                  @OA\Property(property="product_details", type="JSON", example={{"combination":null,"stock":10,"channel_data":{{"sku_channel_id":218,"channel_id":1,"price":100,"cost":90,"wholesale_price":100, "is_percentage":0,"discount":10,"discount_end_date":"2025-05-25 00:00:00", "discount_details": "It's good"},{"sku_channel_id":219,"channel_id":2,"price":95,"cost":90,"wholesale_price":100, "is_percentage":0,"discount":10,"discount_end_date":"2025-05-25 00:00:00", "discount_details": "It's good"}}}}),
      *                  @OA\Property(property="image[0]", type="file")
      *             )
      *         )
