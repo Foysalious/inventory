@@ -1,6 +1,8 @@
 <?php namespace App\Services\Product;
 
 
+use App\Exceptions\ProductDetailsPropertyValidationError;
+
 class ProductCreateRequest
 {
 
@@ -20,14 +22,20 @@ class ProductCreateRequest
         return !is_null($this->productDetails[0]->combination);
     }
 
+    /**
+     * @return array
+     * @throws ProductDetailsPropertyValidationError
+     */
     public function get()
     {
         $has_variant  = $this->hasVariant();
         $final = [];
         foreach( $this->productDetails as $productDetail)
         {
-            $productRequestObject = app(ProductDetailsObject::class)->hasVariant($has_variant)->setProductDetail($productDetail)->build();
-            array_push($final,$productRequestObject);
+            /** @var ProductDetailsObject $productRequestObject */
+            $productRequestObject = app(ProductDetailsObject::class);
+            $productRequestObject = $productRequestObject->hasVariant($has_variant)->setProductDetail($productDetail)->build();
+            array_push($final, $productRequestObject);
         }
         return [$has_variant,$final];
     }

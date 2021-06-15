@@ -147,7 +147,7 @@ class OptionsUpdated
                 array_push($product_option_value_ids, $product_option_value->id);
                 array_push($values, $value_name);
             }
-            $sku = $this->createSku($product, $values, $product->id, $productDetailObject->getStock());
+            $sku = $this->createSku($product, $values, $product->id, $productDetailObject->getStock(), $productDetailObject->getWeight(), $productDetailObject->getWeightUnit());
             $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
             array_push($all_channels,$channels);
             $this->createCombination($sku->id, $product_option_value_ids);
@@ -156,19 +156,24 @@ class OptionsUpdated
         $this->createProductChannel($all_channels, $product->id);
     }
 
+
     /**
      * @param $product
      * @param $values
      * @param $product_id
      * @param $stock
+     * @param $weight
+     * @param $weight_unit
      * @return mixed
      */
-    private function createSku($product, $values, $product_id, $stock)
+    private function createSku($product, $values, $product_id, $stock, $weight, $weight_unit)
     {
         $sku_data = [
             'name' => implode("-", $values),
             'product_id' => $product_id,
             'stock' => $stock,
+            'weight' => $weight,
+            'weight_unit' => $weight_unit,
         ];
         return $product->skus()->create($sku_data);
     }
