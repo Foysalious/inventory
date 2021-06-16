@@ -1,5 +1,6 @@
 <?php namespace App\Services\Product;
 
+use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
@@ -87,14 +88,16 @@ class ProductService extends BaseService
 
     /**
      * @param $partnerId
-     * @param ProductCreateRequest $request
+     * @param ProductRequest $request
      * @return JsonResponse
+     * @throws ProductDetailsPropertyValidationError
      */
     public function create($partnerId, ProductRequest $request)
     {
-        /** @var ProductDetailsObject[] $product_create_requests */
-       list($has_variant,$product_create_request_objs) = app(ProductCreateRequest::class)->setProductDetails($request->product_details)->get();
-       $product = $this->creator->setPartnerId($partnerId)
+        /** @var ProductCreateRequest $productCreateRequest */
+        $productCreateRequest = app(ProductCreateRequest::class);
+        list($has_variant,$product_create_request_objs) = $productCreateRequest->setProductDetails($request->product_details)->get();
+        $product = $this->creator->setPartnerId($partnerId)
             ->setCategoryId($request->category_id)
             ->setName($request->name)
             ->setDescription($request->description)

@@ -16,6 +16,10 @@ class CombinationDetailsObject
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws ProductDetailsPropertyValidationError
+     */
     public function build()
     {
         if(!$this->validate())

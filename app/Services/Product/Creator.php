@@ -219,7 +219,7 @@ class Creator
     }
 
     /**
-     * @param $productDetails
+     * @param $productRequestObjects
      * @return $this
      */
     public function setProductRequestObjects($productRequestObjects)
@@ -272,7 +272,7 @@ class Creator
                 array_push($values,$value_name);
             }
 
-             $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
+             $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock(), $productDetailObject->getWeight(), $productDetailObject->getWeightUnit());
              $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
@@ -294,19 +294,24 @@ class Creator
         return $this->productChannelCreator->setData($product_channels)->store();
     }
 
+
     /**
      * @param $product
      * @param $values
      * @param $product_id
      * @param $stock
+     * @param $weight
+     * @param $weight_unit
      * @return mixed
      */
-    private function createSku($product, $values, $product_id, $stock)
+    private function createSku($product, $values, $product_id, $stock, $weight, $weight_unit)
     {
         $sku_data = [
             'name' => implode("-",$values) ,
             'product_id' => $product_id,
             'stock' => $stock,
+            'weight' => $weight,
+            'weight_unit' => $weight_unit,
         ];
         return $product->skus()->create($sku_data);
     }
@@ -379,7 +384,9 @@ class Creator
     private function createSKUAndSKUChannels($product)
     {
         $stock = $this->productRequestObjects[0]->getStock();
-        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
+        $weight = $this->productRequestObjects[0]->getWeight();
+        $weight_unit = $this->productRequestObjects[0]->getWeightUnit();
+        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0, "weight" => $weight, "weight_unit" => $weight_unit]);
         $channels = $this->createSKUChannels($sku, $this->productRequestObjects[0]->getChannelData());
         $this->createProductChannel($product->id,$channels);
     }

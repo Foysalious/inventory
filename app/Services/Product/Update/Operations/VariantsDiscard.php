@@ -17,7 +17,9 @@ class VariantsDiscard extends OptionsUpdated
     public function createSkuAndSkuChannels()
     {
         $stock = $this->updateDataObejects[0]->getStock();
-        $sku = $this->product->skus()->create(["product_id" => $this->product->id, "stock" => $stock ?: 0]);
+        $weight = $this->updateDataObejects[0]->getWeight();
+        $weight_unit = $this->updateDataObejects[0]->getWeightUnit();
+        $sku = $this->product->skus()->create(["product_id" => $this->product->id, "stock" => $stock ?: 0, "weight" => $weight, "weight_unit" => $weight_unit]);
         $channels = $this->createSKUChannels($sku, $this->updateDataObejects[0]->getChannelData());
         $this->createProductChannel($this->product->id, $channels);
     }

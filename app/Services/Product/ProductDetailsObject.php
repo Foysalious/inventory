@@ -6,13 +6,15 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 class ProductDetailsObject
 {
     private $productDetail;
-    private  $combination;
+    private $combination;
     private $stock;
     private $channelData;
     private $hasVariant;
     private $isPercentage;
     private $discount;
     private $details;
+    private ?float $weight;
+    private ?string $weightUnit;
 
     /**
      * @param mixed $details
@@ -81,6 +83,10 @@ class ProductDetailsObject
         return $this;
     }
 
+    /**
+     * @return $this
+     * @throws ProductDetailsPropertyValidationError
+     */
     public function build()
     {
         if(!$this->validate())
@@ -88,6 +94,8 @@ class ProductDetailsObject
         if($this->hasVariant)
             $this->setCombination();
         $this->setStock();
+        $this->setWeight();
+        $this->setWeightUnit();
         $this->setChannelData();
         return $this;
     }
@@ -95,7 +103,6 @@ class ProductDetailsObject
 
     /**
      * @return bool|mixed
-     * @throws ProductDetailsPropertyValidationError
      */
     public function validate()
     {
@@ -104,12 +111,17 @@ class ProductDetailsObject
     }
 
 
+    /**
+     * @return $this
+     * @throws ProductDetailsPropertyValidationError
+     */
     public function setCombination()
     {
-
         $final = [];
         foreach ($this->productDetail->combination as $option_value) {
-            array_push($final, app(CombinationDetailsObject::class)->setCombinationDetail($option_value)->build());
+            /** @var CombinationDetailsObject $combinationDetailsObject */
+            $combinationDetailsObject = app(CombinationDetailsObject::class);
+            array_push($final, $combinationDetailsObject->setCombinationDetail($option_value)->build());
         }
 
         $this->combination = $final;
@@ -127,10 +139,33 @@ class ProductDetailsObject
         return $this;
     }
 
+    public function setWeight()
+    {
+        $this->weight = $this->productDetail->weight ?? null;
+        return $this;
+    }
+
+    public function setWeightUnit()
+    {
+        $this->weightUnit = $this->productDetail->weight_unit ?? null;
+        return $this;
+    }
+
     public function getStock()
     {
         return $this->stock;
     }
+
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    public function getWeightUnit()
+    {
+        return $this->weightUnit;
+    }
+
     public function setChannelData()
     {
         $final = [];

@@ -192,18 +192,20 @@ class ValuesUpdated
                 array_push($values, $value_name);
 
             }
-            $sku = $this->createSku($this->product, $values, $this->product->id, $productDetailObject->getStock());
+            $sku = $this->createSku($this->product, $values, $this->product->id, $productDetailObject->getStock(), $productDetailObject->getWeight(), $productDetailObject->getWeightUnit());
             $this->createSkuChannels($sku, $sku_channels);
             $this->createCombination($sku->id, $product_option_value_ids);
         }
     }
 
-    private function createSku($product, $values, $product_id, $stock)
+    private function createSku($product, $values, $product_id, $stock, $weight, $weight_unit)
     {
         $sku_data = [
             'name' => implode("-", $values),
             'product_id' => $product_id,
             'stock' => $stock,
+            'weight' => $weight,
+            'weight_unit' => $weight_unit,
         ];
         return $product->skus()->create($sku_data);
     }
