@@ -9,5 +9,5 @@ class CreateSkuDto extends DataTransferObject
     public int $product_id;
     public float $stock;
     public float $weight;
-    public float $weight_unit;
+    public string $weight_unit;
 }

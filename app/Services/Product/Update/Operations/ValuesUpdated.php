@@ -14,15 +14,14 @@ use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\UpdateNature;
+use App\Services\Sku\CreateSkuDto;
+use App\Services\Sku\Creator as SkuCreator;
 use Carbon\Carbon;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 
 class ValuesUpdated
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private ProductRepositoryInterface $productRepositoryInterface;
     /**
      * @var CombinationRepositoryInterface
      */
@@ -43,14 +42,11 @@ class ValuesUpdated
     private $productOptionValueCreator;
     private $combinationCreator;
     private $productChannelCreator;
-    private $nature;
     private $channels = [];
     /**
      * @var Product $product
      */
-
     protected $product;
-
     /** @var DiscountRepositoryInterface $discountRepository */
     protected DiscountRepositoryInterface $discountRepository;
 
@@ -58,15 +54,13 @@ class ValuesUpdated
 
     protected $deletedValues;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface,
-                                ProductOptionValueRepositoryInterface $productOptionValueRepository,
+    public function __construct(ProductOptionValueRepositoryInterface $productOptionValueRepository,
                                 CombinationRepositoryInterface $combinationRepository,
                                 DiscountRepositoryInterface $discountRepository,
                                 SkuRepositoryInterface $skuRepository, SkuChannelRepositoryInterface $skuChannelRepository,
                                 ProductOptionCreator $productOptionCreator, ProductOptionValueCreator $productOptionValueCreator,
-                                CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator)
+                                CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator)
     {
-        $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productOptionValueRepository = $productOptionValueRepository;
         $this->combinationRepository = $combinationRepository;
         $this->skuRepository = $skuRepository;
@@ -109,12 +103,6 @@ class ValuesUpdated
     {
         $this->updateDataObejects = $updateDataObejects;
         return $this;
-    }
-
-    public function setNature($nature)
-    {
-      $this->nature =   $nature;
-      return $this;
     }
 
     /**
@@ -167,6 +155,10 @@ class ValuesUpdated
             $this->updateSkuChannels($sku_channels, $related_skus);
         }
     }
+
+    /**
+     * @throws UnknownProperties
+     */
     protected function operationsForValueAdd()
     {
         foreach($this->updateDataObejects as $productDetailObject)
@@ -192,22 +184,16 @@ class ValuesUpdated
                 array_push($values, $value_name);
 
             }
-            $sku = $this->createSku($this->product, $values, $this->product->id, $productDetailObject->getStock(), $productDetailObject->getWeight(), $productDetailObject->getWeightUnit());
+            $sku = $this->skuCreator->create(new CreateSkuDto([
+                'name' => implode("-", $values),
+                'product_id' => $this->product->id,
+                'stock' => $productDetailObject->getStock(),
+                'weight' => $productDetailObject->getWeight(),
+                'weight_unit' => $productDetailObject->getWeightUnit(),
+            ]));
             $this->createSkuChannels($sku, $sku_channels);
             $this->createCombination($sku->id, $product_option_value_ids);
         }
-    }
-
-    private function createSku($product, $values, $product_id, $stock, $weight, $weight_unit)
-    {
-        $sku_data = [
-            'name' => implode("-", $values),
-            'product_id' => $product_id,
-            'stock' => $stock,
-            'weight' => $weight,
-            'weight_unit' => $weight_unit,
-        ];
-        return $product->skus()->create($sku_data);
     }
 
     private function createSkuChannels($sku, $channel_data)

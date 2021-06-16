@@ -1,7 +1,5 @@
 <?php namespace App\Services\Product\Update\Operations;
 
-
-use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
 use App\Services\Discount\Creator;
@@ -16,10 +14,6 @@ use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class OptionsUpdated
 {
-    /**
-     * @var ProductRepositoryInterface
-     */
-    private ProductRepositoryInterface $productRepositoryInterface;
     /**
      * @var ProductOptionCreator
      */
@@ -46,11 +40,10 @@ class OptionsUpdated
     protected $discountCreator;
     protected $skuChannelRepository;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductOptionCreator $productOptionCreator,
+    public function __construct(ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator, SkuChannelRepositoryInterface $skuChannelRepository,
-                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, private SkuCreator $skuCreator)
+                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, protected SkuCreator $skuCreator)
     {
-        $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productOptionCreator = $productOptionCreator;
         $this->productOptionValueCreator = $productOptionValueCreator;
         $this->combinationCreator = $combinationCreator;
@@ -166,28 +159,6 @@ class OptionsUpdated
         }
         $all_channels = array_merge(... $all_channels);
         $this->createProductChannel($all_channels, $product->id);
-    }
-
-
-    /**
-     * @param $product
-     * @param $values
-     * @param $product_id
-     * @param $stock
-     * @param $weight
-     * @param $weight_unit
-     * @return mixed
-     */
-    private function createSku($product, $values, $product_id, $stock, $weight, $weight_unit)
-    {
-        $sku_data = [
-            'name' => implode("-", $values),
-            'product_id' => $product_id,
-            'stock' => $stock,
-            'weight' => $weight,
-            'weight_unit' => $weight_unit,
-        ];
-        return $product->skus()->create($sku_data);
     }
 
     /**

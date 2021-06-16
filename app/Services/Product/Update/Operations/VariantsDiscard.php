@@ -3,9 +3,14 @@
 
 use App\Services\Discount\Creator;
 use App\Services\Discount\Types;
+use App\Services\Sku\CreateSkuDto;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class VariantsDiscard extends OptionsUpdated
 {
+    /**
+     * @throws UnknownProperties
+     */
     public function apply()
     {
         $this->deleteProductOptions();
@@ -14,12 +19,21 @@ class VariantsDiscard extends OptionsUpdated
         $this->createSkuAndSkuChannels();
     }
 
+    /**
+     * @throws UnknownProperties
+     */
     public function createSkuAndSkuChannels()
     {
         $stock = $this->updateDataObejects[0]->getStock();
         $weight = $this->updateDataObejects[0]->getWeight();
         $weight_unit = $this->updateDataObejects[0]->getWeightUnit();
-        $sku = $this->product->skus()->create(["product_id" => $this->product->id, "stock" => $stock ?: 0, "weight" => $weight, "weight_unit" => $weight_unit]);
+        $sku = $this->skuCreator->create(new CreateSkuDto([
+            "product_id" => $this->product->id,
+            "stock" => $stock ?: 0,
+            "weight" => $weight,
+            "weight_unit" => $weight_unit
+            ]
+        ));
         $channels = $this->createSKUChannels($sku, $this->updateDataObejects[0]->getChannelData());
         $this->createProductChannel($this->product->id, $channels);
     }
