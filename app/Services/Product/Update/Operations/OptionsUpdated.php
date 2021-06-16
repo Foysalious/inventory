@@ -10,6 +10,9 @@ use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 
+use App\Services\Sku\CreateSkuDto;
+use App\Services\Sku\Creator as SkuCreator;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class OptionsUpdated
 {
@@ -45,7 +48,7 @@ class OptionsUpdated
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator, SkuChannelRepositoryInterface $skuChannelRepository,
-                                ProductChannelCreator $productChannelCreator, Creator $discountCreator)
+                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, private SkuCreator $skuCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productOptionCreator = $productOptionCreator;
@@ -107,7 +110,7 @@ class OptionsUpdated
 
     protected function deleteProductOptions()
     {
-        $this->product->productOptions()->get()->each(function($productOption){
+        $this->product->productOptions()->get()->each(function ($productOption) {
             $productOption->productOptionValues()->delete();
         });
         return $this->product->productOptions()->delete();
@@ -120,16 +123,19 @@ class OptionsUpdated
 
     protected function deleteSkuAndCombination()
     {
-        $this->product->skus()->get()->each(function($sku) {
-           if($this->hasVariants) $sku->combinations()->delete();
-           $sku->skuChannels()->get()->each(function ($skuChannel){
-               $skuChannel->discounts()->delete();
-           });
+        $this->product->skus()->get()->each(function ($sku) {
+            if ($this->hasVariants) $sku->combinations()->delete();
+            $sku->skuChannels()->get()->each(function ($skuChannel) {
+                $skuChannel->discounts()->delete();
+            });
             $sku->skuChannels()->delete();
         });
         return $this->product->skus()->delete();
     }
 
+    /**
+     * @throws UnknownProperties
+     */
     protected function createNewProductVariantsData()
     {
         $product = $this->product;
@@ -147,9 +153,15 @@ class OptionsUpdated
                 array_push($product_option_value_ids, $product_option_value->id);
                 array_push($values, $value_name);
             }
-            $sku = $this->createSku($product, $values, $product->id, $productDetailObject->getStock(), $productDetailObject->getWeight(), $productDetailObject->getWeightUnit());
+            $sku = $this->skuCreator->create(new CreateSkuDto([
+                'name' => implode("-", $values),
+                'product_id' => $product->id,
+                'stock' => $productDetailObject->getStock(),
+                'weight' => $productDetailObject->getWeight(),
+                'weight_unit' => $productDetailObject->getWeightUnit(),
+            ]));
             $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
-            array_push($all_channels,$channels);
+            array_push($all_channels, $channels);
             $this->createCombination($sku->id, $product_option_value_ids);
         }
         $all_channels = array_merge(... $all_channels);
@@ -224,18 +236,19 @@ class OptionsUpdated
         foreach ($channel_data as $channel) {
             $data = [];
             array_push($data, [
-                'sku_id'            => $sku->id,
-                'channel_id'        => $channel->getChannelId() ?? $channel->channel_id,
-                'cost'              => $channel->getCost() ?? $channel->cost,
-                'price'             => $channel->getPrice() ?? $channel->price,
-                'wholesale_price'   => $channel->getWholeSalePrice() ?? $channel->wholesale_price
+                'sku_id' => $sku->id,
+                'channel_id' => $channel->getChannelId() ?? $channel->channel_id,
+                'cost' => $channel->getCost() ?? $channel->cost,
+                'price' => $channel->getPrice() ?? $channel->price,
+                'wholesale_price' => $channel->getWholeSalePrice() ?? $channel->wholesale_price
             ]);
-            array_push($channels,$channel->getChannelId());
+            array_push($channels, $channel->getChannelId());
             $skuChannelData = $this->skuChannelRepository->create($data[0]);
             $this->discountCreator->setProductSkusDiscountData($skuChannelData->id, $channel);
         }
         return $channels;
     }
+
     /**
      * @param $product_id
      * @param $option_name
@@ -245,6 +258,7 @@ class OptionsUpdated
     {
         return $this->productOptionCreator->setProductId($product_id)->setOptionName($option_name)->create();
     }
+
     /**
      * @param $product_option_id
      * @param $value_name
