@@ -146,7 +146,7 @@ class ProductController extends Controller
      *
      * @throws ProductNotFoundException
      */
-    public function index($partner, Request $request)
+    public function index($partner, Request $request): JsonResponse
     {
         return $this->productService->getProducts($partner, $request);
     }

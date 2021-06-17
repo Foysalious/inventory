@@ -1,41 +1,37 @@
 <?php namespace App\Services\Product;
 
 
-use App\Interfaces\ProductOptionRepositoryInterface;
-use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
+use App\Models\Product;
 
 class ProductCombinationService
 {
-    private $productOptionRepositoryInterface;
-    private $skuRepositoryInterface;
-    private $product;
+    private SkuRepositoryInterface $skuRepositoryInterface;
+    private Product $product;
 
     /**
      * ProductCombinationService constructor.
-     * @param $productOptionRepositoryInterface
-     * @param $skuRepositoryInterface
+     * @param SkuRepositoryInterface $skuRepositoryInterface
      */
-    public function __construct(ProductOptionRepositoryInterface $productOptionRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface)
+    public function __construct(SkuRepositoryInterface $skuRepositoryInterface)
     {
-        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
         $this->skuRepositoryInterface = $skuRepositoryInterface;
     }
 
-
-    public function setProduct($product)
+    /**
+     * @param Product $product
+     * @return ProductCombinationService
+     */
+    public function setProduct(Product $product): ProductCombinationService
     {
         $this->product = $product;
         return $this;
     }
 
-    public function getCombinationData()
+    public function getCombinationData(): array
     {
         $data = [];
-        $options = $this->productOptionRepositoryInterface->where('product_id',$this->product->id)->pluck('name');
         $skus = $this->skuRepositoryInterface->where('product_id', $this->product->id)->with('combinations')->get();
-
-
         foreach ($skus as $sku) {
             $sku_data = [];
             $temp = [];
@@ -43,8 +39,6 @@ class ProductCombinationService
             {
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
                     $product_option_value = $combination->productOptionValue;
-                    $product_option=$product_option_value->productOption;
-
                     array_push($temp, [
                         'option_id' => $product_option_value->productOption->id,
                         'option_name' => $product_option_value->productOption->name,
@@ -53,9 +47,9 @@ class ProductCombinationService
                     ]);
                 });
             }
-
+            $sku_data['sku_id'] = $sku->id;
             if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
-            $sku_data['combination'] = !empty($temp)? $temp :null;
+            $sku_data['combination'] = !empty($temp) ? $temp : null;
             if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
             $sku_data['stock'] = $sku->stock;
             $temp = [];
@@ -69,7 +63,7 @@ class ProductCombinationService
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,
                         "purchase_price" => $priceCalculation->getPurchaseUnitPrice(),
-                        "original_price" => $priceCalculation->getOriginalUnitPriceWithVat(),
+                        "original_price" => $priceCalculation->getOriginalUnitPrice(),
                         "discounted_price" => $priceCalculation->getDiscountedUnitPrice(),
                         "discount" => $priceCalculation->getDiscountAmount(),
                         "is_discount_percentage" => $priceCalculation->isDiscountPercentage(),
@@ -77,11 +71,10 @@ class ProductCombinationService
                     ]);
                 });
             }
-
             if (!isset($sku_data['channel_data'])) $sku_data['channel_data'] = [];
-            $sku_data['channel_data'] = !empty($temp)? $temp :null;
+            $sku_data['channel_data'] = !empty($temp) ? $temp : null;
             array_push($data, $sku_data);
         }
-        return [$options,$data];
+        return $data;
     }
 }

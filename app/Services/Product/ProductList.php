@@ -10,86 +10,84 @@ class ProductList
     protected CategoryRepositoryInterface $categoryRepository;
     protected ProductRepositoryInterface $productRepository;
     protected int $partnerId;
-    protected $categoryIds;
-    protected $subCategoryIds;
-    protected $updatedAfter;
-    protected $offset;
-    protected $limit;
-    protected $webstorePublicationStatus;
+    protected ?array $categoryIds;
+    protected ?array $subCategoryIds;
+    protected ?string $updatedAfter;
+    protected ?int $offset;
+    protected ?int $limit;
+    protected ?int $webstorePublicationStatus;
 
-
-    public function __construct(
-        CategoryRepositoryInterface $categoryRepository,
-        ProductRepositoryInterface $productRepository
-    )
+    public function __construct(CategoryRepositoryInterface $categoryRepository, ProductRepositoryInterface $productRepository)
     {
         $this->categoryRepository = $categoryRepository;
         $this->productRepository = $productRepository;
     }
 
     /**
-     * @param mixed $partnerId
-     * @return ProductList
+     * @param int $partnerId
+     * @return $this
      */
-    public function setPartnerId($partnerId)
+    public function setPartnerId(int $partnerId): ProductList
     {
         $this->partnerId = $partnerId;
         return $this;
     }
 
     /**
-     * @param $categoryIds
-     * @return $this
+     * @param array|null $categoryIds
+     * @return ProductList
      */
-    public function setCategoryIds($categoryIds)
+    public function setCategoryIds(?array $categoryIds): ProductList
     {
         $this->categoryIds = $categoryIds;
         return $this;
     }
 
     /**
-     * @param mixed $limit
+     * @param int|null $limit
+     * @return $this
      */
-    public function setLimit($limit)
+    public function setLimit(?int $limit): ProductList
     {
         $this->limit = $limit;
         return $this;
     }
 
     /**
-     * @param mixed $offset
+     * @param int|null $offset
+     * @return $this
      */
-    public function setOffset($offset)
+    public function setOffset(?int $offset): ProductList
     {
         $this->offset = $offset;
         return $this;
     }
 
     /**
-     * @param $subCategoryIds
+     * @param array|null $subCategoryIds
      * @return ProductList
      */
-    public function setSubCategoryIds($subCategoryIds)
+    public function setSubCategoryIds(?array $subCategoryIds): ProductList
     {
         $this->subCategoryIds = $subCategoryIds;
         return $this;
     }
 
     /**
-     * @param mixed $updatedAfter
-     * @return ProductList
+     * @param string|null $updatedAfter
+     * @return $this
      */
-    public function setUpdatedAfter($updatedAfter)
+    public function setUpdatedAfter(?string $updatedAfter): ProductList
     {
         $this->updatedAfter = $updatedAfter;
         return $this;
     }
 
     /**
-     * @param mixed $webstorePublicationStatus
-     * @return ProductList
+     * @param int|null $webstorePublicationStatus
+     * @return $this
      */
-    public function setWebstorePublicationStatus($webstorePublicationStatus)
+    public function setWebstorePublicationStatus(?int $webstorePublicationStatus): ProductList
     {
         $this->webstorePublicationStatus = $webstorePublicationStatus;
         return $this;
@@ -119,12 +117,12 @@ class ProductList
      * @return ProductsInfoResource
      * @throws ProductNotFoundException
      */
-    public function get()
+    public function get(): ProductsInfoResource
     {
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        $deleted_products = $this->getDeletedProducts();
+        $deleted_products = isset($this->updatedAfter) ? $this->getDeletedProducts() : [];
         $products_with_deleted_products = collect([]);
         $products_with_deleted_products->products = $products;
         $products_with_deleted_products->deleted_products = $deleted_products;

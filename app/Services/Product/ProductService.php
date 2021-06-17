@@ -74,7 +74,7 @@ class ProductService extends BaseService
      * @return JsonResponse
      * @throws ProductNotFoundException
      */
-    public function getProducts($partner_id, Request $request)
+    public function getProducts($partner_id, Request $request): JsonResponse
     {
         list($offset, $limit) = calculatePagination($request);
         $category_ids = !is_array($request->category_ids) ? json_decode($request->category_ids,1) : $request->category_ids;
@@ -107,17 +107,18 @@ class ProductService extends BaseService
         }
     }
 
+
     /**
+     * @param $partner
      * @param $product
      * @return JsonResponse
      */
-    public function getDetails($partner, $product)
+    public function getDetails($partner, $product): JsonResponse
     {
         $general_details = $this->productRepositoryInterface->findOrFail($product);
         if($general_details->partner_id != $partner)
             return $this->error("This product does not belongs to this partner", 403);
-        list($options,$combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
-        $general_details->options = collect($options);
+        $combinations = $this->productCombinationService->setProduct($general_details)->getCombinationData();
         $general_details->combinations = collect($combinations);
         $product = new WebstoreProductResource($general_details);
         return $this->success('Successful', ['product' => $product], 200);

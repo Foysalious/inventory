@@ -34,8 +34,7 @@ class ProductService
 
         if ($general_details->partner_id != $partner_id)
             return $this->error("This product does not belongs to this partner", 403);
-        list($options, $combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
-        $general_details->options = collect($options);
+        $combinations = $this->productCombinationService->setProduct($general_details)->getCombinationData();
         $general_details->combinations = collect($combinations);
         $product = new WebstoreProductResource($general_details);
         return $this->success('Successful', ['product' => $product], 200);
