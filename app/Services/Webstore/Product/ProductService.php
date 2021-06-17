@@ -93,7 +93,4 @@ class ProductService
         $product = new ProductResource($general_details);
         return $this->success('Successful', ['product' => $product], 200);
     }
-
-
-
 }

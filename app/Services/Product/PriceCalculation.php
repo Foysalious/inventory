@@ -120,10 +120,10 @@ class PriceCalculation extends BaseService
     public function getDiscountedUnitPrice()
     {
         $this->calculateDiscount();
-        if (!$this->discount) return $this->getOriginalUnitPriceWithVat();
+        if (!$this->discount) return $this->getOriginalUnitPrice();
         if (!$this->discount->is_amount_percentage)
-            return $this->getOriginalUnitPriceWithVat() - $this->discount->amount;
-        return $this->getOriginalUnitPriceWithVat() - (($this->getOriginalUnitPriceWithVat() * $this->discount->amount) / 100);
+            return $this->getOriginalUnitPrice() - $this->discount->amount;
+        return $this->getOriginalUnitPrice() - (($this->getOriginalUnitPrice() * $this->discount->amount) / 100);
     }
 
 }
