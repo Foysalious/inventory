@@ -4,8 +4,11 @@ use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
+use App\Services\Sku\CreateSkuDto;
+use App\Services\Sku\Creator as SkuCreator;
 use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Creator
 {
@@ -43,7 +46,7 @@ class Creator
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface)
+                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -250,6 +253,7 @@ class Creator
 
     /**
      * @param $product
+     * @throws UnknownProperties
      */
     private function createVariantsSKUAndSKUChannels($product)
     {
@@ -271,8 +275,13 @@ class Creator
                 array_push($product_option_value_ids,$product_option_value->id);
                 array_push($values,$value_name);
             }
-
-             $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock(), $productDetailObject->getWeight(), $productDetailObject->getWeightUnit());
+            $sku = $this->skuCreator->create(new CreateSkuDto([
+                'name' => implode("-", $values),
+                'product_id' => $product->id,
+                'stock' => $productDetailObject->getStock(),
+                'weight' => $productDetailObject->getWeight(),
+                'weight_unit' => $productDetailObject->getWeightUnit()
+            ]));
              $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
@@ -292,28 +301,6 @@ class Creator
             ]);
         }
         return $this->productChannelCreator->setData($product_channels)->store();
-    }
-
-
-    /**
-     * @param $product
-     * @param $values
-     * @param $product_id
-     * @param $stock
-     * @param $weight
-     * @param $weight_unit
-     * @return mixed
-     */
-    private function createSku($product, $values, $product_id, $stock, $weight, $weight_unit)
-    {
-        $sku_data = [
-            'name' => implode("-",$values) ,
-            'product_id' => $product_id,
-            'stock' => $stock,
-            'weight' => $weight,
-            'weight_unit' => $weight_unit,
-        ];
-        return $product->skus()->create($sku_data);
     }
 
     /**
@@ -380,13 +367,20 @@ class Creator
 
     /**
      * @param $product
+     * @throws UnknownProperties
      */
     private function createSKUAndSKUChannels($product)
     {
         $stock = $this->productRequestObjects[0]->getStock();
         $weight = $this->productRequestObjects[0]->getWeight();
         $weight_unit = $this->productRequestObjects[0]->getWeightUnit();
-        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0, "weight" => $weight, "weight_unit" => $weight_unit]);
+        $sku = $this->skuCreator->create(new CreateSkuDto([
+            "product_id" => $product->id,
+            "stock" => $stock ?: 0,
+            "weight" => $weight,
+            "weight_unit" => $weight_unit
+            ]
+        ));
         $channels = $this->createSKUChannels($sku, $this->productRequestObjects[0]->getChannelData());
         $this->createProductChannel($product->id,$channels);
     }
@@ -415,7 +409,7 @@ class Creator
     /**
      * @return array
      */
-    private function makeData()
+    private function makeData(): array
     {
         return [
             'partner_id' => $this->partnerId,
