@@ -2,6 +2,7 @@
 
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Resources\ProductsInfoResource;
+use App\Http\Resources\Webstore\ProductsResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -104,7 +105,7 @@ class ProductList
         //if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
        // if (isset($this->setSubCategoryIds))
          //   $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
-        $this->collectionIds = [57];
+        //$this->collectionIds = [57];
        // $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
 
         return $products_query->get();
@@ -125,16 +126,13 @@ class ProductList
         return $deleted_products_query->select('id')->get();
     }
 
-    /**
-     * @return ProductsInfoResource
-     * @throws ProductNotFoundException
-     */
+
     public function get()
     {
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        return new ProductsInfoResource($products);
+        return  ProductsResource::collection($products);
     }
 
     private function filterByCategories($products_query, $categoryIds)

@@ -7,6 +7,7 @@ class ProductsResource extends JsonResource
     public function toArray($request)
     {
         list($rating,$count_rating) = $this->getRatingandCount();
+        list($discounted_price_with_vat, $discount_percentage) = $this->getDiscountedPriceWithVat();
 
         return [
             'id' => $this->id,
@@ -16,9 +17,9 @@ class ProductsResource extends JsonResource
             'rating' => $rating,
             'count_rating' => $count_rating,
             'app_thumb'=> $this->app_thumb,
-            'options' => $this->options,
             'original_price'=> (double) $this->getOriginalPriceWithVat(),
-            'discounted_price' => (double) $this->getDiscountedPriceWithVat()
+            'discounted_price' => (double) $discounted_price_with_vat,
+            'discount_percentage' => $discount_percentage
         ];
     }
 

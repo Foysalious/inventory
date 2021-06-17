@@ -65,7 +65,7 @@ class Product extends BaseModel
 
     public function collectionIds()
     {
-        return $this->collection->pluck('id');
+        return $this->collection ? $this->collection->pluck('id') : [];
     }
 
     public function unit ()
@@ -101,8 +101,8 @@ class Product extends BaseModel
 
     public function getDiscountedPriceWithVat()
     {
-        $discounted_price = $this->getDiscountedPrice();
-        return  $discounted_price + ($discounted_price * $this->vat_percentage) / 100;
+        list($discounted_price,$discount_percentage) = $this->getDiscountedPrice();
+        return  [$discounted_price + ($discounted_price * $this->vat_percentage) / 100, $discount_percentage];
     }
 
     public function getDiscountedAmount()

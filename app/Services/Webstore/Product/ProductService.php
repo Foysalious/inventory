@@ -50,6 +50,7 @@ class ProductService
             ->setOffset($offset)
             ->setLimit($limit);
         $products = $this->productList->get();
+
         if ($request->has('order_by')) {
             $order = ($request->order == 'desc') ? 'sortByDesc' : 'sortBy';
             $products = $products->$order($request->order_by, SORT_NATURAL | SORT_FLAG_CASE);
