@@ -47,7 +47,8 @@ class ProductCalculator
     {
         $discount = $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first();
         $discount_amount = $discount ? $discount->amount : 0;
-        return $this->getOriginalPrice() - $discount_amount;
+        $original_price = $this->getOriginalPrice();
+        return [$original_price - $discount_amount,round(($discount_amount/$original_price)*100,2)];
     }
 
 

@@ -58,6 +58,16 @@ class Product extends BaseModel
         return $this->hasMany(ProductChannel::class,'product_id');
     }
 
+    public function collections()
+    {
+        return $this->belongsToMany(Collection::class,'collection_products','collection_id','product_id')->withTimestamps();
+    }
+
+    public function collectionIds()
+    {
+        return $this->collection ? $this->collection->pluck('id') : [];
+    }
+
     public function unit ()
     {
         return $this->belongsTo(Unit::class,'unit_id')->select('id', 'name_bn', 'name_en');
@@ -91,8 +101,8 @@ class Product extends BaseModel
 
     public function getDiscountedPriceWithVat()
     {
-        $discounted_price = $this->getDiscountedPrice();
-        return  $discounted_price + ($discounted_price * $this->vat_percentage) / 100;
+        list($discounted_price,$discount_percentage) = $this->getDiscountedPrice();
+        return  [$discounted_price + ($discounted_price * $this->vat_percentage) / 100, $discount_percentage];
     }
 
     public function getDiscountedAmount()

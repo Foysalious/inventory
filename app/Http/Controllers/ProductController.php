@@ -152,17 +152,6 @@ class ProductController extends Controller
     }
 
     /**
-     * @param $partner
-     * @param Request $request
-     * @return JsonResponse
-     * @throws ProductNotFoundException
-     */
-    public function getWebstoreProducts($partner, Request $request)
-    {
-        return $this->productService->getWebstoreProducts($partner, $request);
-    }
-
-    /**
      * Store a newly created resource in storage.
      *
      * @param $partner

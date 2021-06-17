@@ -7,6 +7,7 @@ use App\Http\Resources\Webstore\ProductsResource;
 use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
+use App\Services\Webstore\Product\ProductList;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,11 +20,14 @@ class ProductService
 
     private ProductRepositoryInterface $productRepositoryInterface;
     private ProductCombinationService $productCombinationService;
+    private ProductList $productList;
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductCombinationService $productCombinationService)
+    public function __construct(ProductRepositoryInterface $productRepositoryInterface, ProductCombinationService $productCombinationService, ProductList $productList)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productCombinationService = $productCombinationService;
+        $this->productList = $productList;
+
     }
 
 
@@ -36,11 +40,17 @@ class ProductService
     public function getProducts(int $partner_id, Request $request): JsonResponse
     {
         list($offset, $limit) = calculatePagination($request);
-        $resource = $this->productRepositoryInterface->getProductsByPartnerId($partner_id, $offset, $limit);
-        if ($resource->isEmpty()) throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        $products = ProductsResource::collection($resource);
-        if ($request->has('filter_by'))
-            $products = $this->filterProducts($products, $request->filter_by, $request->filter_values);
+        $category_ids = !is_array($request->category_ids) ? json_decode($request->category_ids,1) : $request->category_ids;
+        $sub_category_ids = !is_array($request->sub_category_ids) ? json_decode($request->sub_category_ids,1) : $request->sub_category_ids;
+        $this->productList->setPartnerId($partner_id)
+            ->setCategoryIds($category_ids)
+            ->setSubCategoryIds($sub_category_ids)
+            ->setUpdatedAfter($request->updated_after)
+            ->setWebstorePublicationStatus($request->is_published_for_webstore)
+            ->setOffset($offset)
+            ->setLimit($limit);
+        $products = $this->productList->get();
+
         if ($request->has('order_by')) {
             $order = ($request->order == 'desc') ? 'sortByDesc' : 'sortBy';
             $products = $products->$order($request->order_by, SORT_NATURAL | SORT_FLAG_CASE);
@@ -52,7 +62,7 @@ class ProductService
     {
         switch ($by) {
             case 'category': return $products->whereIn('category_id',json_decode($values));
-            case 'collection': return $products->whereIn('collection_id',json_decode($values));
+            case 'collection': return $products->whereIn('collection_id',[57]);
             case 'price': return $products->whereBetween('original_price', json_decode($values));
             case 'rating': return $products->whereIn('rating', json_decode($values));
             default: return '';
