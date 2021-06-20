@@ -15,7 +15,7 @@ class ProductsResource extends JsonResource
             'collection_id' => $this->collectionIds(),
             'name' => $this->name,
             'rating' => $rating,
-            'count_rating' => $count_rating,
+            'rating_count' => $count_rating,
             'app_thumb'=> $this->app_thumb,
             'original_price'=> (double) $this->getOriginalPriceWithVat(),
             'discounted_price' => (double) $discounted_price_with_vat,

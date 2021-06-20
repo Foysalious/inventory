@@ -40,7 +40,9 @@ class ProductCalculator
 
     public function getOriginalPrice()
     {
-       return  $this->skuChannelWithMinimumPrice()->price;
+       return  $this->skuChannelRepositoryInterface->builder()->where('channel_id', $this->channel)->wherehas('sku',function ($q){
+           $q->where('product_id',$this->product->id);
+       })->get()->min('price');
     }
 
     public function getDiscountedPrice()

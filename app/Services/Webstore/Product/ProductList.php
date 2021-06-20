@@ -102,12 +102,11 @@ class ProductList
     {
         $products_query = $this->productRepository->where('partner_id', $this->partnerId);
 
-        //if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-       // if (isset($this->setSubCategoryIds))
-         //   $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
-        //$this->collectionIds = [57];
-       // $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-
+//        if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+//        if (isset($this->setSubCategoryIds))
+//            $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
+//        $this->collectionIds = [57,69];
+//        $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
         return $products_query->get();
     }
 
@@ -154,10 +153,15 @@ class ProductList
 
     private function filterByCollectionIds($products_query, $collectionIds)
     {
-        return $products_query->whereHas('collections', function ($q) use ($collectionIds) {
+        return $products_query->whereHas('collections',function($q) use ($collectionIds){
             $q->whereIn('id', $collectionIds);
         });
     }
+
+ /*   private function filterByPrice($products_query,$price_range)
+    {
+        return $products_query->
+    }*/
 
 
 

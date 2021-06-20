@@ -60,7 +60,7 @@ class Product extends BaseModel
 
     public function collections()
     {
-        return $this->belongsToMany(Collection::class,'collection_products','collection_id','product_id')->withTimestamps();
+        return $this->belongsToMany(Collection::class,'collection_products','product_id','collection_id')->withTimestamps();
     }
 
     public function collectionIds()
