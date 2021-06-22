@@ -1,6 +1,7 @@
 <?php namespace App\Services\Product;
 
 
+use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
 
@@ -13,9 +14,10 @@ class ProductCombinationService
      * ProductCombinationService constructor.
      * @param SkuRepositoryInterface $skuRepositoryInterface
      */
-    public function __construct(SkuRepositoryInterface $skuRepositoryInterface)
+    public function __construct(SkuRepositoryInterface $skuRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface)
     {
         $this->skuRepositoryInterface = $skuRepositoryInterface;
+        $this->productOptionRepositoryInterface= $productOptionRepositoryInterface;
     }
 
     /**
