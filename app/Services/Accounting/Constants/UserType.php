@@ -2,9 +2,9 @@
 
 use App\Helper\ConstGetter;
 
-class Cash
+final class UserType
 {
     use ConstGetter;
 
-    const CASH = 'cash';
+    const PARTNER = "partner";
 }

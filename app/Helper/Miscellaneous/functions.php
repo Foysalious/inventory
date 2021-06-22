@@ -14,3 +14,20 @@ if (!function_exists('simplifyExceptionTrace')) {
         })->all();
     }
 }
+
+if (!function_exists('decodeGuzzleResponse')) {
+    /**
+     * @param      $response
+     * @param      bool $assoc
+     * @return     object|array|string|null
+     */
+    function decodeGuzzleResponse($response, $assoc = true)
+    {
+        $string = $response->getBody()->getContents();
+        $result = json_decode($string, $assoc);
+        if (json_last_error() != JSON_ERROR_NONE && $string != "") {
+            $result = $string;
+        }
+        return $result;
+    }
+}

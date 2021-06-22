@@ -12,7 +12,6 @@ class AccountingEntryClient
     protected string $apiKey;
     protected string $userType;
     protected int $userId;
-    protected $reportType;
 
     public function __construct(Client $client)
     {

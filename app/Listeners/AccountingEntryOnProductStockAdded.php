@@ -3,20 +3,23 @@
 namespace App\Listeners;
 
 use App\Events\ProductStockAdded;
+use App\Services\Accounting\ExpenseEntry;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
 class AccountingEntryOnProductStockAdded
 {
+    protected ExpenseEntry $stockEntry;
+
     /**
-     * Create the event listener.
-     *
-     * @return void
+     * AccountingEntryOnProductStockAdded constructor.
+     * @param ExpenseEntry $stockEntry
      */
-    public function __construct()
+    public function __construct(ExpenseEntry $stockEntry)
     {
-        //
+        $this->stockEntry = $stockEntry;
     }
+
 
     /**
      * Handle the event.
@@ -26,6 +29,6 @@ class AccountingEntryOnProductStockAdded
      */
     public function handle(ProductStockAdded $event)
     {
-        //
+        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequest())->createEntryForStockAdd();
     }
 }
