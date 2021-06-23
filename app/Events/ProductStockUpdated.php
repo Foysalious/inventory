@@ -1,36 +1,41 @@
-<?php
+<?php namespace App\Events;
 
-namespace App\Events;
-
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use App\Http\Requests\ProductRequest;
+use App\Models\Product;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 class ProductStockUpdated
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
+
+    protected Product $product;
+    protected ProductRequest $productRequest;
 
     /**
-     * Create a new event instance.
-     *
-     * @return void
+     * ProductStockAdded constructor.
+     * @param Product $product
+     * @param ProductRequest $request
      */
-    public function __construct()
+    public function __construct(Product $product, ProductRequest $request)
     {
-        //
+        $this->product = $product;
+        $this->productRequest = $request;
     }
 
     /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return \Illuminate\Broadcasting\Channel|array
+     * @return Product
      */
-    public function broadcastOn()
+    public function getProduct(): Product
     {
-        return new PrivateChannel('channel-name');
+        return $this->product;
+    }
+
+    /**
+     * @return ProductRequest
+     */
+    public function getRequest(): ProductRequest
+    {
+        return $this->productRequest;
     }
 }

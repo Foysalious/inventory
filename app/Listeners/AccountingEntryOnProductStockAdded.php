@@ -1,11 +1,7 @@
-<?php
-
-namespace App\Listeners;
+<?php namespace App\Listeners;
 
 use App\Events\ProductStockAdded;
 use App\Services\Accounting\ExpenseEntry;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 
 class AccountingEntryOnProductStockAdded
 {
@@ -29,6 +25,6 @@ class AccountingEntryOnProductStockAdded
      */
     public function handle(ProductStockAdded $event)
     {
-        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequest())->createEntryForStockAdd();
+        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequest())->createEntryForProductStockAdd();
     }
 }
