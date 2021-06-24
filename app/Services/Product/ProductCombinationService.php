@@ -109,7 +109,7 @@ class ProductCombinationService
             if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
             $sku_data['combination'] = !empty($temp) ? $temp : null;
             if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
-            $sku_data['stock'] = $sku->stock;
+            $sku_data['stock'] = $sku->stock();
             $temp = [];
             if($sku->skuChannels)
             {

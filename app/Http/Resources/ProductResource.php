@@ -22,7 +22,7 @@ class ProductResource extends JsonResource
             'name' => $this->name,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
-            'stock' => $this->getTotalStock(),
+            'stock' => $this->stock(),
             'app_thumb'=> "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/1608693744_jacket.jpeg",
             'variations' => $this->combinations(),
             'created_at' => $this->created_at

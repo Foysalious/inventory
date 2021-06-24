@@ -169,12 +169,16 @@ class Product extends BaseModel
         return $combinations;
     }
 
-    public function getTotalStock(){
+    public function stock(){
         $total_stock = 0;
-        $combinations = $this->combinations();
-        foreach ($combinations as $combination){
-            $total_stock += $combination['stock'];
-        }
+        $this->skus()->each(function ($each_sku) use (&$total_stock) {
+            $batches = $each_sku->batch;
+            if(count($batches) > 0) {
+                foreach ($batches as $batch) {
+                    $total_stock = $total_stock + $batch->stock;
+                }
+            }
+        });
         return $total_stock;
     }
 }

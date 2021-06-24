@@ -1,5 +1,6 @@
 <?php namespace App\Http\Resources;
 use App\Models\Discount;
+use App\Models\Sku;
 use App\Models\SkuChannel;
 use App\Models\Unit;
 use Illuminate\Http\Request;
@@ -16,6 +17,7 @@ class ProductSkuResource extends JsonResource
     public function toArray($request)
     {
         $sku_id = $this->skus()->pluck('id')->first();
+        /** @var $this Sku */
         return [
             'id' => $this->id,
             'name' => $this->name,
@@ -23,7 +25,7 @@ class ProductSkuResource extends JsonResource
             'vat_included_price'=> 200 ,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit()->pluck('name_en')->first(),
-            'stock' => $this->skus()->pluck('stock')->first(),
+            'stock' => $this->stock(),
             'category_id' => $this->category_id,
             'discount_applicable' => 0,
             'discounted_amount' => 10,
