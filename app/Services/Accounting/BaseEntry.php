@@ -2,6 +2,7 @@
 
 use App\Helper\Miscellaneous\RequestIdentification;
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Product;
 use App\Repositories\Accounting\AccountingRepository;
 use App\Services\Accounting\Constants\EntryTypes;
@@ -31,7 +32,7 @@ class BaseEntry
      * @param ProductRequest $request
      * @return $this
      */
-    public function setData(ProductRequest $request)
+    public function setData(ProductUpdateRequest $request)
     {
         $this->productDetails = (json_decode($request->product_details,true))[0];
         $this->accountingInfo = json_decode($request->accounting_info,true);
@@ -64,6 +65,40 @@ class BaseEntry
             'partner' => $this->product->partner_id,
         ];
         return  $data;
+    }
+
+    protected function makeData(): array
+    {
+        $data = $this->makeCommonData();
+        list($inventory_items,$total_amount) = $this->makeInventoryProduct();
+        $data['partner'] = $this->product->partner_id;
+        $data['inventory_products'] = $inventory_items;
+        $data['amount'] = $total_amount;
+        if ($this->accountingInfo['transaction_type'] == 'due')
+            $data['amount_cleared'] = $this->accountingInfo['amount_cleared'];
+        $data['source_id'] = null;
+        return $data;
+
+    }
+
+    protected function makeInventoryProduct():array
+    {
+        $data = [];
+        $total_amount = 0;
+        $this->product->skus()->each(function ($each_sku) use (&$data,&$total_amount){
+            $batches = $each_sku->batch()->get();
+            foreach ($batches as $batch) {
+                $data [] = [
+                    'id' => $this->product->id,
+                    'sku_id' => $batch->sku_id,
+                    'unit_price' => (double) $batch->cost,
+                    'name' => $this->product->name,
+                    'quantity' => (double) $batch->stock
+                ];
+                $total_amount = $total_amount + ($batch->cost * $batch->stock);
+            }
+        });
+        return [ json_encode($data), $total_amount ];
     }
 
 }

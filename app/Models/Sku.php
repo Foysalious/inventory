@@ -27,4 +27,9 @@ class Sku extends BaseModel
     {
         return $this->skuChannels()->min('price');
     }
+
+    public function batch()
+    {
+        return $this->hasMany(SkuBatch::class,'sku_id');
+    }
 }

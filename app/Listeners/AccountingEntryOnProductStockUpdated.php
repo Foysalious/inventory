@@ -3,18 +3,19 @@
 namespace App\Listeners;
 
 use App\Events\ProductStockUpdated;
-use App\Services\Accounting\ExpenseEntry;
+use App\Services\Accounting\StockAddEntry;
+use App\Services\Accounting\StockUpdateEntry;
 
 
 class AccountingEntryOnProductStockUpdated
 {
-    protected ExpenseEntry $stockEntry;
+    protected StockUpdateEntry $stockEntry;
 
     /**
-     * AccountingEntryOnProductStockAdded constructor.
-     * @param ExpenseEntry $stockEntry
+     * AccountingEntryOnProductStockUpdated constructor.
+     * @param StockUpdateEntry $stockEntry
      */
-    public function __construct(ExpenseEntry $stockEntry)
+    public function __construct(StockUpdateEntry $stockEntry)
     {
         $this->stockEntry = $stockEntry;
     }
@@ -28,6 +29,6 @@ class AccountingEntryOnProductStockUpdated
      */
     public function handle(ProductStockUpdated $event)
     {
-        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequest())->createEntryForProductStockAdd();
+        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequest())->createEntry();
     }
 }

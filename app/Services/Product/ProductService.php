@@ -1,6 +1,7 @@
 <?php namespace App\Services\Product;
 
 use App\Events\ProductStockAdded;
+use App\Events\ProductStockUpdated;
 use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
@@ -99,22 +100,21 @@ class ProductService extends BaseService
         /** @var ProductCreateRequest $productCreateRequest */
         $productCreateRequest = app(ProductCreateRequest::class);
         list($has_variant,$product_create_request_objs) = $productCreateRequest->setProductDetails($request->product_details)->get();
-        $product = true;
-//        $product = $this->creator->setPartnerId($partnerId)
-//            ->setCategoryId($request->category_id)
-//            ->setName($request->name)
-//            ->setDescription($request->description)
-//            ->setWarranty($request->warranty)
-//            ->setWarrantyUnit($request->warranty_unit)
-//            ->setVatPercentage($request->vat_percentage)
-//            ->setUnitId($request->unit_id)
-//            ->setDiscount($request->discount_amount)
-//            ->setDiscountEndDate($request->discount_end_date)
-//            ->setImages($request->images)
-//            ->setProductRequestObjects($product_create_request_objs)
-//            ->setHasVariant($has_variant)
-//            ->create();
-        $product = Product::find(1000328);
+        $product = $this->creator->setPartnerId($partnerId)
+            ->setCategoryId($request->category_id)
+            ->setName($request->name)
+            ->setDescription($request->description)
+            ->setWarranty($request->warranty)
+            ->setWarrantyUnit($request->warranty_unit)
+            ->setVatPercentage($request->vat_percentage)
+            ->setUnitId($request->unit_id)
+            ->setDiscount($request->discount_amount)
+            ->setDiscountEndDate($request->discount_end_date)
+            ->setImages($request->images)
+            ->setProductRequestObjects($product_create_request_objs)
+            ->setHasVariant($has_variant)
+            ->create();
+
         if($product && $request->has('accounting_info')) {
             event(new ProductStockAdded($product,$request));
         }
@@ -133,24 +133,28 @@ class ProductService extends BaseService
         if($product->partner_id != $partner)
             return $this->error("This product does not belong this partner", 403);
         /** @var $productUpdateRequestObjects ProductUpdateRequestObjects */
-        $productUpdateRequestObjects = app(ProductUpdateRequestObjects::class);
-        list($has_variant,$product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
+//        $productUpdateRequestObjects = app(ProductUpdateRequestObjects::class);
+//        list($has_variant,$product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
 
-        $this->updater->setProduct($product)
-            ->setCategoryId($request->category_id)
-            ->setName($request->name)
-            ->setDescription($request->description)
-            ->setWarranty($request->warranty)
-            ->setWarrantyUnit($request->warranty_unit)
-            ->setVatPercentage($request->vat_percentage)
-            ->setUnitId($request->unit_id)
-            ->setDiscount($request->discount_amount)
-            ->setDiscountEndDate($request->discount_end_date)
-            ->setImages($request->images)
-            ->setDeletedImages($request->deleted_images)
-            ->setProductUpdateRequestObjects($product_update_request_objs)
-            ->setHasVariant($has_variant)
-            ->update();
+//        $this->updater->setProduct($product)
+//            ->setCategoryId($request->category_id)
+//            ->setName($request->name)
+//            ->setDescription($request->description)
+//            ->setWarranty($request->warranty)
+//            ->setWarrantyUnit($request->warranty_unit)
+//            ->setVatPercentage($request->vat_percentage)
+//            ->setUnitId($request->unit_id)
+//            ->setDiscount($request->discount_amount)
+//            ->setDiscountEndDate($request->discount_end_date)
+//            ->setImages($request->images)
+//            ->setDeletedImages($request->deleted_images)
+//            ->setProductUpdateRequestObjects($product_update_request_objs)
+//            ->setHasVariant($has_variant)
+//            ->update();
+
+        if($product && $request->has('accounting_info')) {
+            event(new ProductStockUpdated($product,$request));
+        }
 
         return $this->success("Successful", ['product' => $product],200);
     }

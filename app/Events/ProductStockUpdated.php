@@ -1,6 +1,7 @@
 <?php namespace App\Events;
 
 use App\Http\Requests\ProductRequest;
+use App\Http\Requests\ProductUpdateRequest;
 use App\Models\Product;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
@@ -10,17 +11,17 @@ class ProductStockUpdated
     use Dispatchable, SerializesModels;
 
     protected Product $product;
-    protected ProductRequest $productRequest;
+    protected ProductUpdateRequest $productUpdateRequest;
 
     /**
-     * ProductStockAdded constructor.
+     * ProductStockUpdated constructor.
      * @param Product $product
-     * @param ProductRequest $request
+     * @param ProductUpdateRequest $request
      */
-    public function __construct(Product $product, ProductRequest $request)
+    public function __construct(Product $product, ProductUpdateRequest $request)
     {
         $this->product = $product;
-        $this->productRequest = $request;
+        $this->productUpdateRequest = $request;
     }
 
     /**
@@ -32,10 +33,10 @@ class ProductStockUpdated
     }
 
     /**
-     * @return ProductRequest
+     * @return ProductUpdateRequest
      */
-    public function getRequest(): ProductRequest
+    public function getRequest(): ProductUpdateRequest
     {
-        return $this->productRequest;
+        return $this->productUpdateRequest;
     }
 }
