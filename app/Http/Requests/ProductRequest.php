@@ -24,7 +24,8 @@ class ProductRequest extends FormRequest
         return [
             'category_id' => 'required|numeric',
             'name' => 'required|string',
-            'product_details' => 'required'
+            'product_details' => 'required',
+            'accounting_info' => 'sometimes|nullable'
         ];
     }
 }
