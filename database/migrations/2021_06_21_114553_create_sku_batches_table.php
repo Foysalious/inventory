@@ -20,6 +20,7 @@ class CreateSkuBatchesTable extends Migration
                 ->onUpdate('cascade')->onDelete('set null');
             $table->decimal('stock', 11, 2)->nullable()->index();
             $table->decimal('cost', 11, 2)->unsigned()->default(0.0);
+            $table->softDeletes();
             commonColumns($table);
         });
     }
