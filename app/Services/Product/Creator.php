@@ -4,8 +4,11 @@ use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
-use App\Services\Warranty\Units;
+use App\Services\Sku\CreateSkuDto;
+use App\Services\Sku\Creator as SkuCreator;
+use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Creator
 {
@@ -40,11 +43,10 @@ class Creator
     private $productRequestObjects;
     private $hasVariants;
 
-
-
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
-                                DiscountCreator $discountCreator, ProductImageCreator $productImageCreator, ProductChannelCreator $productChannelCreator)
+                                DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
+                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -53,6 +55,7 @@ class Creator
         $this->productOptionValueCreator = $productOptionValueCreator;
         $this->combinationCreator = $combinationCreator;
         $this->productChannelCreator = $productChannelCreator;
+        $this->discountRepositoryInterface = $discountRepositoryInterface;
     }
 
 
@@ -219,7 +222,7 @@ class Creator
     }
 
     /**
-     * @param $productDetails
+     * @param $productRequestObjects
      * @return $this
      */
     public function setProductRequestObjects($productRequestObjects)
@@ -250,6 +253,7 @@ class Creator
 
     /**
      * @param $product
+     * @throws UnknownProperties
      */
     private function createVariantsSKUAndSKUChannels($product)
     {
@@ -271,12 +275,16 @@ class Creator
                 array_push($product_option_value_ids,$product_option_value->id);
                 array_push($values,$value_name);
             }
-
-             $sku = $this->createSku($product,$values,$product->id,$productDetailObject->getStock());
+            $sku = $this->skuCreator->create(new CreateSkuDto([
+                'name' => implode("-", $values),
+                'product_id' => $product->id,
+                'stock' => $productDetailObject->getStock(),
+                'weight' => $productDetailObject->getWeight(),
+                'weight_unit' => $productDetailObject->getWeightUnit()
+            ]));
              $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
-             //$this->createProductChannel($productDetailObject->getChannelData(),$product->id);
         }
         $all_channels = array_merge(...$all_channels);
         $this->createProductChannel($product->id,$all_channels);
@@ -294,40 +302,6 @@ class Creator
         }
         return $this->productChannelCreator->setData($product_channels)->store();
     }
-
-    /**
-     * @param $product
-     * @param $values
-     * @param $product_id
-     * @param $stock
-     * @return mixed
-     */
-    private function createSku($product, $values, $product_id, $stock)
-    {
-        $sku_data = [
-            'name' => implode("-",$values) ,
-            'product_id' => $product_id,
-            'stock' => $stock,
-        ];
-        return $product->skus()->create($sku_data);
-    }
-
-    /**
-     * @param $channels
-     * @param $product_id
-     * @return mixed
-     */
-  /*  private function createProductChannel($channels, $product_id)
-    {
-        $product_channels =   collect($channels)->map(function($channel) use($product_id) {
-            return [
-                'product_id' => $product_id,
-                'channel_id' =>   $channel->getChannelId(),
-            ];
-        });
-
-        return $this->productChannelCreator->setData($product_channels->toArray())->store();
-    }*/
 
     /**
      * @param $sku_id
@@ -352,20 +326,20 @@ class Creator
      */
     private function createSkuChannels($sku, $channel_data)
     {
-        $data = [];
         $channels  = [];
         foreach($channel_data as $channel)
         {
-           array_push($data,[
-               'sku_id' => $sku->id,
-               'channel_id' => $channel->getChannelId(),
-               'cost' =>  $channel->getCost() ?: 0,
-               'price' => $channel->getPrice() ?: 0,
-               'wholesale_price' => $channel->getWholeSalePrice() ?: null
-           ]);
+           $data = [
+               'sku_id'             => $sku->id,
+               'channel_id'         => $channel->getChannelId(),
+               'cost'               => $channel->getCost() ?: 0,
+               'price'              => $channel->getPrice() ?: 0,
+               'wholesale_price'    => $channel->getWholeSalePrice() ?: null
+           ];
+           $skuChannelData = $sku->skuChannels()->create($data);
+           $this->discountCreator->setProductSkusDiscountData($skuChannelData->id, $channel);
            array_push($channels,$channel->getChannelId());
         }
-         $sku->skuChannels()->insert($data);
         return $channels;
     }
 
@@ -393,12 +367,21 @@ class Creator
 
     /**
      * @param $product
+     * @throws UnknownProperties
      */
     private function createSKUAndSKUChannels($product)
     {
         $stock = $this->productRequestObjects[0]->getStock();
-        $sku = $product->skus()->create(["product_id" => $product->id, "stock" => $stock ?: 0]);
-        $channels = $this->createSKUChannels($sku,$this->productRequestObjects[0]->getChannelData());
+        $weight = $this->productRequestObjects[0]->getWeight();
+        $weight_unit = $this->productRequestObjects[0]->getWeightUnit();
+        $sku = $this->skuCreator->create(new CreateSkuDto([
+            "product_id" => $product->id,
+            "stock" => $stock ?: 0,
+            "weight" => $weight,
+            "weight_unit" => $weight_unit
+            ]
+        ));
+        $channels = $this->createSKUChannels($sku, $this->productRequestObjects[0]->getChannelData());
         $this->createProductChannel($product->id,$channels);
     }
 
@@ -408,7 +391,11 @@ class Creator
      */
     private function createProductDiscount($product)
     {
-        $this->discountCreator->setDiscount($this->discountAmount)->setDiscountEndDate($this->discountEndDate)->setDiscountTypeId($product->id)->setDiscountType(Types::PRODUCT)->create();
+        $this->discountCreator->setDiscount($this->discountAmount)
+            ->setDiscountEndDate($this->discountEndDate)
+            ->setDiscountTypeId($product->id)
+            ->setDiscountType(Types::PRODUCT)
+            ->create();
     }
 
     /**
@@ -422,7 +409,7 @@ class Creator
     /**
      * @return array
      */
-    private function makeData()
+    private function makeData(): array
     {
         return [
             'partner_id' => $this->partnerId,
@@ -430,7 +417,7 @@ class Creator
             'name' => $this->name,
             'description' => $this->description,
             'warranty' => $this->warranty ?: 0,
-            'warranty_unit' => $this->warrantyUnit ?: Units::DAY,
+            'warranty_unit' => $this->warrantyUnit ?: WarrantyUnits::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
             'unit_id' => $this->unitId,
         ];

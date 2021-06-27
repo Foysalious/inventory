@@ -1,12 +1,13 @@
 <?php namespace App\Http\Controllers;
 
+use App\Http\Requests\SkuStockUpdateRequest;
 use App\Services\Sku\SkuService;
 use Illuminate\Http\Request;
 
 class SkuController extends Controller
 {
     /**
-     * @var SkuService
+     * @var SkuService $skuService
      */
     private SkuService $skuService;
 
@@ -23,5 +24,14 @@ class SkuController extends Controller
     public function getSkusByProductIds(Request $request)
     {
         return $this->skuService->getSkusByProductIds($request->product_ids);
+    }
+
+    /**
+     * @param int $partner_id
+     * @param SkuStockUpdateRequest $request
+     */
+    public function updateSkuStock(int $partner_id, SkuStockUpdateRequest $request)
+    {
+        return $this->skuService->updateSkuStockForOrder($request);
     }
 }

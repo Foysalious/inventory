@@ -31,7 +31,7 @@ class ImageUpdater
     {
         foreach (ImageConstants::COLLECTION_IMAGE_COLUMNS as $column_name)
         {
-            $fileName = $this->collection_repo->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+            $fileName = $this->collection_repo->getDeletionFileNameFromCDN($partner_id, $collection_id, $column_name);
             $mainFileName = $this->getMainFileName($fileName);
 
             if($mainFileName != 'default.jpg') $this->deleteFileFromCDN(substr($fileName, strlen(config('s3.url'))));
@@ -40,11 +40,10 @@ class ImageUpdater
 
     public function deleteSingleCollectionImage($partner_id, $collection_id, $column_name)
     {
-        $fileName = $this->collectionRepositoryInterface->getDeletionFileNameCollectionImageFromCDN($partner_id, $collection_id, $column_name);
+        $fileName = $this->collectionRepositoryInterface->getDeletionFileNameFromCDN($partner_id, $collection_id, $column_name);
         $mainFileName = $this->getMainFileName($fileName);
 
-        if($mainFileName != 'default.jpg')
-            $this->deleteFileFromCDN(substr($fileName, strlen(config('s3.url'))));
+        if($mainFileName != 'default.jpg') $this->deleteFileFromCDN(substr($fileName, strlen(config('s3.url'))));
     }
 
     public function getMainFileName($fileName)

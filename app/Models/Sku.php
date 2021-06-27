@@ -8,6 +8,7 @@ class Sku extends BaseModel
 {
     use HasFactory,SoftDeletes;
     protected $guarded = ['id'];
+    protected $casts = ['stock' => 'double'];
 
     public function skuChannels()
     {
@@ -25,5 +26,10 @@ class Sku extends BaseModel
     public function originalPrice()
     {
         return $this->skuChannels()->min('price');
+    }
+
+    public function batch()
+    {
+        return $this->hasMany(SkuBatch::class,'sku_id');
     }
 }

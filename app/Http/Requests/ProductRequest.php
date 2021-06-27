@@ -24,9 +24,8 @@ class ProductRequest extends FormRequest
         return [
             'category_id' => 'required|numeric',
             'name' => 'required|string',
-            'discount_amount' => 'sometimes|required|numeric',
-            'discount_end_date'=> 'date|required_with:discount_amount',
-            'product_details' => 'required'
+            'product_details' => 'required',
+            'accounting_info' => 'sometimes|nullable'
         ];
     }
 }

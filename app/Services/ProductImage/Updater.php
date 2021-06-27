@@ -1,7 +1,4 @@
-<?php
-
-
-namespace App\Services\ProductImage;
+<?php namespace App\Services\ProductImage;
 
 
 use App\Interfaces\ProductImageRepositoryInterface;
@@ -23,9 +20,10 @@ class Updater
 
     public function updateImageList($images, $deletedImages, $product)
     {
-        if($deletedImages) {
-            $this->deleteRequestedProductImages($product->id, $deletedImages);
+        if(json_decode($deletedImages)) {
+            $this->deleteRequestedProductImages($product->id, json_decode($deletedImages));
         }
+
         if($images) {
             $this->productImageCreator->setProductId($product->id)->setImages($images)->create();
         }

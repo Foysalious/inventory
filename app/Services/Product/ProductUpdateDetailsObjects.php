@@ -5,10 +5,12 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 class ProductUpdateDetailsObjects
 {
     private $productDetail;
-    private  $combination;
+    private $combination;
     private $stock;
     private $channelData;
     private $hasVariant;
+    private ?float $weight;
+    private ?string $weightUnit;
 
     public function setProductDetail($productDetail)
     {
@@ -29,13 +31,14 @@ class ProductUpdateDetailsObjects
         if($this->hasVariant)
             $this->setCombination();
         $this->setStock();
+        $this->setWeight();
+        $this->setWeightUnit();
         $this->setChannelData();
         return $this;
     }
 
     /**
      * @return bool|mixed
-     * @throws ProductDetailsPropertyValidationError
      */
     public function validate()
     {
@@ -60,10 +63,21 @@ class ProductUpdateDetailsObjects
         return $this->combination;
     }
 
-
     public function setStock()
     {
         $this->stock = $this->productDetail->stock;
+        return $this;
+    }
+
+    public function setWeight()
+    {
+        $this->weight = $this->productDetail->weight ?? null;
+        return $this;
+    }
+
+    public function setWeightUnit()
+    {
+        $this->weightUnit = $this->productDetail->weight_unit ?? null;
         return $this;
     }
 
@@ -71,6 +85,17 @@ class ProductUpdateDetailsObjects
     {
         return $this->stock;
     }
+
+    public function getWeight()
+    {
+        return $this->weight;
+    }
+
+    public function getWeightUnit()
+    {
+        return $this->weightUnit;
+    }
+
     public function setChannelData()
     {
         $final = [];

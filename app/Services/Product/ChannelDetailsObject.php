@@ -5,12 +5,87 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 
 class ChannelDetailsObject
 {
-
+    protected $discountEndDate;
     private $channelDetails;
     private $price;
     private $cost;
     private $wholeSalePrice;
     private $channelId;
+    private $isPercentage;
+    private $discount;
+    private $discount_details;
+
+    /**
+     * @param mixed $details
+     * @return ChannelDetailsObject
+     */
+    public function setDiscountDetails($discount_details)
+    {
+        $this->discount_details = $discount_details;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDiscountDetails()
+    {
+        return $this->discount_details;
+    }
+
+    /**
+     * @param mixed $discountEndDate
+     * @return ChannelDetailsObject
+     */
+    public function setDiscountEndDate($discountEndDate)
+    {
+        $this->discountEndDate = $discountEndDate;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDiscountEndDate()
+    {
+        return $this->discountEndDate;
+    }
+
+    /**
+     * @param mixed $isPercentage
+     * @return ProductDetailsObject
+     */
+    public function setIsPercentage($isPercentage)
+    {
+        $this->isPercentage = $isPercentage;
+        return $this;
+    }
+
+    /**
+     * @param mixed $discount
+     * @return ProductDetailsObject
+     */
+    public function setDiscount($discount)
+    {
+        $this->discount = $discount;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getIsPercentage()
+    {
+        return $this->isPercentage;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
 
     /**
      * @param mixed $channelDetails
@@ -57,6 +132,10 @@ class ChannelDetailsObject
         $this->price = $this->channelDetails->price;
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;
+        $this->discount_details = $this->channelDetails->discount_details;
+        $this->isPercentage = $this->channelDetails->is_percentage;
+        $this->discount = $this->channelDetails->discount;
+        $this->discountEndDate = $this->channelDetails->discount_end_date;
         return $this;
 
     }

@@ -1,6 +1,7 @@
 <?php namespace App\Services\Sku;
 
-use App\Http\Resources\ProductResource;
+use App\Http\Requests\SkuStockUpdateRequest;
+use App\Http\Resources\WebstoreProductResource;
 use App\Http\Resources\SkuResource;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Services\BaseService;
@@ -48,10 +49,22 @@ class SkuService extends BaseService
         return $this->skuRepository->getSkuDetails($channel_id,$sku_id);
     }
 
-    public function getSkusByProductIds($productIds)
+    /**
+     * @param SkuStockUpdateRequest $request
+     */
+    public function updateSkuStockForOrder(SkuStockUpdateRequest $request)
     {
-        $skus = $this->skuRepository->whereIn('product_id', $productIds)
-            ->pluck('id', 'product_id');
-        return $this->success('Successful', ['skus' => $skus], 200);
+        $sku = $this->skuRepository->where('id', $request->id)->where('product_id', $request->product_id)->first();
+        if ($request->operation == StockOperationType::DECREMENT) {
+            $sku->stock = $sku->stock - $request->quantity;
+            $updated = $sku->save();
+        }
+        if ($request->operation == StockOperationType::INCREMENT) {
+            $sku->stock = $sku->stock + $request->quantity;
+            $updated = $sku->save();
+        }
+        if (isset($updated)) $data = ['stock_updated' => $updated];
+
+        return $this->success('Successful', $data ?? null, 200);
     }
 }

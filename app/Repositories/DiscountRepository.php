@@ -10,6 +10,4 @@ class DiscountRepository extends BaseRepository implements DiscountRepositoryInt
     {
         parent::__construct($model);
     }
-
-
 }

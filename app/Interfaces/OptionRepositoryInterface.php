@@ -3,5 +3,5 @@
 
 interface OptionRepositoryInterface extends BaseRepositoryInterface
 {
-    public function getAllWithOptions($partner_id,$offset = 0, $limit = 50);
+    public function getAllWithOptions($offset = 0, $limit = 50);
 }

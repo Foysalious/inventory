@@ -2,6 +2,7 @@
 
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Category extends BaseModel
@@ -10,7 +11,6 @@ class Category extends BaseModel
 
     protected $guarded = ['id'];
 
-//    protected $visible = ['id', 'name'];
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
@@ -51,8 +51,13 @@ class Category extends BaseModel
         return $this->belongsToMany(Partner::class);
     }
 
-    public function categoryPartner()
+    public function categoryPartner(): HasMany
     {
         return $this->hasMany(CategoryPartner::class, 'category_id');
+    }
+
+    public function isPublishedForSheba()
+    {
+        return $this->is_published_for_sheba;
     }
 }
