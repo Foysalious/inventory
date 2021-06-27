@@ -276,7 +276,7 @@ class Creator
                 array_push($values,$value_name);
             }
             $sku = $this->skuCreator->create(new CreateSkuDto([
-                'name' => implode("-", $values),
+                'name' => $product->name . '-' . implode("-", $values),
                 'product_id' => $product->id,
                 'stock' => $productDetailObject->getStock(),
                 'weight' => $productDetailObject->getWeight(),
@@ -375,6 +375,7 @@ class Creator
         $weight = $this->productRequestObjects[0]->getWeight();
         $weight_unit = $this->productRequestObjects[0]->getWeightUnit();
         $sku = $this->skuCreator->create(new CreateSkuDto([
+            "name" => $product->name ,
             "product_id" => $product->id,
             "stock" => $stock ?: 0,
             "weight" => $weight,
