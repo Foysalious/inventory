@@ -115,9 +115,9 @@ class ProductService extends BaseService
             ->setHasVariant($has_variant)
             ->create();
 
-        if($product && $request->has('accounting_info')) {
-            event(new ProductStockAdded($product,$request));
-        }
+//        if($product && $request->has('accounting_info')) {
+//            event(new ProductStockAdded($product,$request));
+//        }
 
         return $this->success("Successful", ['product' => $product],201);
     }

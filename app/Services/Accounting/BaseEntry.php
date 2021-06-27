@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Repositories\Accounting\AccountingRepository;
 use App\Services\Accounting\Constants\EntryTypes;
 use App\Traits\ModificationFields;
+use Illuminate\Http\Request;
 
 
 class BaseEntry
@@ -32,7 +33,7 @@ class BaseEntry
      * @param ProductRequest $request
      * @return $this
      */
-    public function setData(ProductUpdateRequest $request)
+    public function setData(Request $request)
     {
         $this->productDetails = (json_decode($request->product_details,true))[0];
         $this->accountingInfo = json_decode($request->accounting_info,true);
