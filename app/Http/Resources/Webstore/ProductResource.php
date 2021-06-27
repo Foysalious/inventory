@@ -26,7 +26,7 @@ class ProductResource extends JsonResource
             'description' => $this->description,
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
-            'stock' => $this->stock,
+            'stock' => $this->stock(),
             'rating' => $rating,
             'rating_count' => $count_rating,
             'app_thumb' => $this->app_thumb,
