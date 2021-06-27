@@ -32,4 +32,16 @@ class Sku extends BaseModel
     {
         return $this->hasMany(SkuBatch::class,'sku_id');
     }
+
+    public function stock()
+    {
+        $total_stock = 0;
+        $batches = $this->batch()->get();
+        if(count($batches) > 0) {
+            foreach ($batches as $batch) {
+                $total_stock = $total_stock + $batch->stock;
+            }
+        }
+        return $total_stock;
+    }
 }
