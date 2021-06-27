@@ -2,12 +2,16 @@
 
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Models\Sku;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
+use App\Services\SkuBatch\SkuBatchDto;
 use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\SkuBatch\Creator as SkuBatchCreator;
+use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Creator
@@ -46,7 +50,9 @@ class Creator
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator)
+                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator,
+                                protected SkuBatchCreator $skuBatchCreator
+    )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -264,25 +270,30 @@ class Creator
             $combinations = $productDetailObject->getCombination();
             $product_option_value_ids = [];
             $values = [];
-            foreach($combinations as $combination)
-            {
-                /** @var $combination CombinationDetailsObject */
-                $option_name = $combination->getoption();
-                $product_option = $this->createProductOptions($product->id, $option_name);
-                $value_name = $combination->getValue();
-                $value_details = $combination->getValueDetails();
-                $product_option_value = $this->createProductOptionValues($product_option->id, $value_name, $value_details);
-                array_push($product_option_value_ids,$product_option_value->id);
-                array_push($values,$value_name);
-            }
-            $sku = $this->skuCreator->create(new CreateSkuDto([
-                'name' => $product->name . '-' . implode("-", $values),
-                'product_id' => $product->id,
-                'stock' => $productDetailObject->getStock(),
-                'weight' => $productDetailObject->getWeight(),
-                'weight_unit' => $productDetailObject->getWeightUnit()
-            ]));
-             $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
+//            foreach($combinations as $combination)
+//            {
+//                /** @var $combination CombinationDetailsObject */
+//                $option_name = $combination->getoption();
+//                $product_option = $this->createProductOptions($product->id, $option_name);
+//                $value_name = $combination->getValue();
+//                $value_details = $combination->getValueDetails();
+//                $product_option_value = $this->createProductOptionValues($product_option->id, $value_name, $value_details);
+//                array_push($product_option_value_ids,$product_option_value->id);
+//                array_push($values,$value_name);
+//            }
+//            $sku = $this->skuCreator->create(new CreateSkuDto([
+//                'name' => $product->name . '-' . implode("-", $values),
+//                'product_id' => $product->id,
+//                'stock' => $productDetailObject->getStock(),
+//                'weight' => $productDetailObject->getWeight(),
+//                'weight_unit' => $productDetailObject->getWeightUnit()
+//            ]));
+            $sku = Sku::find(520);
+//            dd($sku);
+//             $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
+
+             $this->createSkuBatch($sku,$productDetailObject);
+             dd($sku,$productDetailObject->getChannelData());
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
         }
@@ -423,4 +434,20 @@ class Creator
             'unit_id' => $this->unitId,
         ];
     }
+
+    private function createSkuBatch(Sku $sku, $product_detail_object)
+    {
+
+        $sku_batch_dto = new SkuBatchDto([
+            "sku_id" => $sku->id,
+            "stock" => $product_detail_object->getStock() ?: 0,
+            "cost" => $product_detail_object->getChannelData()[0]->getCost() ?: 0,
+        ]);
+
+        dd($sku_batch_dto);
+        $this->skuBatchCreator->create();
+        dd($sku,$product_detail_object);
+    }
+
+
 }
