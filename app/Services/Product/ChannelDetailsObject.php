@@ -132,10 +132,10 @@ class ChannelDetailsObject
         $this->price = $this->channelDetails->price;
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;
-        $this->discount_details = $this->channelDetails->discount_details;
-        $this->isPercentage = $this->channelDetails->is_percentage;
-        $this->discount = $this->channelDetails->discount;
-        $this->discountEndDate = $this->channelDetails->discount_end_date;
+        $this->discount_details = $this->channelDetails->discount_details ?? '';
+        $this->isPercentage = $this->channelDetails->is_percentage ?? null;
+        $this->discount = $this->channelDetails->discount ?? null;
+        $this->discountEndDate = $this->channelDetails->discount_end_date ?? null;
         return $this;
 
     }

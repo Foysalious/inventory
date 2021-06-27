@@ -9,12 +9,8 @@ use Illuminate\Http\Request;
 
 class CollectionController extends Controller
 {
-    protected $collectionService;
 
-    public function __construct(CollectionService $collectionService)
-    {
-        $this->collectionService = $collectionService;
-    }
+    public function __construct(public CollectionService $collectionService){}
 
     public function index(Request $request, $partner_id) : object
     {
