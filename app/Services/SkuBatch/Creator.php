@@ -1,9 +1,11 @@
 <?php namespace App\Services\SkuBatch;
 
 use App\Interfaces\SkuBatchRepositoryInterface;
+use App\Traits\ModificationFields;
 
 class Creator
 {
+    use ModificationFields;
     public function __construct(
        protected SkuBatchRepositoryInterface $skuBatchRepository
     )
@@ -11,8 +13,7 @@ class Creator
 
     public function create(SkuBatchDto $skuBatchDto)
     {
-        dd($skuBatchDto);
-        dd('in skuBatch creator');
+        $this->skuBatchRepository->create(($skuBatchDto->toArray()));
     }
 
 

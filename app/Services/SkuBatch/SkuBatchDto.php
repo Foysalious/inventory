@@ -4,8 +4,8 @@ use Spatie\DataTransferObject\DataTransferObject;
 
 class SkuBatchDto extends DataTransferObject
 {
-    protected int $sku_id;
-    protected float $stock;
-    protected float $cost;
+    public int $sku_id;
+    public float $stock;
+    public float $cost;
 
 }
