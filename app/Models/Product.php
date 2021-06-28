@@ -14,6 +14,26 @@ class Product extends BaseModel
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];
 
+    public function setNameAttribute($name)
+    {
+        $this->attributes['name']=json_encode($name);
+    }
+
+    public function getNameAttribute($name)
+    {
+        return json_decode($name);
+    }
+
+    public function setDescriptionAttribute($description){
+
+        $this->attributes['description']=json_encode($description);
+    }
+
+    public function getDescriptionAttribute($description){
+
+        return json_decode($description);
+    }
+
     public function skus()
     {
         return $this->hasMany(Sku::class);
