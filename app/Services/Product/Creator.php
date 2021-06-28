@@ -2,12 +2,15 @@
 
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Models\Sku;
 use App\Services\Discount\Types;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
+use App\Services\SkuBatch\SkuBatchDto;
 use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
+use App\Services\SkuBatch\Creator as SkuBatchCreator;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Creator
@@ -46,7 +49,9 @@ class Creator
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator)
+                                ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator,
+                                protected SkuBatchCreator $skuBatchCreator
+    )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -283,6 +288,7 @@ class Creator
                 'weight_unit' => $productDetailObject->getWeightUnit()
             ]));
              $channels = $this->createSkuChannels($sku,$productDetailObject->getChannelData());
+             $this->createSkuBatch($sku,$productDetailObject);
              array_push($all_channels,$channels);
              $this->createCombination($sku->id,$product_option_value_ids);
         }
@@ -423,4 +429,15 @@ class Creator
             'unit_id' => $this->unitId,
         ];
     }
+
+    private function createSkuBatch(Sku $sku, $product_detail_object)
+    {
+        $this->skuBatchCreator->create(new SkuBatchDto([
+            "sku_id" => $sku->id,
+            "stock" => $product_detail_object->getStock() ?: 0,
+            "cost" => $product_detail_object->getChannelData()[0]->getCost() ?: 0,
+        ]));
+    }
+
+
 }

@@ -9,6 +9,7 @@ use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\ProductChannelRepositoryInterface;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductOptionValueRepositoryInterface;
+use App\Interfaces\SkuBatchRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\PartnerRepositoryInterface;
@@ -28,6 +29,7 @@ use App\Repositories\OptionRepository;
 use App\Repositories\ProductChannelRepository;
 use App\Repositories\ProductOptionRepository;
 use App\Repositories\ProductOptionValueRepository;
+use App\Repositories\SkuBatchRepository;
 use App\Repositories\SkuChannelRepository;
 use App\Repositories\SkuRepository;
 use App\Repositories\PartnerRepository;
@@ -81,6 +83,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(ProductUpdateLogRepositoryInterface::class, ProductUpdateLogRepository::class);
         $this->app->singleton(CollectionProductsRepositoryInterface::class, CollectionProductsRepository::class);
         $this->app->singleton(SkuChannelRepositoryInterface::class, SkuChannelRepository::class);
+        $this->app->singleton(SkuBatchRepositoryInterface::class, SkuBatchRepository::class);
     }
 
 }
