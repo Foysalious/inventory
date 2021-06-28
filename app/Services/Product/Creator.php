@@ -388,6 +388,7 @@ class Creator
             "weight_unit" => $weight_unit
             ]
         ));
+        $this->createSkuBatch($sku,$this->productRequestObjects[0]);
         $channels = $this->createSKUChannels($sku, $this->productRequestObjects[0]->getChannelData());
         $this->createProductChannel($product->id,$channels);
     }
