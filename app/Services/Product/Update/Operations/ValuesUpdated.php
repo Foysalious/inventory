@@ -16,8 +16,11 @@ use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\UpdateNature;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
+use App\Services\SkuBatch\SkuBatchDto;
 use Carbon\Carbon;
+use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
+use App\Services\SkuBatch\Updater as SkuStockUpdater;
 
 
 class ValuesUpdated
@@ -59,7 +62,9 @@ class ValuesUpdated
                                 DiscountRepositoryInterface $discountRepository,
                                 SkuRepositoryInterface $skuRepository, SkuChannelRepositoryInterface $skuChannelRepository,
                                 ProductOptionCreator $productOptionCreator, ProductOptionValueCreator $productOptionValueCreator,
-                                CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator)
+                                CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator,
+                                protected SkuStockUpdater $skuStockUpdater
+    )
     {
         $this->productOptionValueRepository = $productOptionValueRepository;
         $this->combinationRepository = $combinationRepository;
@@ -356,5 +361,17 @@ class ValuesUpdated
     protected function deleteSkuChannelDiscount($skus_channels_to_delete)
     {
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
+    }
+
+    protected function updateStock(int $sku_id, float $cost, float $stock)
+    {
+        $sku_dto = new SkuBatchDto(
+            [
+                "sku_id" => $sku_id,
+                "stock" => $stock,
+                "cost" => $cost,
+            ]
+        );
+        $this->skuStockUpdater->setSkuBatchDto($sku_dto)->update();
     }
 }
