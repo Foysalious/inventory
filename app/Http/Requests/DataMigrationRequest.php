@@ -23,8 +23,7 @@ class DataMigrationRequest extends FormRequest
     public function rules()
     {
         return [
-            'pos_categories' => 'required',
-            'partner_pos_categories' => 'required'
+            'pos_categories' => 'sometimes|required',
         ];
     }
 }

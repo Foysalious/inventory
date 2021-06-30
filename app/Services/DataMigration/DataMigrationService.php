@@ -3,8 +3,10 @@
 
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\ChannelRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\PartnerRepositoryInterface;
+use App\Interfaces\ProductImageRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ProductUpdateLogRepositoryInterface;
 use App\Interfaces\UnitRepositoryInterface;
@@ -28,6 +30,11 @@ class DataMigrationService
     /** @var DiscountRepositoryInterface */
     private DiscountRepositoryInterface $discountRepositoryInterface;
     private $discounts;
+    /** @var ChannelRepositoryInterface */
+    private ChannelRepositoryInterface $channelRepositoryInterface;
+    private $productImages;
+    /** @var ProductImageRepositoryInterface */
+    private ProductImageRepositoryInterface $productImageRepositoryInterface;
 
     /**
      * DataMigrationService constructor.
@@ -38,12 +45,16 @@ class DataMigrationService
      * @param ProductRepositoryInterface $productRepositoryInterface
      * @param UnitRepositoryInterface $unitRepositoryInterface
      * @param DiscountRepositoryInterface $discountRepositoryInterface
+     * @param ChannelRepositoryInterface $channelRepositoryInterface
+     * @param ProductImageRepositoryInterface $productImageRepositoryInterface
      */
     public function __construct(CategoryRepositoryInterface $categoryRepositoryInterface,
                                 CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface,
                                 PartnerRepositoryInterface $partnerRepositoryInterface, ProductUpdateLogRepositoryInterface $productUpdateLogRepositoryInterface,
                                 ProductRepositoryInterface $productRepositoryInterface, UnitRepositoryInterface $unitRepositoryInterface,
-                                DiscountRepositoryInterface $discountRepositoryInterface)
+                                DiscountRepositoryInterface $discountRepositoryInterface,
+                                ChannelRepositoryInterface $channelRepositoryInterface,
+                                ProductImageRepositoryInterface $productImageRepositoryInterface)
     {
         $this->categoryRepositoryInterface = $categoryRepositoryInterface;
         $this->categoryPartnerRepositoryInterface = $categoryPartnerRepositoryInterface;
@@ -52,6 +63,8 @@ class DataMigrationService
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->unitRepositoryInterface = $unitRepositoryInterface;
         $this->discountRepositoryInterface = $discountRepositoryInterface;
+        $this->channelRepositoryInterface = $channelRepositoryInterface;
+        $this->productImageRepositoryInterface = $productImageRepositoryInterface;
     }
 
     /**
@@ -95,6 +108,16 @@ class DataMigrationService
     }
 
     /**
+     * @param $productImages
+     * @return DataMigrationService
+     */
+    public function setProductImages($productImages)
+    {
+        $this->productImages = $productImages;
+        return $this;
+    }
+
+    /**
      * @param mixed $productUpdateLogs
      * @return DataMigrationService
      */
@@ -116,11 +139,13 @@ class DataMigrationService
 
     public function migrate()
     {
-        $this->migratePartnerInfoData();
-        $this->migrateCategoryData();
-        $this->migrateProductsData();
-        $this->migrateProductDiscountsData();
-        $this->migrateProductUpdateLogsData();
+        if ($this->partnerInfo) $this->migratePartnerInfoData();
+        if ($this->categories) $this->migrateCategoriesData();
+        if ($this->categoryPartner) $this->migrateCategoryPartnerData();
+        if ($this->products) $this->migrateProductsData();
+        if ($this->productImages) $this->migrateProductImagesData();
+        if ($this->productUpdateLogs) $this->migrateProductUpdateLogsData();
+        if ($this->discounts) $this->migrateProductDiscountsData();
     }
 
     private function migratePartnerInfoData()
@@ -128,15 +153,21 @@ class DataMigrationService
         $this->partnerRepositoryInterface->insertOrIgnore($this->partnerInfo);
     }
 
-    private function migrateCategoryData()
+    private function migrateCategoriesData()
     {
         $this->categoryRepositoryInterface->insertOrIgnore($this->categories);
+    }
+
+    private function migrateCategoryPartnerData()
+    {
         $this->categoryPartnerRepositoryInterface->insertOrIgnore($this->categoryPartner);
     }
 
     private function migrateProductsData()
     {
         $units = $this->unitRepositoryInterface->builder()->select('id', 'name_en')->pluck('name_en', 'id')->toArray();
+        $pos_channel_id = $this->channelRepositoryInterface->where('name', 'pos')->first();
+        $webstore_channel_id = $this->channelRepositoryInterface->where('name', 'webstore')->first();
         foreach ($this->products as $singleProduct)
         {
             $unit = array_search($singleProduct['unit'], $units, true);
@@ -145,6 +176,7 @@ class DataMigrationService
                 'partner_id' => $singleProduct['partner_id'],
                 'category_id' => $singleProduct['category_id'],
                 'name' => $singleProduct['name'],
+                'app_thumb' => $singleProduct['app_thumb'],
                 'description' => $singleProduct['description'],
                 'unit_id' => $unit ?: null,
                 'warranty' => $singleProduct['warranty'],
@@ -166,7 +198,7 @@ class DataMigrationService
                 ]);
                 $sku_channels = collect();
                 if ($singleProduct['publication_status']) $sku_channels->push([
-                    'channel_id' => 1,
+                    'channel_id' => $pos_channel_id,
                     'cost' => $singleProduct['cost'],
                     'price' => $singleProduct['price'],
                     'wholesale_price' => $singleProduct['wholesale_price'],
@@ -176,7 +208,7 @@ class DataMigrationService
                     'updated_at' => $singleProduct['updated_at'],
                 ]);
                 if ($singleProduct['is_published_for_shop']) $sku_channels->push([
-                    'channel_id' => 2,
+                    'channel_id' => $webstore_channel_id,
                     'cost' => $singleProduct['cost'],
                     'price' => $singleProduct['price'],
                     'wholesale_price' => $singleProduct['wholesale_price'],
@@ -188,6 +220,11 @@ class DataMigrationService
                 if ($singleProduct['publication_status']) $sku->skuChannels()->insertOrIgnore($sku_channels->toArray());
             }
         }
+    }
+
+    private function migrateProductImagesData()
+    {
+        $this->productImageRepositoryInterface->insertOrIgnore($this->productImages);
     }
 
     private function migrateProductUpdateLogsData()
