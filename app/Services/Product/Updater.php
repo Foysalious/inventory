@@ -238,23 +238,24 @@ class Updater
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
         dump($nature);
         if($nature == UpdateNature::NON_VARIANT) {
+            dd('dd non variant');
             /** @var  $nonVariantClass NonVariant */
             $nonVariantClass = app(NonVariant::class);
             $nonVariantClass->setProduct($this->product)
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         } elseif($nature == UpdateNature::VARIANTS_DISCARD) {
-            die('died in VARIANTS_DISCARD');
+            dd('died in VARIANTS_DISCARD');
             /** @var  $variantDiscard VariantsDiscard */
             $variantDiscard = app(VariantsDiscard::class);
             $variantDiscard->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         } elseif ($nature == UpdateNature::OPTIONS_UPDATED) {
-            die('died in OPTIONS_UPDATED');
+            dd('died in OPTIONS_UPDATED');
             /** @var  $optionsUpdated OptionsUpdated */
             $optionsUpdated = app(OptionsUpdated::class);
             $optionsUpdated->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         } elseif($nature == UpdateNature::VALUES_UPDATED) {
-            die('died in VALUES_UPDATED');
+            dd('died in VALUES_UPDATED');
             /** @var  $valuesUpdated ValuesUpdated */
             $valuesUpdated = app(ValuesUpdated::class);
             $valuesUpdated->setNature($nature)
@@ -263,7 +264,7 @@ class Updater
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         } elseif($nature == UpdateNature::VALUE_ADD) {
-            die('died in VALUE_ADD');
+            dd('died in VALUE_ADD');
             /** @var  $valuesAdded ValuesUpdated */
             $valuesAdded = app(ValuesAdded::class);
             $valuesAdded->setNature($nature)
@@ -271,8 +272,8 @@ class Updater
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         } else {
-            die('died in else last');
-            /** @var  $valuesDeleted ValuesDeleted */
+            dd('died in else last');
+            /** @var ValuesDeleted $valuesDeleted */
             $valuesDeleted = app(ValuesDeleted::class);
             $valuesDeleted->setNature($nature)
                 ->setProduct($this->product)
@@ -280,7 +281,7 @@ class Updater
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         }
-        die('died after update');
+        dd('died after update');
         $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
     }
 

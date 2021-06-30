@@ -1,11 +1,15 @@
 <?php namespace App\Services\Sku;
 
+use App\Http\Requests\SkuStockAddRequest;
 use App\Http\Requests\SkuStockUpdateRequest;
 use App\Http\Resources\WebstoreProductResource;
 use App\Http\Resources\SkuResource;
+use App\Interfaces\SkuBatchRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Services\BaseService;
+use App\Services\SkuBatch\SkuBatchDto;
 use Illuminate\Http\Request;
+use App\Services\SkuBatch\Creator as SkuBatchCreator;
 
 class SkuService extends BaseService
 {
@@ -14,7 +18,10 @@ class SkuService extends BaseService
      */
     private SkuRepositoryInterface $skuRepository;
 
-    public function __construct(SkuRepositoryInterface $skuRepository)
+    public function __construct(
+        SkuRepositoryInterface $skuRepository,
+        protected SkuBatchCreator $skuBatchCreator
+    )
     {
         $this->skuRepository = $skuRepository;
     }
@@ -66,5 +73,20 @@ class SkuService extends BaseService
         if (isset($updated)) $data = ['stock_updated' => $updated];
 
         return $this->success('Successful', $data ?? null, 200);
+    }
+
+    public function addStock(int $partner_id, int $product_id, SkuStockAddRequest $request)
+    {
+        $sku = $this->skuRepository->where('product_id', $product_id)->where('id', $request->sku_id)->first();
+        if(!$sku) {
+            return $this->error("Variation not found under this product", 403);
+        }
+        $this->skuBatchCreator->create(new SkuBatchDto([
+            'sku_id' => $request->sku_id,
+            'cost' => $request->cost,
+            'stock' => $request->stock,
+        ]));
+
+        return $this->success('Successful', null, 200);
     }
 }
