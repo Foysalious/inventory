@@ -131,7 +131,7 @@ class ProductList
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        return  ProductsResource::collection($products);
+        return ProductsResource::collection($products);
     }
 
     private function filterByCategories($products_query, $categoryIds)
@@ -153,17 +153,15 @@ class ProductList
 
     private function filterByCollectionIds($products_query, $collectionIds)
     {
-        return $products_query->whereHas('collections',function($q) use ($collectionIds){
+        return $products_query->whereHas('collections', function ($q) use ($collectionIds) {
             $q->whereIn('id', $collectionIds);
         });
     }
 
- /*   private function filterByPrice($products_query,$price_range)
-    {
-        return $products_query->
-    }*/
-
-
+    /*   private function filterByPrice($products_query,$price_range)
+       {
+           return $products_query->
+       }*/
 
 
 }

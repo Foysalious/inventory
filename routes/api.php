@@ -32,46 +32,47 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::group(['prefix'=>'v1'], function(){
-    Route::group(['prefix'=>'webstore'], function() {
-        Route::group(['prefix'=>'partners'], function() {
-            Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
-            Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
-            Route::get('{partner_id}/categories', [WebstoreCategoryController::class, 'getAllCategory']);
-            Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
-        });
-        Route::apiResource('partners.products', WebstoreProductController::class);
-    });
-    Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
-    Route::group(['prefix'=>'partners/{partner_id}'], function() {
-        Route::get('category-tree', [CategoryController::class, 'index']);
-        Route::post('category-with-sub-category', [CategoryController::class, 'createCategoryWithSubCategory']);
-        Route::group(['prefix' => 'categories'], function () {
-            Route::post('/', [CategoryController::class, 'store']);
-            Route::post('{category_id}', [CategoryController::class, 'update']);
-        });
-        Route::apiResource('collection', CollectionController::class);
+Route::group(['prefix'=>'v1'], function() {
+    Route::group(['middleware' => 'ip.whitelist'], function () {
         Route::group(['prefix'=>'webstore'], function() {
-            Route::get('products', [ProductController::class, 'getWebstoreProducts']);
+            Route::group(['prefix'=>'partners'], function() {
+                Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
+                Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
+                Route::get('{partner_id}/categories', [WebstoreCategoryController::class, 'getAllCategory']);
+                Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
+            });
+            Route::apiResource('partners.products', WebstoreProductController::class);
         });
-        Route::apiResource('collections', CollectionController::class);
+        Route::get('categories/{category_id}', [CategoryController::class, 'getCategoryProduct']);
+        Route::group(['prefix'=>'partners/{partner_id}'], function() {
+            Route::get('category-tree', [CategoryController::class, 'index']);
+            Route::post('category-with-sub-category', [CategoryController::class, 'createCategoryWithSubCategory']);
+            Route::group(['prefix' => 'categories'], function () {
+                Route::post('/', [CategoryController::class, 'store']);
+                Route::post('{category_id}', [CategoryController::class, 'update']);
+            });
+            Route::apiResource('collection', CollectionController::class);
+            Route::group(['prefix'=>'webstore'], function() {
+                Route::get('products', [ProductController::class, 'getWebstoreProducts']);
+            });
+            Route::apiResource('collections', CollectionController::class);
+        });
+        Route::apiResource('partners.options', OptionController::class);
+        Route::apiResource('partners.options.values', ValueController::class)->only('store');
+        Route::apiResource('partners.values', ValueController::class)->only('update');
+        Route::apiResource('partners.products', ProductController::class);
+        Route::apiResource('options', OptionController::class);
+        Route::apiResource('options.values', ValueController::class)->shallow();
+        Route::apiResource('partners.categories', CategoryController::class);
+        Route::apiResource('partners.migrate', DataMigrationController::class)->only('store');
+        Route::group(['prefix' => 'units'], function () {
+            Route::get('/', [UnitController::class, 'index']);
+        });
+        Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
+        Route::apiResource('collection', CollectionController::class);
+        Route::get('/channels', [ChannelController::class, 'index']);
+        Route::apiResource('partners.skus', SkuController::class);
+        Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
+        Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
     });
-
-    Route::apiResource('partners.options', OptionController::class);
-    Route::apiResource('partners.options.values', ValueController::class)->only('store');
-    Route::apiResource('partners.values', ValueController::class)->only('update');
-    Route::apiResource('partners.products', ProductController::class);
-    Route::apiResource('options', OptionController::class);
-    Route::apiResource('options.values', ValueController::class)->shallow();
-    Route::apiResource('partners.categories', CategoryController::class);
-    Route::apiResource('partners.migrate', DataMigrationController::class)->only('store');
-    Route::group(['prefix' => 'units'], function () {
-        Route::get('/', [UnitController::class, 'index']);
-    });
-    Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
-    Route::apiResource('collection', CollectionController::class);
-    Route::get('/channels', [ChannelController::class, 'index']);
-    Route::apiResource('partners.skus', SkuController::class);
-    Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
-    Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
 });
