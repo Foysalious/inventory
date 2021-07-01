@@ -2,6 +2,7 @@
 
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
+use App\Models\Sku;
 use App\Services\Discount\Creator;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
@@ -10,7 +11,10 @@ use App\Services\Product\ProductOptionValueCreator;
 
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
+use App\Services\SkuBatch\SkuBatchDto;
+use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
+use App\Services\SkuBatch\Creator as SkuBatchCreator;
 
 class OptionsUpdated
 {
@@ -42,7 +46,9 @@ class OptionsUpdated
 
     public function __construct(ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator, SkuChannelRepositoryInterface $skuChannelRepository,
-                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, protected SkuCreator $skuCreator)
+                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, protected SkuCreator $skuCreator,
+                                protected SkuBatchCreator $skuBatchCreator
+    )
     {
         $this->productOptionCreator = $productOptionCreator;
         $this->productOptionValueCreator = $productOptionValueCreator;
@@ -98,6 +104,7 @@ class OptionsUpdated
         $this->deleteProductOptions();
         $this->deleteSkuAndCombination();
         $this->deleteProductChannels();
+        $this->deleteBatchStock();
         $this->createNewProductVariantsData();
     }
 
@@ -156,6 +163,7 @@ class OptionsUpdated
             $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
             array_push($all_channels, $channels);
             $this->createCombination($sku->id, $product_option_value_ids);
+            $this->createBatchStock($sku, $productDetailObject);
         }
         $all_channels = array_merge(... $all_channels);
         $this->createProductChannel($all_channels, $product->id);
@@ -238,6 +246,26 @@ class OptionsUpdated
     private function createProductOptionValues($product_option_id, $value_name)
     {
         return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
+    }
+
+    protected function deleteBatchStock()
+    {
+        $skus = $this->product->skus()->get();
+        $skus->each(function ($sku){
+            $batches = $sku->batch()->get();
+            $batches->each(function ($batch){
+                $batch->delete();
+            });
+        });
+    }
+
+    protected function createBatchStock($sku, $productDetailObject)
+    {
+        $this->skuBatchCreator->create(new SkuBatchDto([
+            'sku_id' => $sku->id,
+            'cost' => $productDetailObject->getChannelData()[0]->getCost(),
+            'stock' => $productDetailObject->getStock(),
+        ]));
     }
 
 }

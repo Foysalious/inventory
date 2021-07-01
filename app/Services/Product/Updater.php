@@ -236,26 +236,21 @@ class Updater
         $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
         $this->productRepositoryInterface->update($this->product, $this->makeData());
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
-        dump($nature);
         if($nature == UpdateNature::NON_VARIANT) {
-            dd('dd non variant');
             /** @var  $nonVariantClass NonVariant */
             $nonVariantClass = app(NonVariant::class);
             $nonVariantClass->setProduct($this->product)
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         } elseif($nature == UpdateNature::VARIANTS_DISCARD) {
-            dd('died in VARIANTS_DISCARD');
             /** @var  $variantDiscard VariantsDiscard */
             $variantDiscard = app(VariantsDiscard::class);
             $variantDiscard->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         } elseif ($nature == UpdateNature::OPTIONS_UPDATED) {
-            dd('died in OPTIONS_UPDATED');
             /** @var  $optionsUpdated OptionsUpdated */
             $optionsUpdated = app(OptionsUpdated::class);
             $optionsUpdated->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
         } elseif($nature == UpdateNature::VALUES_UPDATED) {
-            dd('died in VALUES_UPDATED');
             /** @var  $valuesUpdated ValuesUpdated */
             $valuesUpdated = app(ValuesUpdated::class);
             $valuesUpdated->setNature($nature)
@@ -264,15 +259,20 @@ class Updater
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         } elseif($nature == UpdateNature::VALUE_ADD) {
-            dd('died in VALUE_ADD');
             /** @var  $valuesAdded ValuesUpdated */
             $valuesAdded = app(ValuesAdded::class);
             $valuesAdded->setNature($nature)
                 ->setProduct($this->product)
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
-        } else {
-            dd('died in else last');
+        }elseif($nature == UpdateNature::VARIANTS_ADD){
+            /** @var VariantsAdd $variantsAdd */
+            $variantsAdd = app(VariantsAdd::class);
+            $variantsAdd->setProduct($this->product)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->apply();
+        }
+        else {
             /** @var ValuesDeleted $valuesDeleted */
             $valuesDeleted = app(ValuesDeleted::class);
             $valuesDeleted->setNature($nature)
@@ -281,7 +281,6 @@ class Updater
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
         }
-        dd('died after update');
         $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
     }
 

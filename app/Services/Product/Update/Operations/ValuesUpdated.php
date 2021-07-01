@@ -7,6 +7,7 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
+use App\Repositories\SkuBatchRepository;
 use App\Services\Discount\Creator;
 use App\Services\Discount\Types;
 use App\Services\Product\CombinationCreator;
@@ -21,6 +22,7 @@ use Carbon\Carbon;
 use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use App\Services\SkuBatch\Updater as SkuStockUpdater;
+use App\Services\SkuBatch\Creator as SkuBatchCreator;
 
 
 class ValuesUpdated
@@ -63,7 +65,9 @@ class ValuesUpdated
                                 SkuRepositoryInterface $skuRepository, SkuChannelRepositoryInterface $skuChannelRepository,
                                 ProductOptionCreator $productOptionCreator, ProductOptionValueCreator $productOptionValueCreator,
                                 CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator,
-                                protected SkuStockUpdater $skuStockUpdater
+                                protected SkuStockUpdater $skuStockUpdater,
+                                protected SkuBatchRepository $skuBatchRepository,
+                                protected SkuBatchCreator $skuBatchCreator
     )
     {
         $this->productOptionValueRepository = $productOptionValueRepository;
@@ -209,6 +213,7 @@ class ValuesUpdated
             ]));
             $this->createSkuChannels($sku, $sku_channels);
             $this->createCombination($sku->id, $product_option_value_ids);
+            $this->createBatchStock($sku, $productDetailObject);
         }
     }
 
@@ -362,6 +367,7 @@ class ValuesUpdated
     {
         $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
         $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
+        $this->deleteSkusStockBatch($skus_to_delete);
         $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
         $this->skuRepository->whereIn('id', $skus_to_delete)->delete();
         $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->delete();
@@ -385,4 +391,19 @@ class ValuesUpdated
         );
         $this->skuStockUpdater->setSkuBatchDto($sku_dto)->update();
     }
+
+    protected function deleteSkusStockBatch($sku_ids)
+    {
+        $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
+    }
+
+    protected function createBatchStock($sku, $productDetailObject)
+    {
+        $this->skuBatchCreator->create(new SkuBatchDto([
+            'sku_id' => $sku->id,
+            'cost' => $productDetailObject->getChannelData()[0]->getCost(),
+            'stock' => $productDetailObject->getStock(),
+        ]));
+    }
+
 }
