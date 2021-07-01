@@ -10,6 +10,7 @@ use App\Services\BaseService;
 use App\Services\SkuBatch\SkuBatchDto;
 use Illuminate\Http\Request;
 use App\Services\SkuBatch\Creator as SkuBatchCreator;
+use App\Services\SkuBatch\UpdaterForOrder as SkuBatchUpdaterForOrder;
 
 class SkuService extends BaseService
 {
@@ -20,7 +21,8 @@ class SkuService extends BaseService
 
     public function __construct(
         SkuRepositoryInterface $skuRepository,
-        protected SkuBatchCreator $skuBatchCreator
+        protected SkuBatchCreator $skuBatchCreator,
+        protected SkuBatchUpdaterForOrder $skuBatchUpdaterForOrder
     )
     {
         $this->skuRepository = $skuRepository;
@@ -58,23 +60,29 @@ class SkuService extends BaseService
 
     /**
      * @param SkuStockUpdateRequest $request
+     * @return \Illuminate\Http\JsonResponse
      */
     public function updateSkuStockForOrder(SkuStockUpdateRequest $request)
     {
         $sku = $this->skuRepository->where('id', $request->id)->where('product_id', $request->product_id)->first();
+        if (!$sku)  return $this->error("sku not found under this product", 403);
+
         if ($request->operation == StockOperationType::DECREMENT) {
-            $sku->stock = $sku->stock - $request->quantity;
-            $updated = $sku->save();
+            $this->skuBatchUpdaterForOrder->setSku($sku)->setQuantity($request->quantity)->stockDecrease();
         }
         if ($request->operation == StockOperationType::INCREMENT) {
-            $sku->stock = $sku->stock + $request->quantity;
-            $updated = $sku->save();
+            $this->skuBatchUpdaterForOrder->setSku($sku)->setQuantity($request->quantity)->stockIncrease();
         }
-        if (isset($updated)) $data = ['stock_updated' => $updated];
-
-        return $this->success('Successful', $data ?? null, 200);
+        return $this->success('Successful', null, 200);
     }
 
+    /**
+     * @param int $partner_id
+     * @param int $product_id
+     * @param SkuStockAddRequest $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Spatie\DataTransferObject\Exceptions\UnknownProperties
+     */
     public function addStock(int $partner_id, int $product_id, SkuStockAddRequest $request)
     {
         $sku = $this->skuRepository->where('product_id', $product_id)->where('id', $request->sku_id)->first();
