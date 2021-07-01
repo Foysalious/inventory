@@ -52,7 +52,7 @@ class ValuesUpdated
 
     protected $updateDataObejects;
 
-    protected $deletedValues;
+    protected $deletedValues, $nature;
 
     public function __construct(ProductOptionValueRepositoryInterface $productOptionValueRepository,
                                 CombinationRepositoryInterface $combinationRepository,
@@ -71,6 +71,17 @@ class ValuesUpdated
         $this->productChannelCreator = $productChannelCreator;
         $this->discountRepository = $discountRepository;
     }
+
+    /**
+     * @param mixed $nature
+     * @return ValuesUpdated
+     */
+    public function setNature($nature)
+    {
+        $this->nature = $nature;
+        return $this;
+    }
+
     /**
      * @return Product
      */
