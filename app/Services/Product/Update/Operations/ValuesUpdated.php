@@ -14,15 +14,14 @@ use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
+use App\Services\Product\ProductStockBatchUpdater;
 use App\Services\Product\UpdateNature;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
 use App\Services\SkuBatch\SkuBatchDto;
 use Carbon\Carbon;
-use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use App\Services\SkuBatch\Updater as SkuStockUpdater;
-use App\Services\SkuBatch\Creator as SkuBatchCreator;
 
 
 class ValuesUpdated
@@ -67,7 +66,7 @@ class ValuesUpdated
                                 CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator,
                                 protected SkuStockUpdater $skuStockUpdater,
                                 protected SkuBatchRepository $skuBatchRepository,
-                                protected SkuBatchCreator $skuBatchCreator
+                                protected ProductStockBatchUpdater $productStockBatchUpdater
     )
     {
         $this->productOptionValueRepository = $productOptionValueRepository;
@@ -213,7 +212,7 @@ class ValuesUpdated
             ]));
             $this->createSkuChannels($sku, $sku_channels);
             $this->createCombination($sku->id, $product_option_value_ids);
-            $this->createBatchStock($sku, $productDetailObject);
+            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject);
         }
     }
 
@@ -333,16 +332,17 @@ class ValuesUpdated
 
     private function checkAndApplyOperationForOldCombination($combination,$sku)
     {
-            $old_product_option_value_ids = [];
-            foreach($combination as $option_values)
-            {
-                array_push($old_product_option_value_ids,$option_values->getOptionValueId());
-            }
+        $old_product_option_value_ids = [];
+        foreach($combination as $option_values)
+        {
+            array_push($old_product_option_value_ids,$option_values->getOptionValueId());
+        }
 
-            $stock = $sku->getStock();
-            $old_skus = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
-            $this->skuRepository->where('id',$old_skus)->update(['stock' => $stock ]);
-            return $old_skus;
+        $stock = $sku->getStock();
+        $old_sku = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
+        $this->skuRepository->where('id',$old_sku)->update(['stock' => $stock ]);
+        $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
+        return $old_sku;
     }
 
     private function checkAndApplyOperationIfOldCombination($combination,$sku)
@@ -380,13 +380,13 @@ class ValuesUpdated
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
 
-    protected function updateStock(int $sku_id, float $cost, float $stock)
+    protected function updateStock($sku, $updateDataObjects)
     {
         $sku_dto = new SkuBatchDto(
             [
-                "sku_id" => $sku_id,
-                "stock" => $stock,
-                "cost" => $cost,
+                "sku_id" => $sku->id,
+                "cost" => $updateDataObjects[0]->getChannelData()[0]->getCost(),
+                "stock" => $this->updateDataObejects[0]->getStock(),
             ]
         );
         $this->skuStockUpdater->setSkuBatchDto($sku_dto)->update();
@@ -395,15 +395,6 @@ class ValuesUpdated
     protected function deleteSkusStockBatch($sku_ids)
     {
         $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
-    }
-
-    protected function createBatchStock($sku, $productDetailObject)
-    {
-        $this->skuBatchCreator->create(new SkuBatchDto([
-            'sku_id' => $sku->id,
-            'cost' => $productDetailObject->getChannelData()[0]->getCost(),
-            'stock' => $productDetailObject->getStock(),
-        ]));
     }
 
 }

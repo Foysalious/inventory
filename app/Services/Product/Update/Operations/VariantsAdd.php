@@ -5,7 +5,7 @@ class VariantsAdd extends OptionsUpdated
 {
     public function apply()
     {
-        $this->deleteBatchStock();
+        $this->productStockBatchUpdater->deleteBatchStock($this->product);
         $this->deleteSkuAndCombination();
         $this->deleteProductChannels();
         $this->createNewProductVariantsData();
