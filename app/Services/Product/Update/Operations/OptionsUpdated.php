@@ -2,12 +2,14 @@
 
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
+use App\Models\Sku;
 use App\Services\Discount\Creator;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 
+use App\Services\Product\ProductStockBatchUpdater;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
@@ -42,7 +44,9 @@ class OptionsUpdated
 
     public function __construct(ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator, CombinationCreator $combinationCreator, SkuChannelRepositoryInterface $skuChannelRepository,
-                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, protected SkuCreator $skuCreator)
+                                ProductChannelCreator $productChannelCreator, Creator $discountCreator, protected SkuCreator $skuCreator,
+                                protected ProductStockBatchUpdater $productStockBatchUpdater
+    )
     {
         $this->productOptionCreator = $productOptionCreator;
         $this->productOptionValueCreator = $productOptionValueCreator;
@@ -98,6 +102,7 @@ class OptionsUpdated
         $this->deleteProductOptions();
         $this->deleteSkuAndCombination();
         $this->deleteProductChannels();
+        $this->productStockBatchUpdater->deleteBatchStock($this->product);
         $this->createNewProductVariantsData();
     }
 
@@ -156,6 +161,7 @@ class OptionsUpdated
             $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
             array_push($all_channels, $channels);
             $this->createCombination($sku->id, $product_option_value_ids);
+            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject);
         }
         $all_channels = array_merge(... $all_channels);
         $this->createProductChannel($all_channels, $product->id);

@@ -63,7 +63,7 @@ class ProductCalculator
             $rating = array_column($response['reviews'], 'rating');
             $count_rating = count($rating);
             $sum_rating = array_sum($rating);
-            $average_rating = $sum_rating / $count_rating;
+            $average_rating = round($sum_rating / $count_rating);
             return [$average_rating, $count_rating];
         } catch (GuzzleException $exception) {
         }

@@ -73,5 +73,6 @@ Route::group(['prefix'=>'v1'], function() {
         Route::get('/channels', [ChannelController::class, 'index']);
         Route::apiResource('partners.skus', SkuController::class);
         Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
+        Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
     });
 });

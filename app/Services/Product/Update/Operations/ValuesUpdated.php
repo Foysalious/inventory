@@ -7,17 +7,21 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
+use App\Repositories\SkuBatchRepository;
 use App\Services\Discount\Creator;
 use App\Services\Discount\Types;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
+use App\Services\Product\ProductStockBatchUpdater;
 use App\Services\Product\UpdateNature;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
+use App\Services\SkuBatch\SkuBatchDto;
 use Carbon\Carbon;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
+use App\Services\SkuBatch\Updater as SkuStockUpdater;
 
 
 class ValuesUpdated
@@ -52,14 +56,18 @@ class ValuesUpdated
 
     protected $updateDataObejects;
 
-    protected $deletedValues;
+    protected $deletedValues, $nature;
 
     public function __construct(ProductOptionValueRepositoryInterface $productOptionValueRepository,
                                 CombinationRepositoryInterface $combinationRepository,
                                 DiscountRepositoryInterface $discountRepository,
                                 SkuRepositoryInterface $skuRepository, SkuChannelRepositoryInterface $skuChannelRepository,
                                 ProductOptionCreator $productOptionCreator, ProductOptionValueCreator $productOptionValueCreator,
-                                CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator)
+                                CombinationCreator $combinationCreator, ProductChannelCreator $productChannelCreator, private SkuCreator $skuCreator,
+                                protected SkuStockUpdater $skuStockUpdater,
+                                protected SkuBatchRepository $skuBatchRepository,
+                                protected ProductStockBatchUpdater $productStockBatchUpdater
+    )
     {
         $this->productOptionValueRepository = $productOptionValueRepository;
         $this->combinationRepository = $combinationRepository;
@@ -71,6 +79,17 @@ class ValuesUpdated
         $this->productChannelCreator = $productChannelCreator;
         $this->discountRepository = $discountRepository;
     }
+
+    /**
+     * @param mixed $nature
+     * @return ValuesUpdated
+     */
+    public function setNature($nature)
+    {
+        $this->nature = $nature;
+        return $this;
+    }
+
     /**
      * @return Product
      */
@@ -193,6 +212,7 @@ class ValuesUpdated
             ]));
             $this->createSkuChannels($sku, $sku_channels);
             $this->createCombination($sku->id, $product_option_value_ids);
+            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject);
         }
     }
 
@@ -312,16 +332,17 @@ class ValuesUpdated
 
     private function checkAndApplyOperationForOldCombination($combination,$sku)
     {
-            $old_product_option_value_ids = [];
-            foreach($combination as $option_values)
-            {
-                array_push($old_product_option_value_ids,$option_values->getOptionValueId());
-            }
+        $old_product_option_value_ids = [];
+        foreach($combination as $option_values)
+        {
+            array_push($old_product_option_value_ids,$option_values->getOptionValueId());
+        }
 
-            $stock = $sku->getStock();
-            $old_skus = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
-            $this->skuRepository->where('id',$old_skus)->update(['stock' => $stock ]);
-            return $old_skus;
+        $stock = $sku->getStock();
+        $old_sku = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
+        $this->skuRepository->where('id',$old_sku)->update(['stock' => $stock ]);
+        $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
+        return $old_sku;
     }
 
     private function checkAndApplyOperationIfOldCombination($combination,$sku)
@@ -346,6 +367,7 @@ class ValuesUpdated
     {
         $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
         $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
+        $this->deleteSkusStockBatch($skus_to_delete);
         $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
         $this->skuRepository->whereIn('id', $skus_to_delete)->delete();
         $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->delete();
@@ -357,4 +379,22 @@ class ValuesUpdated
     {
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
+
+    protected function updateStock($sku, $updateDataObjects)
+    {
+        $sku_dto = new SkuBatchDto(
+            [
+                "sku_id" => $sku->id,
+                "cost" => $updateDataObjects[0]->getChannelData()[0]->getCost(),
+                "stock" => $this->updateDataObejects[0]->getStock(),
+            ]
+        );
+        $this->skuStockUpdater->setSkuBatchDto($sku_dto)->update();
+    }
+
+    protected function deleteSkusStockBatch($sku_ids)
+    {
+        $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
+    }
+
 }

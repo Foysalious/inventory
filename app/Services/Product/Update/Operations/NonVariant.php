@@ -9,5 +9,6 @@ class NonVariant extends ValuesUpdated
         $sku_channels = $this->updateDataObejects[0]->getChannelData();
         $this->updateSkuChannels($sku_channels,$sku->id);
         $this->resolveProductChannel();
+        $this->updateStock($sku, $this->updateDataObejects);
     }
 }

@@ -236,7 +236,6 @@ class Updater
         $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
         $this->productRepositoryInterface->update($this->product, $this->makeData());
         list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
-
         if($nature == UpdateNature::NON_VARIANT) {
             /** @var  $nonVariantClass NonVariant */
             $nonVariantClass = app(NonVariant::class);
@@ -266,8 +265,15 @@ class Updater
                 ->setProduct($this->product)
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->apply();
-        } else {
-            /** @var  $valuesDeleted ValuesDeleted */
+        }elseif($nature == UpdateNature::VARIANTS_ADD){
+            /** @var VariantsAdd $variantsAdd */
+            $variantsAdd = app(VariantsAdd::class);
+            $variantsAdd->setProduct($this->product)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->apply();
+        }
+        else {
+            /** @var ValuesDeleted $valuesDeleted */
             $valuesDeleted = app(ValuesDeleted::class);
             $valuesDeleted->setNature($nature)
                 ->setProduct($this->product)

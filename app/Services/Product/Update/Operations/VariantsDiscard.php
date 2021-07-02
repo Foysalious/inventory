@@ -4,6 +4,8 @@
 use App\Services\Discount\Creator;
 use App\Services\Discount\Types;
 use App\Services\Sku\CreateSkuDto;
+use App\Services\SkuBatch\SkuBatchDto;
+use Spatie\DataTransferObject\DataTransferObject;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class VariantsDiscard extends OptionsUpdated
@@ -13,6 +15,7 @@ class VariantsDiscard extends OptionsUpdated
      */
     public function apply()
     {
+        $this->productStockBatchUpdater->deleteBatchStock($this->product);
         $this->deleteProductOptions();
         $this->deleteSkuAndCombination();
         $this->deleteProductChannels();
@@ -36,6 +39,7 @@ class VariantsDiscard extends OptionsUpdated
         ));
         $channels = $this->createSKUChannels($sku, $this->updateDataObejects[0]->getChannelData());
         $this->createProductChannel($this->product->id, $channels);
+        $this->productStockBatchUpdater->createBatchStock($sku, $this->updateDataObejects);
     }
 
     private function createSkuChannels($sku, $channel_data)
@@ -72,6 +76,5 @@ class VariantsDiscard extends OptionsUpdated
         }
         return $this->productChannelCreator->setData($product_channels)->store();
     }
-
 
 }
