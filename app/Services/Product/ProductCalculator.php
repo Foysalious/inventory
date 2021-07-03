@@ -47,9 +47,11 @@ class ProductCalculator
 
     public function getDiscountedPrice()
     {
-        $discount = $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first();
+        $discount = $this->skuChannelWithMinimumPrice() ? $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first() : null;
         $discount_amount = $discount ? $discount->amount : 0;
         $original_price = $this->getOriginalPrice();
+        if(!$original_price)
+        dd($original_price);
         return [$original_price - $discount_amount,round(($discount_amount/$original_price)*100,2)];
     }
 
