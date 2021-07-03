@@ -71,6 +71,7 @@ Route::group(['prefix'=>'v1'], function() {
         Route::get('partners/{partner}/category-products', [CategoryProductController::class, 'getProducts']);
         Route::apiResource('collection', CollectionController::class);
         Route::get('/channels', [ChannelController::class, 'index']);
+        Route::post('/get-skus-by-product-ids', [SkuController::class, 'getSkusByProductIds']);
         Route::apiResource('partners.skus', SkuController::class);
         Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
         Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
