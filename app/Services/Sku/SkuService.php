@@ -49,6 +49,13 @@ class SkuService extends BaseService
         return $this->skuRepository->getSkuDetails($channel_id,$sku_id);
     }
 
+    public function getSkusByProductIds($productIds)
+    {
+        $skus = $this->skuRepository->whereIn('product_id', $productIds)
+            ->pluck('id', 'product_id');
+        return $this->success('Successful', ['skus' => $skus], 200);
+    }
+
     /**
      * @param SkuStockUpdateRequest $request
      */
