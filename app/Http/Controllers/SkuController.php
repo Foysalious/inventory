@@ -33,7 +33,7 @@ class SkuController extends Controller
      */
     public function updateSkuStock(int $partner_id,SkuStockUpdateRequest $request)
     {
-        return $this->skuService->updateSkuStockForOrder($partner_id,$request);
+        return $this->skuService->updateSkuStockForOrder($request);
     }
 
     public function addStock(int $partner_id, int $product_id, SkuStockAddRequest $request)

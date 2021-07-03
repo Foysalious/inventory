@@ -17,7 +17,7 @@ class SkuResource extends JsonResource
             'warranty_unit' => $this->product->warranty_unit,
             'vat_percentage' => $this->product->vat_percentage,
             'unit' => $this->product->unit,
-            'stock' => $this->stock,
+            'stock' => $this->stock(),
             'sku_channel' => $this->skuChannels,
             'combination' => $this->sku_details->combinations
         ];
