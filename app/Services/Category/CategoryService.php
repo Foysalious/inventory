@@ -23,23 +23,12 @@ class CategoryService extends BaseService
 {
     protected CategoryRepositoryInterface $categoryRepositoryInterface;
 
-    /**
-     * @var Updater
-     */
+    /** @var Updater $updater */
     private Updater $updater;
-    /**
-     * @var Creator
-     */
+    /** @var Creator $creator */
     private Creator $creator;
-
     private CategoryWithSubCategoryCreator $categoryWithSubCategoryCreator;
-
     private $partnerCategoryRepositoryInterface;
-
-    /**
-     * @var CategoryPartnerRepositoryInterface
-     */
-    private CategoryPartnerRepositoryInterface $categoryPartnerRepositoryInterface;
     private $productRepositoryInterface;
     private $authorization;
 

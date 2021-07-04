@@ -46,14 +46,6 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
 
 
         return $master_categories;
-//        return $this->model->where('is_published', 1)->where('partner_id', $partner_id)->whereHas('products', function ($q) {
-//            $q->whereHas('skuChannels', function ($q) {
-//                $q->select(DB::raw('SUM(stock) as total_stock'))
-//                    ->havingRaw('total_stock > 0');
-//            })->whereHas('skuChannels', function ($q) {
-//                $q->where('channel_id', Channels::WEBSTORE);
-//            });
-//        })->offset($offset)->limit($limit)->latest()->get();
 
     }
 
