@@ -127,7 +127,6 @@ class Product extends BaseModel
 
     public function getDiscountedAmount()
     {
-        return 0;
         $amount = $this->price - $this->getDiscount();
         return ($amount < 0) ? 0 : (float)$amount;
     }
@@ -166,7 +165,6 @@ class Product extends BaseModel
 
     public function getDiscountPercentage()
     {
-        return 0;
         $original_price = $this->getOriginalPrice();
         if($original_price == 0)
             return 0;
