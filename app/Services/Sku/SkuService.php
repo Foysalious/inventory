@@ -8,6 +8,7 @@ use App\Interfaces\SkuBatchRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Services\BaseService;
 use App\Services\SkuBatch\SkuBatchDto;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\SkuBatch\Creator as SkuBatchCreator;
 use App\Services\SkuBatch\UpdaterForOrder as SkuBatchUpdaterForOrder;
@@ -31,7 +32,7 @@ class SkuService extends BaseService
     /**
      * @param $partner
      * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function getSkuList($partner, Request $request)
     {
@@ -67,7 +68,7 @@ class SkuService extends BaseService
 
     /**
      * @param SkuStockUpdateRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      */
     public function updateSkuStockForOrder(SkuStockUpdateRequest $request)
     {
@@ -87,7 +88,7 @@ class SkuService extends BaseService
      * @param int $partner_id
      * @param int $product_id
      * @param SkuStockAddRequest $request
-     * @return \Illuminate\Http\JsonResponse
+     * @return JsonResponse
      * @throws \Spatie\DataTransferObject\Exceptions\UnknownProperties
      */
     public function addStock(int $partner_id, int $product_id, SkuStockAddRequest $request)
