@@ -23,6 +23,7 @@ class ProductRequest extends FormRequest
     {
         return [
             'category_id' => 'required|numeric',
+            'sub_category_id' => 'sometimes|numeric',
             'name' => 'required|string',
             'product_details' => 'required',
             'accounting_info' => 'sometimes|nullable'

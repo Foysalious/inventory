@@ -10,7 +10,9 @@ use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
+use App\Models\Category;
 use App\Models\Product;
+use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,7 +41,8 @@ class ProductService extends BaseService
         Updater $updater,
         SkuRepositoryInterface $skuRepositoryInterface,
         ProductCombinationService $productCombinationService,
-        ProductList $productList
+        ProductList $productList,
+        protected CategoryRepository $categoryRepository
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -101,7 +104,7 @@ class ProductService extends BaseService
         $productCreateRequest = app(ProductCreateRequest::class);
         list($has_variant,$product_create_request_objs) = $productCreateRequest->setProductDetails($request->product_details)->get();
         $product = $this->creator->setPartnerId($partnerId)
-            ->setCategoryId($request->category_id)
+            ->setCategoryId($request->sub_category_id ?? ($this->categoryRepository->getDefaultSubCategory($partnerId, $request->category_id))->id)
             ->setName($request->name)
             ->setDescription($request->description)
             ->setWarranty($request->warranty)
@@ -137,7 +140,7 @@ class ProductService extends BaseService
         list($has_variant,$product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
 
         $this->updater->setProduct($product)
-            ->setCategoryId($request->category_id)
+            ->setCategoryId($request->sub_category_id ?? ($this->categoryRepository->getDefaultSubCategory($partner, $request->category_id))->id)
             ->setName($request->name)
             ->setDescription($request->description)
             ->setWarranty($request->warranty)
