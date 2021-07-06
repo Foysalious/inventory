@@ -152,7 +152,7 @@ class OptionsUpdated
                 array_push($values, $value_name);
             }
             $sku = $this->skuCreator->create(new CreateSkuDto([
-                'name' => implode("-", $values),
+                'name' => $product->name . '-' .implode("-", $values),
                 'product_id' => $product->id,
                 'stock' => $productDetailObject->getStock(),
                 'weight' => $productDetailObject->getWeight(),

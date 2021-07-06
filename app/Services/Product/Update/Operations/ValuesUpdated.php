@@ -204,7 +204,7 @@ class ValuesUpdated
 
             }
             $sku = $this->skuCreator->create(new CreateSkuDto([
-                'name' => implode("-", $values),
+                'name' => $this->product->name . '-' .implode("-", $values),
                 'product_id' => $this->product->id,
                 'stock' => $productDetailObject->getStock(),
                 'weight' => $productDetailObject->getWeight(),
