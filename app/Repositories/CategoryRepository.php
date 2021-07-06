@@ -49,5 +49,14 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
 
     }
 
+    public function getDefaultSubCategory(int $partner_id,int $category_id)
+    {
+         return $this->model->where('parent_id', $category_id)
+            ->whereHas('categoryPartner', function ($q) use ($partner_id){
+            $q->where('partner_id', $partner_id)
+                ->where('is_default', 1);
+            })->first();
+    }
+
 
 }

@@ -18,7 +18,8 @@ class WebstoreProductResource extends JsonResource
         /** @var $this Product */
         return [
             'id' => $this->id,
-            'category_id' => $this->category_id,
+            'category_id' => $this->category()->get()->pluck('parent_id')->first(),
+            'sub_category_id' => $this->category_id,
             'collection_id' => $this->collection_id,
             'name' => $this->name,
             'description' => $this->description,
@@ -32,7 +33,8 @@ class WebstoreProductResource extends JsonResource
             'warranty_unit' => $this->warranty_unit,
             'orginal_price'=> (double) $this->getOriginalPrice(),
             'variations' => $this->combinations(),
-            'created_at' => $this->created_at
+            'created_at' => $this->created_at,
+            'image_gallery' => $this->images()->get() ?? [],
         ];
     }
 }
