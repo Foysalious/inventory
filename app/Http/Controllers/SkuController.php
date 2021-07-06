@@ -3,6 +3,7 @@
 use App\Http\Requests\SkuStockAddRequest;
 use App\Http\Requests\SkuStockUpdateRequest;
 use App\Services\Sku\SkuService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SkuController extends Controller
@@ -28,10 +29,10 @@ class SkuController extends Controller
     }
 
     /**
-     * @param int $partner_id
      * @param SkuStockUpdateRequest $request
+     * @return JsonResponse
      */
-    public function updateSkuStock(int $partner_id,SkuStockUpdateRequest $request)
+    public function updateSkuStock(SkuStockUpdateRequest $request)
     {
         return $this->skuService->updateSkuStockForOrder($request);
     }
