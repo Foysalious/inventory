@@ -18,7 +18,7 @@ class WebstoreProductResource extends JsonResource
         /** @var $this Product */
         return [
             'id' => $this->id,
-            'category_id' => $this->category()->get()->pluck('parent_id')->first(),
+            'category_id' => $this->category->parent->id,
             'sub_category_id' => $this->category_id,
             'collection_id' => $this->collection_id,
             'name' => $this->name,
