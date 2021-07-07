@@ -8,16 +8,16 @@ class ChannelDetailsObject
     protected $discountEndDate;
     private $channelDetails;
     private $price;
-    private $cost;
     private $wholeSalePrice;
     private $channelId;
     private $isPercentage;
     private $discount;
     private $discount_details;
 
+
     /**
-     * @param mixed $details
-     * @return ChannelDetailsObject
+     * @param $discount_details
+     * @return $this
      */
     public function setDiscountDetails($discount_details)
     {
@@ -52,8 +52,8 @@ class ChannelDetailsObject
     }
 
     /**
-     * @param mixed $isPercentage
-     * @return ProductDetailsObject
+     * @param $isPercentage
+     * @return $this
      */
     public function setIsPercentage($isPercentage)
     {
@@ -62,8 +62,8 @@ class ChannelDetailsObject
     }
 
     /**
-     * @param mixed $discount
-     * @return ProductDetailsObject
+     * @param $discount
+     * @return $this
      */
     public function setDiscount($discount)
     {
@@ -128,7 +128,6 @@ class ChannelDetailsObject
     {
         if(!$this->validate())
             throw new ProductDetailsPropertyValidationError();
-        $this->cost = $this->channelDetails->cost;
         $this->price = $this->channelDetails->price;
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;
@@ -147,8 +146,9 @@ class ChannelDetailsObject
 
     public function validate()
     {
-        return (property_exists( $this->channelDetails,'channel_id')) && (property_exists( $this->channelDetails,'cost'))
-        && (property_exists( $this->channelDetails,'price')) && (property_exists( $this->channelDetails,'wholesale_price'));
+        return (property_exists( $this->channelDetails,'channel_id'))
+            && (property_exists( $this->channelDetails,'price'))
+            && (property_exists( $this->channelDetails,'wholesale_price'));
     }
 
 }

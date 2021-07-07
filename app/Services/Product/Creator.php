@@ -283,7 +283,7 @@ class Creator
             $sku = $this->skuCreator->create(new CreateSkuDto([
                 'name' => $product->name . '-' . implode("-", $values),
                 'product_id' => $product->id,
-                'stock' => $productDetailObject->getStock(),
+                'stock' => -1,
                 'weight' => $productDetailObject->getWeight(),
                 'weight_unit' => $productDetailObject->getWeightUnit()
             ]));
@@ -338,7 +338,7 @@ class Creator
            $data = [
                'sku_id'             => $sku->id,
                'channel_id'         => $channel->getChannelId(),
-               'cost'               => $channel->getCost() ?: 0,
+               'cost'               => -1,
                'price'              => $channel->getPrice() ?: 0,
                'wholesale_price'    => $channel->getWholeSalePrice() ?: null
            ];
@@ -383,7 +383,7 @@ class Creator
         $sku = $this->skuCreator->create(new CreateSkuDto([
             "name" => $product->name ,
             "product_id" => $product->id,
-            "stock" => $stock ?: 0,
+            "stock" => -1,
             "weight" => $weight,
             "weight_unit" => $weight_unit
             ]
@@ -431,12 +431,12 @@ class Creator
         ];
     }
 
-    private function createSkuBatch(Sku $sku, $product_detail_object)
+    private function createSkuBatch(Sku $sku, ProductDetailsObject $product_detail_object)
     {
         $this->skuBatchCreator->create(new SkuBatchDto([
             "sku_id" => $sku->id,
             "stock" => $product_detail_object->getStock() ?: 0,
-            "cost" => $product_detail_object->getChannelData()[0]->getCost() ?: 0,
+            "cost" => $product_detail_object->getCost() ?: 0,
         ]));
     }
 

@@ -1,11 +1,14 @@
 <?php namespace App\Models;
 
 use App\Http\Controllers\ProductController;
+use App\Repositories\SkuBatchRepository;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
+use App\Services\SkuBatch\SkuBatchService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\App;
 
 class Product extends BaseModel
 {
@@ -198,5 +201,14 @@ class Product extends BaseModel
             }
         });
         return $total_stock;
+    }
+
+    public function lastBatchCostAndStock()
+    {
+        /** @var SkuBatchService $service */
+        $service = app(SkuBatchService::class);
+        $last_batch = $service->setProduct($this)->getLastBatchOfTheProduct();
+        return [ $last_batch->stock, $last_batch->cost ];
+
     }
 }

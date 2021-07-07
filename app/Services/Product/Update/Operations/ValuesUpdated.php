@@ -206,7 +206,7 @@ class ValuesUpdated
             $sku = $this->skuCreator->create(new CreateSkuDto([
                 'name' => $this->product->name . '-' .implode("-", $values),
                 'product_id' => $this->product->id,
-                'stock' => $productDetailObject->getStock(),
+                'stock' => -1,
                 'weight' => $productDetailObject->getWeight(),
                 'weight_unit' => $productDetailObject->getWeightUnit(),
             ]));
@@ -289,7 +289,7 @@ class ValuesUpdated
             if($sku_channel_id)//old sku_channel
             {
                 $this->skuChannelRepository->where('id',$sku_channel_id)->update([
-                    'cost' => $sku_channel->getCost(),
+                    'cost' => -1,
                     'price' => $sku_channel->getPrice(),
                     'wholesale_price' => $sku_channel->getWholesalePrice()
                 ]);
@@ -385,7 +385,7 @@ class ValuesUpdated
         $sku_dto = new SkuBatchDto(
             [
                 "sku_id" => $sku->id,
-                "cost" => $updateDataObjects[0]->getChannelData()[0]->getCost(),
+                "cost" => $updateDataObjects->getCost(),
                 "stock" => $this->updateDataObejects[0]->getStock(),
             ]
         );

@@ -33,7 +33,7 @@ class ProductStockBatchUpdater
     {
         $this->skuBatchCreator->create(new SkuBatchDto([
             'sku_id' => $sku->id,
-            'cost' => $productDetailObject->getChannelData()[0]->getCost(),
+            'cost' => $productDetailObject->getCost(),
             'stock' => $productDetailObject->getStock(),
         ]));
     }
