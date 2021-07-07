@@ -5,11 +5,12 @@ namespace App\Services\SkuBatch;
 
 
 use App\Models\Product;
+use App\Models\Sku;
 use App\Repositories\SkuBatchRepository;
 
 class SkuBatchService
 {
-    protected Product $product;
+    protected Sku $sku;
 
     public function __construct(
         protected SkuBatchRepository $skuBatchRepository
@@ -21,17 +22,14 @@ class SkuBatchService
      * @param Product $product
      * @return $this
      */
-    public function setProduct(Product $product)
+    public function setSku(Sku $sku)
     {
-        $this->product = $product;
+        $this->sku = $sku;
         return $this;
     }
 
-    public function getLastBatchOfTheProduct()
+    public function getLastBatchOfTheSku()
     {
-        return $this->skuBatchRepository
-            ->whereIn('sku_id', $this->product->skus()->pluck('id'))
-            ->orderByDesc('created_at')
-            ->first();
+        
     }
 }

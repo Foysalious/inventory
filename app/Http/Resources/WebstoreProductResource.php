@@ -16,7 +16,6 @@ class WebstoreProductResource extends JsonResource
     {
         /** @var  $this Product */
         list($rating,$count_rating) = $this->getRatingandCount();
-        list($last_batch_stock,$last_batch_cost) = $this->lastBatchCostAndStock();
         /** @var $this Product */
         return [
             'id' => $this->id,
@@ -28,8 +27,6 @@ class WebstoreProductResource extends JsonResource
             'vat_percentage' => $this->vat_percentage,
             'unit' => $this->unit ?: null,
             'stock' => $this->stock(),
-            'last_batch_stock' => $last_batch_stock,
-            'cost' => $last_batch_cost,
             'rating' => $rating,
             'count_rating' => $count_rating,
             'app_thumb'=> $this->app_thumb,

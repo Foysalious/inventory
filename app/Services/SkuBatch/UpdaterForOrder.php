@@ -52,8 +52,15 @@ class UpdaterForOrder
                 $batch->stock = $batch->stock - $this->quantity;
             }
         }
-        $batches->each(function ($batch) {
+        $total_batch = count($batches);
+        $batches->each(function ($batch, $key) use ($total_batch) {
+            $is_last_batch = ($key+1) == $total_batch;
             $batch->save();
+            if (!$is_last_batch) {
+                if ($batch->stock == 0) {
+                    $batch->delete();
+                }
+            }
         });
     }
 }
