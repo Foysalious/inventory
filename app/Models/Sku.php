@@ -34,6 +34,8 @@ class Sku extends BaseModel
 
     public function stock()
     {
+        $last_batch = $this->batch()->orderByDesc('id')->first();
+        if (is_null($last_batch)) return null;
         $total_stock = 0;
         $batches = $this->batch()->get();
         if(count($batches) > 0) {
@@ -46,13 +48,15 @@ class Sku extends BaseModel
 
     public function getPurchaseUnitPrice()
     {
-        return $this->batch()->orderByDesc('id')->first()->cost ?? 0;
+        $last_batch = $this->batch()->orderByDesc('id')->first();
+        return $last_batch ? $last_batch->cost : 0;
 
     }
 
     public function getLastBatchStock()
     {
-        return $this->batch()->orderByDesc('id')->first()->stock ?? null;
+        $last_batch = $this->batch()->orderByDesc('id')->first();
+        return $last_batch ? $last_batch->stock : null;
     }
 
 
