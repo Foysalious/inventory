@@ -94,6 +94,8 @@ class ProductService
     public function getDetails($partner_id, $product_id)
     {
         $general_details = $this->productRepositoryInterface->find($product_id);
+        if (!$general_details)
+            return $this->error("Product is not found", 404);
         if ($general_details->partner_id != $partner_id)
             return $this->error("This product does not belongs to this partner", 403);
         list($options, $combinations) = $this->productCombinationService->setProduct($general_details)->getCombinationData();
