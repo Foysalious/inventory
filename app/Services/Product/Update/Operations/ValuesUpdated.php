@@ -206,7 +206,6 @@ class ValuesUpdated
             $sku = $this->skuCreator->create(new CreateSkuDto([
                 'name' => $this->product->name . '-' .implode("-", $values),
                 'product_id' => $this->product->id,
-                'stock' => -1,
                 'weight' => $productDetailObject->getWeight(),
                 'weight_unit' => $productDetailObject->getWeightUnit(),
             ]));
@@ -223,7 +222,6 @@ class ValuesUpdated
             array_push($data, [
                 'sku_id' => $sku->id,
                 'channel_id' => $channel->getChannelId(),
-                'cost' => $channel->getCost() ?: 0,
                 'price' => $channel->getPrice() ?: 0,
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
@@ -289,7 +287,6 @@ class ValuesUpdated
             if($sku_channel_id)//old sku_channel
             {
                 $this->skuChannelRepository->where('id',$sku_channel_id)->update([
-                    'cost' => -1,
                     'price' => $sku_channel->getPrice(),
                     'wholesale_price' => $sku_channel->getWholesalePrice()
                 ]);
@@ -305,7 +302,6 @@ class ValuesUpdated
                 $this->skuChannelRepository->create([
                         'sku_id' => $related_skus,
                         'channel_id' => $sku_channel->getChannelId(),
-                        'cost' => $sku_channel->getCost(),
                         'price' => $sku_channel->getPrice(),
                         'wholesale_price' => $sku_channel->getWholesalePrice()
                     ]);

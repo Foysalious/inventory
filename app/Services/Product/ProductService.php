@@ -156,7 +156,7 @@ class ProductService extends BaseService
 //            event(new ProductStockUpdated($product,$request));
 //        }
 
-        return $this->success("Successful", ['product' => $product],200);
+        return $this->success("Successful", [],200);
     }
 
     public function delete($partner,$productId)

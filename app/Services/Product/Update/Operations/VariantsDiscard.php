@@ -27,12 +27,10 @@ class VariantsDiscard extends OptionsUpdated
      */
     public function createSkuAndSkuChannels()
     {
-        $stock = $this->updateDataObejects[0]->getStock();
         $weight = $this->updateDataObejects[0]->getWeight();
         $weight_unit = $this->updateDataObejects[0]->getWeightUnit();
         $sku = $this->skuCreator->create(new CreateSkuDto([
             "product_id" => $this->product->id,
-            "stock" => $stock ?: 0,
             "weight" => $weight,
             "weight_unit" => $weight_unit
             ]
@@ -50,7 +48,6 @@ class VariantsDiscard extends OptionsUpdated
             array_push($data, [
                 'sku_id' => $sku->id,
                 'channel_id' => $channel->getChannelId(),
-                'cost' => $channel->getCost() ?: 0,
                 'price' => $channel->getPrice() ?: 0,
                 'wholesale_price' => $channel->getWholeSalePrice() ?: null
             ]);
