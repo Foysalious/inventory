@@ -46,13 +46,13 @@ class Sku extends BaseModel
 
     public function getPurchaseUnitPrice()
     {
-        return $this->batch()->orderByDesc('id')->first()->cost;
+        return $this->batch()->orderByDesc('id')->first()->cost ?? 0;
 
     }
 
     public function getLastBatchStock()
     {
-        return $this->batch()->orderByDesc('id')->first()->stock;
+        return $this->batch()->orderByDesc('id')->first()->stock ?? null;
     }
 
 

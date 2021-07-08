@@ -81,6 +81,12 @@ class ProductService
         $products =  $this->productRepositoryInterface->searchProductFromWebstore($searchKey, $partnerId, $limit);
         if($products->isEmpty())
             return $this->error("No products found", 404);
+        $products = $products->filter(function ($product){
+           $stock = $product->stock();
+            if($stock != null && $stock > 0) {
+                return $product;
+            }
+        });
         $products = ProductSearchResultResource::collection($products);
         return $this->success("Successful", ['products' => $products]);
     }
