@@ -35,7 +35,7 @@ class Sku extends BaseModel
     public function stock()
     {
         $last_batch = $this->batch()->orderByDesc('id')->first();
-        if (is_null($last_batch)) return null;
+        if (is_null($last_batch) || is_null($last_batch->stock)) return null;
         $total_stock = 0;
         $batches = $this->batch()->get();
         if(count($batches) > 0) {
