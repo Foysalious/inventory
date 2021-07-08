@@ -79,15 +79,17 @@ class ProductService extends BaseService
      * @param $product
      * @return JsonResponse
      */
-    public function getDetails($partner, $product): JsonResponse
+    public function getDetails($partner, $product_id): JsonResponse
     {
-        $general_details = $this->productRepositoryInterface->findOrFail($product);
-        if($general_details->partner_id != $partner)
+        $product = $this->productRepositoryInterface->find($product_id);
+        if(!$product)
+            return $this->error("Product is not found", 404);
+        if($product->partner_id != $partner)
             return $this->error("This product does not belongs to this partner", 403);
-        $combinations = $this->productCombinationService->setProduct($general_details)->getCombinationData();
-        $general_details->combinations = collect($combinations);
-        $product = new WebstoreProductResource($general_details);
-        return $this->success('Successful', ['product' => $product], 200);
+        $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
+        $product->combinations = collect($combinations);
+        $product_resource = new WebstoreProductResource($product);
+        return $this->success('Successful', ['product' => $product_resource], 200);
     }
 
     /**
