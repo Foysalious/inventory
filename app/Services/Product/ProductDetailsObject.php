@@ -7,7 +7,8 @@ class ProductDetailsObject
 {
     private $productDetail;
     private $combination;
-    private $stock;
+    private ?float $stock;
+    private ?float $cost;
     private $channelData;
     private $hasVariant;
     private $isPercentage;
@@ -94,6 +95,7 @@ class ProductDetailsObject
         if($this->hasVariant)
             $this->setCombination();
         $this->setStock();
+        $this->setCost();
         $this->setWeight();
         $this->setWeightUnit();
         $this->setChannelData();
@@ -106,7 +108,9 @@ class ProductDetailsObject
      */
     public function validate()
     {
-        return (property_exists($this->productDetail,'combination') && property_exists($this->productDetail,'stock')
+        return (property_exists($this->productDetail,'combination')
+            && property_exists($this->productDetail,'stock')
+            && (property_exists( $this->productDetail,'cost'))
             && property_exists($this->productDetail,'channel_data'));
     }
 
@@ -137,6 +141,23 @@ class ProductDetailsObject
     {
         $this->stock = $this->productDetail->stock;
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function setCost()
+    {
+        $this->cost = $this->productDetail->cost;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCost()
+    {
+        return $this->cost;
     }
 
     public function setWeight()
@@ -170,7 +191,9 @@ class ProductDetailsObject
     {
         $final = [];
         foreach ($this->productDetail->channel_data as $channel_data) {
-            array_push($final, app(ChannelDetailsObject::class)->setChannelDetails($channel_data)->build());
+            /** @var ChannelDetailsObject $channel_obj */
+            $channel_obj = app(ChannelDetailsObject::class);
+            array_push($final, $channel_obj->setChannelDetails($channel_data)->build());
         }
         $this->channelData = $final;
         return $this;

@@ -14,6 +14,7 @@ class WebstoreProductResource extends JsonResource
      */
     public function toArray($request)
     {
+        /** @var  $this Product */
         list($rating,$count_rating) = $this->getRatingandCount();
         /** @var $this Product */
         return [

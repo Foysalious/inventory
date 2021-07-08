@@ -1,7 +1,6 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sku extends BaseModel
@@ -44,4 +43,17 @@ class Sku extends BaseModel
         }
         return $total_stock;
     }
+
+    public function getPurchaseUnitPrice()
+    {
+        return $this->batch()->orderByDesc('id')->first()->cost ?? 0;
+
+    }
+
+    public function getLastBatchStock()
+    {
+        return $this->batch()->orderByDesc('id')->first()->stock ?? null;
+    }
+
+
 }

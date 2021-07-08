@@ -4,6 +4,7 @@
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
+use App\Models\Sku;
 
 class ProductCombinationService
 {
@@ -57,11 +58,12 @@ class ProductCombinationService
             if (!isset($sku_data['combination'])) $sku_data['combination'] = [];
             $sku_data['combination'] = !empty($temp)? $temp :null;
             if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
-            $sku_data['stock'] = $sku->stock;
+            $sku_data['stock'] = $sku->stock();
+            $sku_data['purchase_price'] = $sku->getPurchaseUnitPrice();
             $temp = [];
             if($sku->skuChannels)
             {
-                $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                $sku->skuChannels->each(function ($sku_channel) use (&$temp, $sku) {
                     /** @var  $priceCalculation PriceCalculation */
                     $priceCalculation = app(PriceCalculation::class);
                     $priceCalculation->setSkuChannel($sku_channel);
@@ -69,7 +71,7 @@ class ProductCombinationService
                         $temp =  [
                             "sku_channel_id" => $sku_channel->id,
                             "channel_id" => $sku_channel->channel_id,
-                            "purchase_price" => $priceCalculation->getPurchaseUnitPrice(),
+                            "purchase_price" => $sku->getPurchaseUnitPrice(),
                             "original_price" => $priceCalculation->getOriginalUnitPriceWithVat(),
                             "discounted_price" => $priceCalculation->getDiscountedUnitPrice(),
                             "discount" => $priceCalculation->getDiscountAmount(),
@@ -90,6 +92,7 @@ class ProductCombinationService
     {
         $data = [];
         $skus = $this->skuRepositoryInterface->where('product_id', $this->product->id)->with('combinations')->get();
+        /** @var Sku $sku */
         foreach ($skus as $sku) {
             $sku_data = [];
             $temp = [];
@@ -110,6 +113,8 @@ class ProductCombinationService
             $sku_data['combination'] = !empty($temp) ? $temp : null;
             if (!isset($sku_data['stock'])) $sku_data['stock'] = [];
             $sku_data['stock'] = $sku->stock();
+            $sku_data['purchase_price'] = $sku->getPurchaseUnitPrice();
+            $sku_data['last_batch_stock'] = $sku->getLastBatchStock();
             $temp = [];
             if($sku->skuChannels)
             {

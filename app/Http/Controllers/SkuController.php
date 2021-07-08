@@ -29,6 +29,30 @@ class SkuController extends Controller
     }
 
     /**
+     *     /**
+     *
+     * * @OA\PUT(
+     *      path="/api/v1/partners/{partner}/stock-update",
+     *      operationId="stockUpdate",
+     *      tags={"Stock Update"},
+     *      summary="Partner Product's Stock Update for order",
+     *      description="update sku stock of a product on order create/update",
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\RequestBody(
+     *          @OA\MediaType(mediaType="multipart/form-data",
+     *              @OA\Schema(
+     *                  @OA\Property(property="id", type="Integer"),
+     *                  @OA\Property(property="product_id", type="Integer"),
+     *                  @OA\Property(property="operation", type="Text"),
+     *                  @OA\Property(property="quantity", type="Integer"),
+     *             )
+     *         )
+     *      ),
+     *      @OA\Response(response=200, description="Successful"),
+     *      @OA\Response(response=404, description="message: Sku Not Found!"),
+     *      @OA\Response(response=403, description="Forbidden")
+     *     )
+     *
      * @param SkuStockUpdateRequest $request
      * @return JsonResponse
      */

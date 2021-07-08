@@ -6,7 +6,8 @@ class ProductUpdateDetailsObjects
 {
     private $productDetail;
     private $combination;
-    private $stock;
+    private ?float $stock;
+    private ?float $cost;
     private $channelData;
     private $hasVariant;
     private ?float $weight;
@@ -31,6 +32,7 @@ class ProductUpdateDetailsObjects
         if($this->hasVariant)
             $this->setCombination();
         $this->setStock();
+        $this->setCost();
         $this->setWeight();
         $this->setWeightUnit();
         $this->setChannelData();
@@ -69,6 +71,23 @@ class ProductUpdateDetailsObjects
         return $this;
     }
 
+    /**
+     * @return $this
+     */
+    public function setCost()
+    {
+        $this->cost = $this->productDetail->cost;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCost()
+    {
+        return $this->cost;
+    }
+
     public function setWeight()
     {
         $this->weight = $this->productDetail->weight ?? null;
@@ -100,7 +119,9 @@ class ProductUpdateDetailsObjects
     {
         $final = [];
         foreach ($this->productDetail->channel_data as $channel_data) {
-            array_push($final, app(ChannelUpdateDetailsObjects::class)->setChannelDetails($channel_data)->build());
+            /** @var ChannelDetailsObject $channel_obj */
+            $channel_obj = app(ChannelDetailsObject::class);
+            array_push($final, $channel_obj->setChannelDetails($channel_data)->build());
         }
         $this->channelData = $final;
         return $this;

@@ -154,7 +154,6 @@ class OptionsUpdated
             $sku = $this->skuCreator->create(new CreateSkuDto([
                 'name' => $product->name . '-' .implode("-", $values),
                 'product_id' => $product->id,
-                'stock' => $productDetailObject->getStock(),
                 'weight' => $productDetailObject->getWeight(),
                 'weight_unit' => $productDetailObject->getWeightUnit(),
             ]));
@@ -215,7 +214,6 @@ class OptionsUpdated
             array_push($data, [
                 'sku_id' => $sku->id,
                 'channel_id' => $channel->getChannelId() ?? $channel->channel_id,
-                'cost' => $channel->getCost() ?? $channel->cost,
                 'price' => $channel->getPrice() ?? $channel->price,
                 'wholesale_price' => $channel->getWholeSalePrice() ?? $channel->wholesale_price
             ]);

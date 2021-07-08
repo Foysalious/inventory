@@ -1,11 +1,11 @@
 <?php namespace App\Models;
 
-use App\Http\Controllers\ProductController;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class Product extends BaseModel
 {

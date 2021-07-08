@@ -7,7 +7,7 @@ class SkuBatch extends BaseModel
 {
     use HasFactory,SoftDeletes;
     protected $guarded = ['id'];
-    protected $casts = ['stock' => 'double'];
+    protected $casts = ['stock' => 'double', 'cost' => 'double' ];
 
     public function sku()
     {

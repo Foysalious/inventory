@@ -10,8 +10,6 @@ use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
-use App\Models\Category;
-use App\Models\Product;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use Illuminate\Http\JsonResponse;
@@ -140,7 +138,6 @@ class ProductService extends BaseService
         /** @var $productUpdateRequestObjects ProductUpdateRequestObjects */
         $productUpdateRequestObjects = app(ProductUpdateRequestObjects::class);
         list($has_variant,$product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
-
         $this->updater->setProduct($product)
             ->setCategoryId($request->sub_category_id ?? ($this->categoryRepository->getDefaultSubCategory($partner, $request->category_id))->id)
             ->setName($request->name)
@@ -161,7 +158,7 @@ class ProductService extends BaseService
 //            event(new ProductStockUpdated($product,$request));
 //        }
 
-        return $this->success("Successful", ['product' => $product],200);
+        return $this->success("Successful", [],200);
     }
 
     public function delete($partner,$productId)
