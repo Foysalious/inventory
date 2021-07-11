@@ -5,7 +5,9 @@ use App\Http\Resources\ProductsInfoResource;
 use App\Http\Resources\Webstore\ProductsResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Services\Channel\Channels;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class ProductList
 {
@@ -19,6 +21,7 @@ class ProductList
     protected $offset;
     protected $limit;
     protected $webstorePublicationStatus;
+    protected $productCount;
 
 
     public function __construct(
@@ -92,14 +95,24 @@ class ProductList
 
     private function getProducts()
     {
-        $products_query = $this->productRepository->where('partner_id', $this->partnerId);
+        $products_query =  $this->productRepository->where('partner_id', $this->partnerId)->whereHas('skus', function ($q) {
+            $q->whereHas('batch',function($q){
+                $q->select(DB::raw('SUM(stock) as total_stock'))
+                    ->havingRaw('total_stock > 0');
+            });
+        })->whereHas('skuChannels', function ($q) {
+            $q->where('channel_id', Channels::WEBSTORE);
+        });
 
-      /*  if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-        if (isset($this->subCategoryIds))
-            $products_query = $this->filterBySubCategories($products_query, $this->subCategoryIds);
-        $this->collectionIds = [57,69];
-        $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        $products_query = $this->filterByPrice($products_query, $this->collectionIds);*/
+        $this->productCount = $products_query->count();
+
+
+        /*  if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+          if (isset($this->subCategoryIds))
+              $products_query = $this->filterBySubCategories($products_query, $this->subCategoryIds);
+          $this->collectionIds = [57,69];
+          $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
+          $products_query = $this->filterByPrice($products_query, $this->collectionIds);*/
 
         return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
@@ -125,7 +138,7 @@ class ProductList
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        return  ProductsResource::collection($products);
+        return  [$this->totalProducts,ProductsResource::collection($products)];
     }
 
     private function filterByCategories($products_query, $categoryIds)

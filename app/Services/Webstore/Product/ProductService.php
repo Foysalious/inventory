@@ -47,17 +47,14 @@ class ProductService
             ->setCategoryIds($category_ids)
             ->setSubCategoryIds($sub_category_ids)
             ->setCollectionIds($collection_ids)
-            ->setWebstorePublicationStatus($request->is_published_for_webstore)
             ->setOffset($offset)
             ->setLimit($limit);
-        $products = $this->productList->get();
-        $product_count= count($products);
-
+        list($product_count,$products) = $this->productList->get();
         if ($request->has('order_by')) {
             $order = ($request->order == 'desc') ? 'sortByDesc' : 'sortBy';
             $products = $products->$order($request->order_by, SORT_NATURAL | SORT_FLAG_CASE);
         }
-        return $this->success('Successful', ['product_count'=>$product_count,'products' => $products], 200);
+        return $this->success('Successful', ['product_count' => $product_count,'products' => $products], 200);
     }
 
     private function filterProducts($products, $by, $values)
