@@ -94,14 +94,14 @@ class ProductList
     {
         $products_query = $this->productRepository->where('partner_id', $this->partnerId);
 
-        if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+      /*  if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
         if (isset($this->subCategoryIds))
             $products_query = $this->filterBySubCategories($products_query, $this->subCategoryIds);
         $this->collectionIds = [57,69];
         $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        $products_query = $this->filterByPrice($products_query, $this->collectionIds);
+        $products_query = $this->filterByPrice($products_query, $this->collectionIds);*/
 
-        return $products_query->get();
+        return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
 
 
