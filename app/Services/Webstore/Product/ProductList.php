@@ -138,7 +138,7 @@ class ProductList
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        return  [$this->totalProducts,ProductsResource::collection($products)];
+        return  [$this->productCount,ProductsResource::collection($products)];
     }
 
     private function filterByCategories($products_query, $categoryIds)
