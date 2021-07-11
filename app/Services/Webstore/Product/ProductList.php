@@ -78,15 +78,7 @@ class ProductList
         return $this;
     }
 
-    /**
-     * @param mixed $updatedAfter
-     * @return ProductList
-     */
-    public function setUpdatedAfter($updatedAfter)
-    {
-        $this->updatedAfter = $updatedAfter;
-        return $this;
-    }
+
 
     /**
      * @param mixed $webstorePublicationStatus
@@ -102,12 +94,14 @@ class ProductList
     {
         $products_query = $this->productRepository->where('partner_id', $this->partnerId);
 
-//        if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-//        if (isset($this->setSubCategoryIds))
-//            $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
-//        $this->collectionIds = [57,69];
-//        $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        return $products_query->get();
+      /*  if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+        if (isset($this->subCategoryIds))
+            $products_query = $this->filterBySubCategories($products_query, $this->subCategoryIds);
+        $this->collectionIds = [57,69];
+        $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
+        $products_query = $this->filterByPrice($products_query, $this->collectionIds);*/
+
+        return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
 
 
@@ -131,7 +125,7 @@ class ProductList
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        return ProductsResource::collection($products);
+        return  ProductsResource::collection($products);
     }
 
     private function filterByCategories($products_query, $categoryIds)
@@ -153,15 +147,22 @@ class ProductList
 
     private function filterByCollectionIds($products_query, $collectionIds)
     {
-        return $products_query->whereHas('collections', function ($q) use ($collectionIds) {
+        return $products_query->whereHas('collections',function($q) use ($collectionIds){
             $q->whereIn('id', $collectionIds);
         });
     }
 
-    /*   private function filterByPrice($products_query,$price_range)
-       {
-           return $products_query->
-       }*/
+    public function filterByPrice($products_query,$priceRange)
+    {
+       // $priceRange= [50,50000];
+        return $products_query->whereHas('skus',function($q) use ($priceRange){
+            $q->whereHas('skuChannels',function($q) use($priceRange){
+                $q->where('channel_id',2)->whereBetween('price',$priceRange);
+            });
+        });
+    }
+
+
 
 
 }
