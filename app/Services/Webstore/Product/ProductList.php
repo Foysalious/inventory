@@ -22,6 +22,8 @@ class ProductList
     protected $limit;
     protected $webstorePublicationStatus;
     protected $productCount;
+    protected $priceRange;
+    protected $ratings;
 
 
     public function __construct(
@@ -95,8 +97,8 @@ class ProductList
 
     private function getProducts()
     {
-        $products_query =  $this->productRepository->where('partner_id', $this->partnerId)->whereHas('skus', function ($q) {
-            $q->whereHas('batch',function($q){
+        $products_query = $this->productRepository->where('partner_id', $this->partnerId)->whereHas('skus', function ($q) {
+            $q->whereHas('batch', function ($q) {
                 $q->select(DB::raw('SUM(stock) as total_stock'))
                     ->havingRaw('total_stock > 0');
             });
@@ -105,15 +107,14 @@ class ProductList
         });
 
         $this->productCount = $products_query->count();
-
-
-        /*  if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-          if (isset($this->subCategoryIds))
-              $products_query = $this->filterBySubCategories($products_query, $this->subCategoryIds);
-          $this->collectionIds = [57,69];
-          $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-          $products_query = $this->filterByPrice($products_query, $this->collectionIds);*/
-
+        if (isset($this->categoryIds))
+            $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+        if(isset($this->collectionIds))
+            $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
+        if(isset($this->priceRange))
+            $products_query = $this->filterByPrice($products_query, $this->priceRange);
+        if(isset($this->ratings))
+            $products_query = $this->filterByRatings($products_query, $this->ratings);
         return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
 
@@ -124,12 +125,16 @@ class ProductList
         return $this;
     }
 
-    private function getDeletedProducts()
+    public function setPriceRange($priceRange)
     {
-        $deleted_products_query = $this->productRepository->where('partner_id', $this->partnerId)->onlyTrashed();
-        if (isset($this->updatedAfter))
-            $deleted_products_query = $deleted_products_query->where('deleted_at', '>=', $this->updatedAfter);
-        return $deleted_products_query->select('id')->get();
+        $this->priceRange = $priceRange;
+        return $this;
+    }
+
+    public function setRatings($ratings)
+    {
+        $this->ratings = $ratings;
+        return $this;
     }
 
 
@@ -167,15 +172,16 @@ class ProductList
 
     public function filterByPrice($products_query,$priceRange)
     {
-       // $priceRange= [50,50000];
         return $products_query->whereHas('skus',function($q) use ($priceRange){
             $q->whereHas('skuChannels',function($q) use($priceRange){
-                $q->where('channel_id',2)->whereBetween('price',$priceRange);
+                $q->where('channel_id',Channels::WEBSTORE)->whereBetween('price',$priceRange);
             });
         });
     }
 
+    public function filterByRatings($products_query,$ratings)
+    {
 
-
+    }
 
 }

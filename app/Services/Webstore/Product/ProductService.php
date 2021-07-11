@@ -41,12 +41,14 @@ class ProductService
     {
         list($offset, $limit) = calculatePagination($request);
         $category_ids = !is_array($request->category_ids) ? json_decode($request->category_ids,1) : $request->category_ids;
-        $sub_category_ids = !is_array($request->sub_category_ids) ? json_decode($request->sub_category_ids,1) : $request->sub_category_ids;
         $collection_ids = !is_array($request->collection_ids) ? json_decode($request->collection_ids,1) : $request->collection_ids;
+        $price_range = !is_array($request->price_range) ? json_decode($request->price_range,1) : $request->price_range;
+        $ratings= !is_array($request->ratings) ? json_decode($request->ratings,1) : $request->ratings;
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
-            ->setSubCategoryIds($sub_category_ids)
             ->setCollectionIds($collection_ids)
+            ->setPriceRange($price_range)
+            ->setRatings($ratings)
             ->setOffset($offset)
             ->setLimit($limit);
         list($product_count,$products) = $this->productList->get();
