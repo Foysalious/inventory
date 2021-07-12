@@ -31,7 +31,7 @@ class Product extends BaseModel
 
     public function getDescriptionAttribute($description){
 
-        return json_decode($description);
+        return html_entity_decode(json_decode($description));
     }
 
     public function skus()
