@@ -3,15 +3,11 @@
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Resources\Webstore\ProductResource;
 use App\Http\Resources\Webstore\ProductSearchResultResource;
-use App\Http\Resources\Webstore\ProductsResource;
-use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Product\ProductCombinationService;
-use App\Services\Webstore\Product\ProductList;
 use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Http;
 
 
 class ProductService
@@ -43,7 +39,7 @@ class ProductService
         $category_ids = !is_array($request->category_ids) ? json_decode($request->category_ids,1) : $request->category_ids;
         $collection_ids = !is_array($request->collection_ids) ? json_decode($request->collection_ids,1) : $request->collection_ids;
         $price_range = !is_array($request->price_range) ? json_decode($request->price_range,1) : $request->price_range;
-        $ratings= !is_array($request->ratings) ? json_decode($request->ratings,1) : $request->ratings;
+        $ratings = !is_array($request->ratings) ? json_decode($request->ratings,1) : $request->ratings;
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
             ->setCollectionIds($collection_ids)
@@ -57,17 +53,6 @@ class ProductService
             $products = $products->$order($request->order_by, SORT_NATURAL | SORT_FLAG_CASE);
         }
         return $this->success('Successful', ['product_count' => $product_count,'products' => $products], 200);
-    }
-
-    private function filterProducts($products, $by, $values)
-    {
-        switch ($by) {
-            case 'category': return $products->whereIn('category_id',json_decode($values));
-            case 'collection': return $products->whereIn('collection_id',[57]);
-            case 'price': return $products->whereBetween('original_price', json_decode($values));
-            case 'rating': return $products->whereIn('rating', json_decode($values));
-            default: return '';
-        }
     }
 
     /**
