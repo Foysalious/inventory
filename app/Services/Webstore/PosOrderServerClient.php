@@ -1,9 +1,8 @@
 <?php namespace App\Services\Webstore;
-use App\Services\Webstore\PosServerError;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 
-class PosServerClient
+class PosOrderServerClient
 {
     protected $client;
     protected $baseUrl;
@@ -11,7 +10,7 @@ class PosServerClient
     public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->baseUrl = rtrim(config('inventory.api_url'), '/');
+        $this->baseUrl = rtrim(config('pos_order_service.api_url'), '/');
     }
 
     public function get($uri)
@@ -25,7 +24,6 @@ class PosServerClient
         try {
             return json_decode($this->client->request(strtoupper($method), $this->makeUrl($uri), $this->getOptions($data, $multipart))->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
-            dd($e);
             $res = $e->getResponse();
             $http_code = $res->getStatusCode();
             $message = $res->getBody()->getContents();

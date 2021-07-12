@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers\Webstore;
 
+use App\Exceptions\ProductNotFoundException;
 use App\Http\Controllers\Controller;
 use App\Services\Webstore\Product\ProductService;
 use Illuminate\Http\JsonResponse;
@@ -17,7 +18,10 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
-    public function index($partner, Request $request)
+    /**
+     * @throws ProductNotFoundException
+     */
+    public function index($partner, Request $request): JsonResponse
     {
         return $this->productService->getProducts($partner, $request);
     }
