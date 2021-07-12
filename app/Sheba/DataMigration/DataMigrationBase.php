@@ -4,7 +4,7 @@ use Illuminate\Support\Str;
 
 class DataMigrationBase
 {
-    protected $namespace = "Sheba\\DataMigration\\migrations";
+    protected $namespace = "App\\Sheba\\DataMigration\\migrations";
 
     /**
      * Get the date prefix for the migration.

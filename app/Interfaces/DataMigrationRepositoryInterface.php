@@ -26,6 +26,7 @@ interface DataMigrationRepositoryInterface
     /**
      * Get the last migration batch number.
      *
+     * @return int
      */
     public function getLastBatchNumber();
 
@@ -39,7 +40,7 @@ interface DataMigrationRepositoryInterface
 
     /**
      * Get the next migration batch number.
-     *
+     * @return int
      */
-    public function getNextBatchNumber():int;
+    public function getNextBatchNumber();
 }

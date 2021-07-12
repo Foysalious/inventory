@@ -47,7 +47,7 @@ class DataMigrationRepository implements DataMigrationRepositoryInterface
      *
      * @return int
      */
-    public function getLastBatchNumber():int
+    public function getLastBatchNumber()
     {
         return $this->model->max('batch');
     }
@@ -68,7 +68,7 @@ class DataMigrationRepository implements DataMigrationRepositoryInterface
      *
      * @return int
      */
-    public function getNextBatchNumber() : int
+    public function getNextBatchNumber()
     {
         return $this->getLastBatchNumber() + 1;
     }
