@@ -118,8 +118,6 @@ class ProductList
             })->whereHas('skuChannels', function ($q) {
                 $q->where('channel_id', Channels::WEBSTORE);
             });
-
-        $this->productCount = $products_query->count();
         if (isset($this->categoryIds))
             $products_query = $this->filterByCategories($products_query, $this->categoryIds);
         if(isset($this->collectionIds))
@@ -128,6 +126,7 @@ class ProductList
             $products_query = $this->filterByPrice($products_query, $this->priceRange);
         if(isset($this->ratings))
             $products_query = $this->filterByRatings($products_query, $this->ratings);
+        $this->productCount = $products_query->count();
         return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
 
