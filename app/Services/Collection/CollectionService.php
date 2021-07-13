@@ -31,7 +31,7 @@ class CollectionService extends BaseService
         $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit, $partner_id);
 
         $collections = CollectionResource::collection($resource);
-        if(!$collections) return $this->error("Collection not found!", 404);
+        if(!$collections) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
         return $this->success("Successful", ['collections' => $collections], 200);
     }
 
