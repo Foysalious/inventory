@@ -20,12 +20,13 @@ class RequestIdentification
     public function get()
     {
         define('PORTAL_NAME', 'portal_name');
+        define('USER_AGENT', 'user_agent');
         $created_by_type = $this->getData();
 
         return [
             PORTAL_NAME => $this->getPortalName(),
             'ip' => !is_null(request('ip')) ? request('ip') : getIp(),
-            'user_agent' => !is_null(request('user_agent')) ? request('user_agent') : request()->header('User-Agent'),
+            USER_AGENT => !is_null(request(USER_AGENT)) ? request(USER_AGENT) : request()->header('User-Agent'),
             'created_by_type' => $created_by_type[0] ? $created_by_type : 'automatic'
         ];
     }
