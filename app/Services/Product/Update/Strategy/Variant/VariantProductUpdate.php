@@ -16,7 +16,6 @@ use App\Services\SkuBatch\Updater as SkuStockUpdater;
 
 abstract class VariantProductUpdate extends ProductUpdate
 {
-    protected $deletedValues;
     protected $hasVariants;
 
     public function __construct(
@@ -34,18 +33,7 @@ abstract class VariantProductUpdate extends ProductUpdate
         parent::__construct($skuRepository, $skuCreator, $skuStockUpdater, $skuChannelRepository, $productStockBatchUpdater, $discountRepository, $discountCreator, $productChannelCreator);
     }
 
-    public function setDeletedValues($deletedValues)
-    {
-        $this->deletedValues = $deletedValues;
-        return $this;
-    }
-
     public abstract function update();
-
-    public function getDeletedValues()
-    {
-        return $this->deletedValues;
-    }
 
     protected function createCombination($sku_id, $product_option_value_ids)
     {

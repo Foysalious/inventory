@@ -21,6 +21,7 @@ abstract class ProductUpdate
     protected $channels = [];
     protected $product;
     protected $updateDataObjects;
+    protected $deletedValues;
 
     public function __construct(
         protected SkuRepositoryInterface $skuRepository,
@@ -47,6 +48,17 @@ abstract class ProductUpdate
     {
         $this->updateDataObjects = $updateDataObjects;
         return $this;
+    }
+
+    public function setDeletedValues($deletedValues)
+    {
+        $this->deletedValues = $deletedValues;
+        return $this;
+    }
+
+    public function getDeletedValues()
+    {
+        return $this->deletedValues;
     }
 
     /**
@@ -144,7 +156,7 @@ abstract class ProductUpdate
             $sku_channel_id = $sku_channel->getSkuChannelId();
             array_push($this->channels, $sku_channel->getChannelId());
             array_push($updated_sku_channels_ids, $sku_channel_id);
-            if($sku_channel_id)//old sku_channel
+            if($sku_channel_id) //old sku_channel
             {
                 $this->skuChannelRepository->where('id',$sku_channel_id)->update([
                     'price' => $sku_channel->getPrice(),

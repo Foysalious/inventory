@@ -70,6 +70,7 @@ class StrategyFactory
     {
         $is_deleted = false;
         $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'))->pluck('product_option_value_id')->toArray();
+        if (!$updatedValues) return [true, $created_product_option_value_ids];
         $filtered_updated_values = array_filter($updatedValues, function ($a) {
             return $a !== null;
         });
@@ -84,6 +85,7 @@ class StrategyFactory
         $product_option_value_ids = [];
         foreach ($skus as $sku) {
             $combination = $sku->getCombination();
+            if (!$combination) return [false,null];
             foreach ($combination as $option_values) {
                 array_push($product_option_value_ids, $option_values->getOptionValueId());
             }
