@@ -16,11 +16,10 @@ class ProductsInfoResource extends JsonResource
     public function toArray($request)
     {
         $products = ProductResource::collection($this->products);
-        list($total_buying_price, $items_with_buying_price, $total_items) = $this->getProductsInfo(collect($products));
         return [
-            'total_items' => $total_items,
-            'total_buying_price' => $total_buying_price,
-            'items_with_buying_price' => $items_with_buying_price,
+            'total_items' => $this->total_items,
+            'total_buying_price' => $this->total_buying_price,
+            'items_with_buying_price' => $this->items_with_buying_price,
             'products' => $products,
             'deleted_products' => $this->deleted_products,
         ];

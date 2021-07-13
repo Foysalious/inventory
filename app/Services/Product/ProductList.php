@@ -4,6 +4,7 @@ use App\Exceptions\ProductNotFoundException;
 use App\Http\Resources\ProductsInfoResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductList
 {
@@ -120,12 +121,16 @@ class ProductList
     public function get(): ProductsInfoResource
     {
         $products = $this->getProducts();
+        $additional_data = $this->getPartnerProductsAdditionalInfo();
         if ($products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
         $deleted_products = isset($this->updatedAfter) ? $this->getDeletedProducts() : [];
         $products_with_deleted_products = collect([]);
         $products_with_deleted_products->products = $products;
         $products_with_deleted_products->deleted_products = $deleted_products;
+        $products_with_deleted_products->total_items = $additional_data['total_items'];
+        $products_with_deleted_products->total_buying_price = $additional_data['total_buying_price'];
+        $products_with_deleted_products->items_with_buying_price = $additional_data['items_with_buying_price'];
         return new ProductsInfoResource($products_with_deleted_products);
     }
 
@@ -162,5 +167,38 @@ class ProductList
                 $q->where('is_published', $webstorePublicationStatus);
             });
         });
+    }
+
+    private function getPartnerProductsAdditionalInfo()
+    {
+        $return_data = [
+            'total_items' => 0,
+            'items_with_buying_price' => 0,
+            'total_buying_price' => 0,
+        ];
+        $items = $this->productRepository->where('partner_id', $this->partnerId)
+            ->select('id')
+            ->whereHas('skus', function ($query){
+                        /** @var $query Builder */
+                    return $query->with(['batch' => function ($query){
+                        /** @var $query Builder */
+                     return $query->where('cost', '>', 0 )
+                         ->orderBy('id', 'desc')
+                         ->limit(1);
+                 }]);
+            })->get();
+
+        foreach ($items as $product){
+            $skus = $product->skus;
+            foreach ($skus as $each_sku) {
+                $return_data['total_items']++;
+                $batch = $each_sku->batch->where('cost', '>', 0)->sortByDesc('id')->first();
+                if($batch){
+                    $return_data['items_with_buying_price']++;
+                    $return_data['total_buying_price'] += $batch->cost;
+                }
+            }
+        }
+        return $return_data;
     }
 }
