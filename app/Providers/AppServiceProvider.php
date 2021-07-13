@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Sheba\DataMigration\DataMigrationServiceProvider;
+use App\Services\DataMigration\DataMigrationServiceProvider;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
