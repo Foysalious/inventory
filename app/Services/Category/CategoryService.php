@@ -63,8 +63,8 @@ class CategoryService extends BaseService
         if ($categories->isEmpty())
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
         $resource = CategoryResource::collection($categories);
-        $data['total_category'] = count($categories);
-        $data['category'] = $resource;
+        $data['total_categories'] = count($categories);
+        $data['categories'] = $resource;
         return $this->success("Successful", $data);
     }
 
