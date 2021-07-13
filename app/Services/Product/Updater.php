@@ -10,19 +10,14 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
-use App\Models\Sku;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\Product\Update\NatureFactory;
-use App\Services\Product\Update\Operations\NonVariant;
-use App\Services\Product\Update\Operations\OptionsUpdated;
-use App\Services\Product\Update\Operations\ValuesAdded;
-use App\Services\Product\Update\Operations\ValuesUpdated;
-use App\Services\Product\Update\Operations\ValuesDeleted;
-use App\Services\Product\Update\Operations\VariantsAdd;
-use App\Services\Product\Update\Operations\VariantsDiscard;
+use App\Services\Product\Update\Strategy\Updater as ProductUpdater;
+use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\ProductImage\Updater as ProductImageUpdater;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Updater
 {
@@ -50,12 +45,9 @@ class Updater
     protected $images;
     protected $deletedImages;
     protected $productImageUpdater;
-
-    private $options;
     private $productUpdateRequestObjects;
     /** @var mixed */
     private $deletedValues;
-    private $natureFactory;
     /** @var ProductUpdateLogCreateRequest */
     private ProductUpdateLogCreateRequest $logCreateRequest;
     private $hasVariants;
@@ -81,7 +73,8 @@ class Updater
                                 OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
                                 ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
-                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest, ProductImageUpdater $productImageUpdater)
+                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest, ProductImageUpdater $productImageUpdater,
+                                protected StrategyFactory $strategyFactory, protected ProductUpdater $productUpdater)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
         $this->productImageCreator = $productImageCreator;
@@ -230,57 +223,20 @@ class Updater
         $this->productImageUpdater->deleteRequestedProductImages($productId, $deleted_images);
     }
 
+    /**
+     * @throws UnknownProperties
+     */
     public function update()
     {
         $oldProductDetails = clone $this->product;
         $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
         $this->productRepositoryInterface->update($this->product, $this->makeData());
-        list($nature, $deleted_values) = $this->natureFactory->getNature($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
-        if($nature == UpdateNature::NON_VARIANT) {
-            /** @var  $nonVariantClass NonVariant */
-            $nonVariantClass = app(NonVariant::class);
-            $nonVariantClass->setProduct($this->product)
-                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-                ->apply();
-        } elseif($nature == UpdateNature::VARIANTS_DISCARD) {
-            /** @var  $variantDiscard VariantsDiscard */
-            $variantDiscard = app(VariantsDiscard::class);
-            $variantDiscard->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-        } elseif ($nature == UpdateNature::OPTIONS_UPDATED) {
-            /** @var  $optionsUpdated OptionsUpdated */
-            $optionsUpdated = app(OptionsUpdated::class);
-            $optionsUpdated->setProduct($this->product)->setUpdatedDataObjects($this->productUpdateRequestObjects)->apply();
-        } elseif($nature == UpdateNature::VALUES_UPDATED) {
-            /** @var  $valuesUpdated ValuesUpdated */
-            $valuesUpdated = app(ValuesUpdated::class);
-            $valuesUpdated->setNature($nature)
-                ->setProduct($this->product)
-                ->setDeletedValues($deleted_values)
-                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-                ->apply();
-        } elseif($nature == UpdateNature::VALUE_ADD) {
-            /** @var  $valuesAdded ValuesUpdated */
-            $valuesAdded = app(ValuesAdded::class);
-            $valuesAdded->setNature($nature)
-                ->setProduct($this->product)
-                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-                ->apply();
-        }elseif($nature == UpdateNature::VARIANTS_ADD){
-            /** @var VariantsAdd $variantsAdd */
-            $variantsAdd = app(VariantsAdd::class);
-            $variantsAdd->setProduct($this->product)
-                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-                ->apply();
-        }
-        else {
-            /** @var ValuesDeleted $valuesDeleted */
-            $valuesDeleted = app(ValuesDeleted::class);
-            $valuesDeleted->setNature($nature)
-                ->setProduct($this->product)
-                ->setDeletedValues($deleted_values)
-                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-                ->apply();
-        }
+        $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
+        $this->productUpdater->setStrategy($strategy)
+            ->setProduct($this->product)
+            ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+            ->setDeletedValues($this->strategyFactory->getDeletedValues())
+            ->update();
         $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
     }
 

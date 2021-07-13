@@ -119,8 +119,8 @@ class ProductUpdateDetailsObjects
     {
         $final = [];
         foreach ($this->productDetail->channel_data as $channel_data) {
-            /** @var ChannelDetailsObject $channel_obj */
-            $channel_obj = app(ChannelDetailsObject::class);
+            /** @var ChannelUpdateDetailsObjects $channel_obj */
+            $channel_obj = app(ChannelUpdateDetailsObjects::class);
             array_push($final, $channel_obj->setChannelDetails($channel_data)->build());
         }
         $this->channelData = $final;
