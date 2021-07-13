@@ -19,12 +19,14 @@ class RequestIdentification
 
     public function get()
     {
+        define('PORTAL_NAME', 'portal_name');
+        define('USER_AGENT', 'user_agent');
         $created_by_type = $this->getData();
 
         return [
-            'portal_name' => $this->getPortalName(),
+            PORTAL_NAME => $this->getPortalName(),
             'ip' => !is_null(request('ip')) ? request('ip') : getIp(),
-            'user_agent' => !is_null(request('user_agent')) ? request('user_agent') : request()->header('User-Agent'),
+            USER_AGENT => !is_null(request(USER_AGENT)) ? request(USER_AGENT) : request()->header('User-Agent'),
             'created_by_type' => $created_by_type[0] ? $created_by_type : 'automatic'
         ];
     }
@@ -33,8 +35,8 @@ class RequestIdentification
     {
         if (request()->hasHeader('Portal-Name')) {
             return request()->header('Portal-Name');
-        } elseif (!is_null(request('portal_name'))) {
-            return request('portal_name');
+        } elseif (!is_null(request('PORTAL_NAME'))) {
+            return request('PORTAL_NAME');
         } else {
             return config('sheba.portal');
         }

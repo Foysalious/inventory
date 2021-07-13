@@ -71,7 +71,7 @@ class AccountingEntryClient
      * @return mixed
      * @throws AccountingEntryServerError
      */
-    public function call($method, $uri, $data = null, $multipart = false)
+    public function call($method, $uri, $data = null)
     {
         try {
             if (!$this->userType || !$this->userId ) {
