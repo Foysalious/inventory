@@ -41,7 +41,7 @@
     },
     "autoload": {
         "classmap": [
-            "app/Sheba/DataMigration/migrations"
+          "app/Services/DataMigration/migrations"
         ],
         "psr-4": {
             "App\\": "app/",
