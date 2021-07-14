@@ -12,7 +12,6 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
-use App\Services\Product\Update\NatureFactory;
 use App\Services\Product\Update\Strategy\Updater as ProductUpdater;
 use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
@@ -65,7 +64,6 @@ class Updater
      * @param CombinationRepositoryInterface $combinationRepositoryInterface
      * @param ProductChannelRepositoryInterface $productChannelRepositoryInterface
      * @param SkuRepositoryInterface $skuRepositoryInterface
-     * @param NatureFactory $natureFactory
      * @param ProductUpdateLogCreateRequest $logCreateRequest
      * @param ProductImageUpdater $productImageUpdater
      */
@@ -73,7 +71,7 @@ class Updater
                                 OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
                                 ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
                                 ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
-                                NatureFactory $natureFactory, ProductUpdateLogCreateRequest $logCreateRequest, ProductImageUpdater $productImageUpdater,
+                                ProductUpdateLogCreateRequest $logCreateRequest, ProductImageUpdater $productImageUpdater,
                                 protected StrategyFactory $strategyFactory, protected ProductUpdater $productUpdater)
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -86,7 +84,6 @@ class Updater
         $this->productOptionValueRepositoryInterface = $productOptionValueRepositoryInterface;
         $this->productChannelRepositoryInterface =  $productChannelRepositoryInterface;
         $this->skuRepositoryInterface = $skuRepositoryInterface;
-        $this->natureFactory = $natureFactory;
         $this->logCreateRequest = $logCreateRequest;
         $this->productImageUpdater = $productImageUpdater;
     }
