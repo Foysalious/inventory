@@ -67,6 +67,7 @@ class ValuesUpdate extends VariantProductUpdate
     protected function deleteDiscardedCombinations()
     {
         $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
+        /** @var array $skus_to_delete */
         $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
         $this->deleteSkusStockBatch($skus_to_delete);
         $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
@@ -76,12 +77,12 @@ class ValuesUpdate extends VariantProductUpdate
         $this->deleteSkuChannelDiscount($skus_channels_to_delete);
     }
 
-    protected function deleteSkusStockBatch($sku_ids)
+    protected function deleteSkusStockBatch(array $sku_ids)
     {
         $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
     }
 
-    protected function deleteSkuChannelDiscount($skus_channels_to_delete)
+    protected function deleteSkuChannelDiscount(array $skus_channels_to_delete)
     {
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
