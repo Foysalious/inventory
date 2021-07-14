@@ -1,9 +1,7 @@
 <?php namespace App\Services\Product\Update\Strategy\Variant;
 
 
-use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
-
-class ValuesAdd extends ValuesUpdate implements ProductUpdateStrategy
+class ValuesAdd extends ValuesUpdate
 {
     public function update()
     {

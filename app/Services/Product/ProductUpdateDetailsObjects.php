@@ -5,10 +5,11 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 class ProductUpdateDetailsObjects
 {
     private $productDetail;
-    private $combination;
+    /** @var CombinationUpdateDetailsObject[] */
+    private array $combination;
     private ?float $stock;
     private ?float $cost;
-    private $channelData;
+    private array $channelData;
     private $hasVariant;
     private ?float $weight;
     private ?string $weightUnit;
@@ -60,7 +61,10 @@ class ProductUpdateDetailsObjects
         return $this;
     }
 
-    public function getCombination()
+    /**
+     * @return CombinationUpdateDetailsObject[]
+     */
+    public function getCombination(): array
     {
         return $this->combination;
     }
@@ -127,7 +131,11 @@ class ProductUpdateDetailsObjects
         return $this;
 
     }
-    public function getChannelData()
+
+    /**
+     * @return ChannelUpdateDetailsObjects[]
+     */
+    public function getChannelData(): array
     {
         return $this->channelData;
     }

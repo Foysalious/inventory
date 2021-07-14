@@ -2,27 +2,21 @@
 
 
 use App\Models\Product;
-use App\Services\Product\Update\Strategy\NonVariant\NonVariant;
-use App\Services\Product\Update\Strategy\Variant\OptionsAdd;
-use App\Services\Product\Update\Strategy\Variant\OptionsDelete;
-use App\Services\Product\Update\Strategy\Variant\OptionsUpdate;
-use App\Services\Product\Update\Strategy\Variant\ValuesAdd;
-use App\Services\Product\Update\Strategy\Variant\ValuesDelete;
-use App\Services\Product\Update\Strategy\Variant\ValuesUpdate;
-use Spatie\DataTransferObject\Exceptions\UnknownProperties;
+use App\Services\Product\ProductUpdateDetailsObjects;
 
 class Updater
 {
-    protected NonVariant|OptionsUpdate|OptionsDelete|ValuesAdd|OptionsAdd|ValuesDelete|ValuesUpdate $strategy;
+    protected ProductUpdateStrategy $strategy;
     protected Product $product;
-    protected $updateDataObjects;
-    private $deletedValues;
+    /** @var ProductUpdateDetailsObjects[] */
+    protected array $updateDataObjects;
+    private ?array $deletedValues;
 
     /**
-     * @param NonVariant|OptionsAdd|OptionsDelete|OptionsUpdate|ValuesAdd|ValuesDelete|ValuesUpdate $strategy
+     * @param ProductUpdateStrategy $strategy
      * @return $this
      */
-    public function setStrategy(ValuesDelete|ValuesUpdate|NonVariant|OptionsAdd|ValuesAdd|OptionsUpdate|OptionsDelete $strategy): Updater
+    public function setStrategy(ProductUpdateStrategy $strategy): Updater
     {
         $this->strategy = $strategy;
         return $this;
@@ -32,27 +26,32 @@ class Updater
      * @param Product $product
      * @return $this
      */
-    public function setProduct(Product $product)
+    public function setProduct(Product $product): Updater
     {
         $this->product = $product;
         return $this;
     }
 
-    public function setUpdatedDataObjects($updateDataObjects)
+    /**
+     * @param ProductUpdateDetailsObjects[] $updateDataObjects
+     * @return $this
+     */
+    public function setUpdatedDataObjects(array $updateDataObjects): Updater
     {
         $this->updateDataObjects = $updateDataObjects;
         return $this;
     }
 
-    public function setDeletedValues($deletedValues)
+    /**
+     * @param array|null $deletedValues
+     * @return $this
+     */
+    public function setDeletedValues(?array $deletedValues): Updater
     {
         $this->deletedValues = $deletedValues;
         return $this;
     }
 
-    /**
-     * @throws UnknownProperties
-     */
     public function update()
     {
         $this->strategy->setProduct($this->product)->setUpdatedDataObjects($this->updateDataObjects)->setDeletedValues($this->deletedValues)->update();

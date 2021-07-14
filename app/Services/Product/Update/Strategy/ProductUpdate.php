@@ -4,11 +4,14 @@
 use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
+use App\Models\Product;
 use App\Models\Sku;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Discount\Types;
+use App\Services\Product\ChannelUpdateDetailsObjects;
 use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductStockBatchUpdater;
+use App\Services\Product\ProductUpdateDetailsObjects;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
 use App\Services\SkuBatch\SkuBatchDto;
@@ -16,12 +19,13 @@ use App\Services\SkuBatch\Updater as SkuStockUpdater;
 use Carbon\Carbon;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
-abstract class ProductUpdate
+abstract class ProductUpdate implements ProductUpdateStrategy
 {
-    protected $channels = [];
-    protected $product;
-    protected $updateDataObjects;
-    protected $deletedValues;
+    protected Product $product;
+    /** @var ProductUpdateDetailsObjects[] */
+    protected array $updateDataObjects;
+    protected ?array $deletedValues;
+    protected ?array $channels = [];
 
     public function __construct(
         protected SkuRepositoryInterface $skuRepository,
@@ -33,38 +37,42 @@ abstract class ProductUpdate
         protected DiscountCreator $discountCreator,
         protected ProductChannelCreator $productChannelCreator){}
 
-    public function setProduct($product)
+    public function setProduct(Product $product): ProductUpdate
     {
         $this->product = $product;
         return $this;
     }
 
-    public function getProduct()
+    public function getProduct(): Product
     {
         return $this->product;
     }
 
-    public function setUpdatedDataObjects($updateDataObjects)
+    public function setUpdatedDataObjects($updateDataObjects): ProductUpdate
     {
         $this->updateDataObjects = $updateDataObjects;
         return $this;
     }
 
-    public function setDeletedValues($deletedValues)
+    public function setDeletedValues($deletedValues): ProductUpdate
     {
         $this->deletedValues = $deletedValues;
         return $this;
     }
 
-    public function getDeletedValues()
+    public function getDeletedValues(): ?array
     {
         return $this->deletedValues;
     }
 
+
     /**
+     * @param Product $product
+     * @param ProductUpdateDetailsObjects $updateDataObject
+     * @return Sku
      * @throws UnknownProperties
      */
-    protected function createSku($product, $updateDataObject): Sku
+    protected function createSku(Product $product, ProductUpdateDetailsObjects $updateDataObject): Sku
     {
         $combinations = $updateDataObject->getCombination();
         $values = [];
@@ -86,7 +94,7 @@ abstract class ProductUpdate
     /**
      * @throws UnknownProperties
      */
-    protected function updateStock($sku, $updateDataObjects)
+    protected function updateStock($sku, $updateDataObjects): void
     {
         $sku_dto = new SkuBatchDto(
             [
@@ -98,21 +106,26 @@ abstract class ProductUpdate
         $this->skuStockUpdater->setSkuBatchDto($sku_dto)->update();
     }
 
-    protected function deleteBatchStock()
+    protected function deleteBatchStock(): void
     {
         $this->productStockBatchUpdater->deleteBatchStock($this->product);
     }
 
-    protected function createSkuChannels($sku, $channel_data)
+    /**
+     * @param Sku $sku
+     * @param ChannelUpdateDetailsObjects[] $channel_data
+     * @return array
+     */
+    protected function createSkuChannels(Sku $sku, array $channel_data): array
     {
         $channels = [];
         foreach ($channel_data as $channel) {
             $data = [];
             array_push($data, [
                 'sku_id' => $sku->id,
-                'channel_id' => $channel->getChannelId() ?? $channel->channel_id,
-                'price' => $channel->getPrice() ?? $channel->price,
-                'wholesale_price' => $channel->getWholeSalePrice() ?? $channel->wholesale_price
+                'channel_id' => $channel->getChannelId(), //?? $channel->channel_id
+                'price' => $channel->getPrice(), //?? $channel->price
+                'wholesale_price' => $channel->getWholeSalePrice() //?? $channel->wholesale_price
             ]);
             array_push($channels, $channel->getChannelId());
             $skuChannelData = $this->skuChannelRepository->create($data[0]);
@@ -121,8 +134,14 @@ abstract class ProductUpdate
         return $channels;
     }
 
-    protected function updateSkuChannels($sku_channels, $related_skus)
+    /**
+     * @param ChannelUpdateDetailsObjects[] $sku_channels
+     * @param int $related_skus
+     */
+    protected function updateSkuChannels(array $sku_channels, int $related_skus): void
     {
+        /** @var bool $is_deleted */
+        /** @var array $deleted_sku_Channels */
         list($is_deleted, $deleted_sku_Channels) = $this->checkAndApplyOperationIfSkuChannelsDeleted($sku_channels, $related_skus);
         if($is_deleted) {
             $this->skuChannelRepository->whereIn('id', $deleted_sku_Channels)->delete();
@@ -135,7 +154,7 @@ abstract class ProductUpdate
         return $this->product->productChannels()->delete();
     }
 
-    protected function createProductChannel($product_id, $channels)
+    protected function createProductChannel(int $product_id, array $channels)
     {
         $product_channels = [];
         $channels = array_unique($channels);
@@ -148,9 +167,15 @@ abstract class ProductUpdate
         return $this->productChannelCreator->setData($product_channels)->store();
     }
 
-    protected function checkAndApplyOperationIfSkuChannelsDeleted($sku_channels, $related_skus)
+    /**
+     * @param ChannelUpdateDetailsObjects[] $sku_channels
+     * @param int $related_skus
+     * @return array
+     */
+    protected function checkAndApplyOperationIfSkuChannelsDeleted(array $sku_channels, int $related_skus): array
     {
-        $created_sku_channels_ids = $this->skuChannelRepository->where('sku_id',$related_skus)->pluck('id')->toArray();
+        /** @var array $created_sku_channels_ids */
+        $created_sku_channels_ids = $this->skuChannelRepository->where('sku_id', $related_skus)->pluck('id')->toArray();
         $updated_sku_channels_ids = [];
         foreach ($sku_channels as $sku_channel) {
             $sku_channel_id = $sku_channel->getSkuChannelId();
@@ -191,12 +216,14 @@ abstract class ProductUpdate
         $filtered_updated_sku_channels_ids = array_filter($updated_sku_channels_ids, function ($a) {
             return $a !== null;
         });
+        /** @var ?array $deleted_sku_channel_ids */
         $deleted_sku_channel_ids = null;
         $is_deleted = $created_sku_channels_ids != $filtered_updated_sku_channels_ids;
         if($is_deleted)
-            $deleted_sku_channel_ids   = array_diff($created_sku_channels_ids,$filtered_updated_sku_channels_ids);
-        return [$is_deleted , $deleted_sku_channel_ids ];
+            $deleted_sku_channel_ids  = array_diff($created_sku_channels_ids,$filtered_updated_sku_channels_ids);
+        return [$is_deleted , $deleted_sku_channel_ids];
     }
 
+    abstract function update();
 
 }

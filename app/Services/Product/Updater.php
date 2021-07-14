@@ -12,44 +12,30 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use App\Services\Product\Update\Strategy\Updater as ProductUpdater;
 use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\ProductImage\Updater as ProductImageUpdater;
-use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Updater
 {
-    protected ProductRepositoryInterface $productRepositoryInterface;
-    /** @var Product */
     protected Product $product;
-    protected $partnerId;
-    protected $categoryId;
-    protected $name;
-    protected $description;
-    protected $warranty;
-    protected $warrantyUnit;
-    protected $vatPercentage;
-    protected $unitId;
-    protected $productDetails;
-    protected $optionRepositoryInterface;
-    protected $valueRepositoryInterface;
-    protected $productOptionRepositoryInterface;
-    protected $productOptionValueRepositoryInterface;
-    protected $combinationRepositoryInterface;
-    protected $productChannelRepositoryInterface;
-    protected $skuRepositoryInterface;
-    protected $discountAmount;
+    protected int $partnerId;
+    protected int $categoryId;
+    protected string $name;
+    protected string $description;
+    protected int $warranty;
+    protected string $warrantyUnit;
+    protected float $vatPercentage;
+    protected int $unitId;
+    /** @var ProductUpdateDetailsObjects[] */
+    protected array $productUpdateRequestObjects;
+    private bool $hasVariants;
+    protected ?float $discountAmount;
     protected $discountEndDate;
     protected $images;
     protected $deletedImages;
-    protected $productImageUpdater;
-    private $productUpdateRequestObjects;
-    /** @var mixed */
-    private $deletedValues;
-    /** @var ProductUpdateLogCreateRequest */
-    private ProductUpdateLogCreateRequest $logCreateRequest;
-    private $hasVariants;
 
 
     /**
@@ -66,163 +52,167 @@ class Updater
      * @param SkuRepositoryInterface $skuRepositoryInterface
      * @param ProductUpdateLogCreateRequest $logCreateRequest
      * @param ProductImageUpdater $productImageUpdater
+     * @param StrategyFactory $strategyFactory
+     * @param ProductUpdater $productUpdater
      */
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
-                                OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
-                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
-                                ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface,
-                                ProductUpdateLogCreateRequest $logCreateRequest, ProductImageUpdater $productImageUpdater,
-                                protected StrategyFactory $strategyFactory, protected ProductUpdater $productUpdater)
-    {
-        $this->productRepositoryInterface = $productRepositoryInterface;
-        $this->productImageCreator = $productImageCreator;
-        $this->discountCreator = $discountCreator;
-        $this->optionRepositoryInterface = $optionRepositoryInterface;
-        $this->valueRepositoryInterface = $valueRepositoryInterface;
-        $this->combinationRepositoryInterface = $combinationRepositoryInterface;
-        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
-        $this->productOptionValueRepositoryInterface = $productOptionValueRepositoryInterface;
-        $this->productChannelRepositoryInterface =  $productChannelRepositoryInterface;
-        $this->skuRepositoryInterface = $skuRepositoryInterface;
-        $this->logCreateRequest = $logCreateRequest;
-        $this->productImageUpdater = $productImageUpdater;
-    }
+    public function __construct(
+        protected ProductRepositoryInterface $productRepositoryInterface,
+        protected DiscountCreator $discountCreator,
+        protected ProductImageCreator $productImageCreator,
+        protected OptionRepositoryInterface $optionRepositoryInterface,
+        protected ValueRepositoryInterface  $valueRepositoryInterface,
+        protected ProductOptionRepositoryInterface $productOptionRepositoryInterface,
+        protected ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface,
+        protected CombinationRepositoryInterface  $combinationRepositoryInterface,
+        protected ProductChannelRepositoryInterface $productChannelRepositoryInterface,
+        protected SkuRepositoryInterface $skuRepositoryInterface,
+        protected ProductUpdateLogCreateRequest $logCreateRequest,
+        protected ProductImageUpdater $productImageUpdater,
+        protected StrategyFactory $strategyFactory,
+        protected ProductUpdater $productUpdater){}
+
 
     /**
      * @param Product $product
-     * @return Updater
+     * @return $this
      */
-    public function setProduct(Product $product)
+    public function setProduct(Product $product): Updater
     {
         $this->product = $product;
         return $this;
     }
 
     /**
-     * @param mixed $categoryId
-     * @return Updater
+     * @param int $categoryId
+     * @return $this
      */
-    public function setCategoryId($categoryId)
+    public function setCategoryId(int $categoryId): Updater
     {
         $this->categoryId = $categoryId;
         return $this;
     }
 
     /**
-     * @param mixed $name
-     * @return Updater
+     * @param string $name
+     * @return $this
      */
-    public function setName($name)
+    public function setName(string $name): Updater
     {
         $this->name = $name;
         return $this;
     }
 
     /**
-     * @param mixed $description
-     * @return Updater
+     * @param string $description
+     * @return $this
      */
-    public function setDescription($description)
+    public function setDescription(string $description): Updater
     {
         $this->description = $description;
         return $this;
     }
 
     /**
-     * @param mixed $warranty
-     * @return Updater
+     * @param int $warranty
+     * @return $this
      */
-    public function setWarranty($warranty)
+    public function setWarranty(int $warranty): Updater
     {
         $this->warranty = $warranty;
         return $this;
     }
 
+
     /**
-     * @param mixed $warrantyUnit
-     * @return Updater
+     * @param string $warrantyUnit
+     * @return $this
      */
-    public function setWarrantyUnit($warrantyUnit)
+    public function setWarrantyUnit(string $warrantyUnit): Updater
     {
         $this->warrantyUnit = $warrantyUnit;
         return $this;
     }
 
     /**
-     * @param mixed $vatPercentage
-     * @return Updater
+     * @param float $vatPercentage
+     * @return $this
      */
-    public function setVatPercentage($vatPercentage)
+    public function setVatPercentage(float $vatPercentage): Updater
     {
         $this->vatPercentage = $vatPercentage;
         return $this;
     }
 
     /**
-     * @param mixed $unitId
-     * @return Updater
+     * @param int $unitId
+     * @return $this
      */
-    public function setUnitId($unitId)
+    public function setUnitId(int $unitId): Updater
     {
         $this->unitId = $unitId;
         return $this;
     }
 
-    public function setDiscount($discount_amount)
+    /**
+     * @param float|null $discount_amount
+     * @return $this
+     */
+    public function setDiscount(?float $discount_amount): Updater
     {
         $this->discountAmount = $discount_amount;
         return $this;
     }
 
-    public function setDiscountEndDate($discount_end_date)
+    /**
+     * @param $discount_end_date
+     * @return $this
+     */
+    public function setDiscountEndDate($discount_end_date): Updater
     {
         $this->discountEndDate = $discount_end_date;
         return $this;
     }
 
-    public function setImages($images)
+    /**
+     * @param $images
+     * @return $this
+     */
+    public function setImages($images): Updater
     {
         $this->images = $images;
         return $this;
     }
 
     /**
-     * @param mixed $deletedImages
-     * @return Updater
+     * @param $deletedImages
+     * @return $this
      */
-    public function setDeletedImages($deletedImages)
+    public function setDeletedImages($deletedImages): Updater
     {
         $this->deletedImages = $deletedImages;
         return $this;
     }
 
-    public function setProductUpdateRequestObjects($productUpdateRequestObjects)
+    /**
+     * @param ProductUpdateDetailsObjects[] $productUpdateRequestObjects
+     * @return $this
+     */
+    public function setProductUpdateRequestObjects(array $productUpdateRequestObjects): Updater
     {
         $this->productUpdateRequestObjects = $productUpdateRequestObjects;
         return $this;
     }
 
-    public function setHasVariant($hasVariants)
+    /**
+     * @param bool $hasVariants
+     * @return $this
+     */
+    public function setHasVariant(bool $hasVariants): Updater
     {
         $this->hasVariants = $hasVariants;
         return $this;
     }
 
-    public function setOptions($options)
-    {
-        $this->options = $options;
-        return $this;
-    }
-
-    public function deleteGalleryImages($deleted_images, $product)
-    {
-        $productId = $product->id;
-        $this->productImageUpdater->deleteRequestedProductImages($productId, $deleted_images);
-    }
-
-    /**
-     * @throws UnknownProperties
-     */
     public function update()
     {
         $oldProductDetails = clone $this->product;
@@ -237,7 +227,7 @@ class Updater
         $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
     }
 
-    private function makeData()
+    private function makeData(): array
     {
         $data = [];
         if (isset($this->categoryId)) $data['category_id'] = $this->categoryId;

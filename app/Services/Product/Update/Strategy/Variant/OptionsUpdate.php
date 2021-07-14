@@ -1,10 +1,12 @@
 <?php namespace App\Services\Product\Update\Strategy\Variant;
 
 
-use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
+use App\Models\ProductOption;
+use App\Models\Sku;
+use App\Models\SkuChannel;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
-class OptionsUpdate extends VariantProductUpdate implements ProductUpdateStrategy
+class OptionsUpdate extends VariantProductUpdate
 {
     /**
      * @throws UnknownProperties
@@ -20,7 +22,7 @@ class OptionsUpdate extends VariantProductUpdate implements ProductUpdateStrateg
 
     protected function deleteProductOptions()
     {
-        $this->product->productOptions()->get()->each(function ($productOption) {
+        $this->product->productOptions()->get()->each(function (ProductOption $productOption) {
             $productOption->productOptionValues()->delete();
         });
         return $this->product->productOptions()->delete();
@@ -28,9 +30,9 @@ class OptionsUpdate extends VariantProductUpdate implements ProductUpdateStrateg
 
     protected function deleteSkuAndCombination()
     {
-        $this->product->skus()->get()->each(function ($sku) {
+        $this->product->skus()->get()->each(function (Sku $sku) {
             if ($this->hasVariants) $sku->combinations()->delete();
-            $sku->skuChannels()->get()->each(function ($skuChannel) {
+            $sku->skuChannels()->get()->each(function (SkuChannel $skuChannel) {
                 $skuChannel->discounts()->delete();
             });
             $sku->skuChannels()->delete();

@@ -35,7 +35,7 @@ abstract class VariantProductUpdate extends ProductUpdate
 
     public abstract function update();
 
-    protected function createCombination($sku_id, $product_option_value_ids)
+    protected function createCombination(int $sku_id, array $product_option_value_ids)
     {
         $combinations = collect($product_option_value_ids)->map(function ($product_option_value_id) use ($sku_id) {
             return [
@@ -51,7 +51,7 @@ abstract class VariantProductUpdate extends ProductUpdate
         return $this->productOptionCreator->setProductId($product_id)->setOptionName($option_name)->create();
     }
 
-    protected function createProductOptionValues($product_option_id, $value_name)
+    protected function createProductOptionValues(int $product_option_id, string $value_name)
     {
         return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
     }
