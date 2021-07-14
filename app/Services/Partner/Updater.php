@@ -1,9 +1,11 @@
 <?php namespace App\Services\Partner;
 
 use App\Models\Partner;
+use App\Traits\ModificationFields;
 
 class Updater
 {
+    use ModificationFields;
     protected ?string $sub_domain;
     protected ?float $vat_percentage;
     protected Partner $partner;
@@ -46,6 +48,6 @@ class Updater
         if(!is_null($this->vat_percentage)){
             $this->partner->vat_percentage = $this->vat_percentage;
         }
-        $this->partner->save();
+        $this->partner->save($this->withUpdateModificationField([]));
     }
 }

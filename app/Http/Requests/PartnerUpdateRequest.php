@@ -3,7 +3,7 @@
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PartnersUpdateRequest extends FormRequest
+class PartnerUpdateRequest extends FormRequest
 {
 
     public function authorize()

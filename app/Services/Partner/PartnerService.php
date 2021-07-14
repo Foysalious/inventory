@@ -1,6 +1,6 @@
 <?php namespace App\Services\Partner;
 
-use App\Http\Requests\PartnersUpdateRequest;
+use App\Http\Requests\PartnerUpdateRequest;
 use App\Repositories\PartnerRepository;
 use App\Services\BaseService;
 
@@ -13,7 +13,7 @@ class PartnerService extends  BaseService
     {
     }
 
-    public function updatePartner(int $partner_id, PartnersUpdateRequest $request)
+    public function updatePartner(int $partner_id, PartnerUpdateRequest $request)
     {
         $partner = $this->partnerRepository->where('id', $partner_id)->first();
         if(!$partner) {
