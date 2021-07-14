@@ -57,8 +57,10 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
             $q->where('name', 'LIKE', '%' . $searchKey . '%')
                 ->orWhere('description', 'LIKE', '%' . $searchKey . '%');
         })->where('partner_id', $partnerId)->whereHas('skus', function ($q) {
-//            $q->select(DB::raw('SUM(stock) as total_stock'))
-//                ->havingRaw('total_stock > 0');
+            $q->whereHas('batch', function ($q) {
+                $q->select(DB::raw('SUM(stock) as total_stock'))
+                    ->havingRaw('total_stock > 0');
+            });
         })->whereHas('skuChannels', function ($q) {
             $q->where('channel_id', Channels::WEBSTORE);
         });

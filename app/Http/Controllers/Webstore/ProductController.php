@@ -74,15 +74,32 @@ class ProductController extends Controller
     /**
      *
      * * @OA\Get(
-     *      path="/api/v1/partners/{partner}/products/search",
+     *      path="/api/v1/webstore/partners/{partner}/products/search",
      *      operationId="search",
      *      tags={"Product Search API"},
      *      summary="search by partnerId and searchKey",
      *      description="",
      *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Parameter(name="search_key", description="search key", required=true, in="query", @OA\Schema(type="string")),
-     *      @OA\Response(response=200, description="Successful operation", @OA\JsonContent(ref="")),
-     *   )
+     *      @OA\Response(response=200, description="Successful operation",
+     *          @OA\JsonContent(
+     *          type="object",
+     *          example={
+     *               "message": "Successful",
+     *                "products": {
+     *                     {
+     *                      "id": 1000328,
+     *                      "name": "Vegetable",
+     *                      "total_stock": 24,
+     *                      "description": "",
+     *                      "partner_id": 37900,
+     *                      "category_id": 1
+     *                   }}
+     *           },
+     *       ),
+     *      ),
+     *      @OA\Response(response=404, description="message: No products found"),
+     *     )
      *
      * @throws ValidationException
      */
