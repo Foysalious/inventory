@@ -10,17 +10,18 @@ use App\Repositories\SkuBatchRepository;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Discount\Types;
 use App\Services\Product\CombinationCreator;
+use App\Services\Product\CombinationUpdateDetailsObject;
 use App\Services\Product\ProductChannelCreator;
 use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\ProductStockBatchUpdater;
-use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
+use App\Services\Product\ProductUpdateDetailsObjects;
 use App\Services\Sku\Creator as SkuCreator;
 use App\Services\SkuBatch\Updater as SkuStockUpdater;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 
-class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
+class ValuesUpdate extends VariantProductUpdate
 {
     public function __construct(
         protected SkuRepositoryInterface $skuRepository,
@@ -66,6 +67,7 @@ class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
     protected function deleteDiscardedCombinations()
     {
         $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
+        /** @var array $skus_to_delete */
         $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
         $this->deleteSkusStockBatch($skus_to_delete);
         $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
@@ -75,12 +77,12 @@ class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
         $this->deleteSkuChannelDiscount($skus_channels_to_delete);
     }
 
-    protected function deleteSkusStockBatch($sku_ids)
+    protected function deleteSkusStockBatch(array $sku_ids)
     {
         $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
     }
 
-    protected function deleteSkuChannelDiscount($skus_channels_to_delete)
+    protected function deleteSkuChannelDiscount(array $skus_channels_to_delete)
     {
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
@@ -94,16 +96,17 @@ class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
         {
             $combinations = $productDetailObject->getCombination();
             $sku_channels = $productDetailObject->getChannelData();
-            list($is_old, $related_skus) = $this->checkAndApplyOperationIfOldCombination($combinations,$productDetailObject);
-            if($is_old)
-            {
+
+            /** @var bool $is_old */
+            /** @var ?int $related_skus */
+            list($is_old, $related_skus) = $this->checkAndApplyOperationIfOldCombination($combinations, $productDetailObject);
+            if($is_old) {
                 $this->updateSkuChannels($sku_channels,$related_skus);
                 continue;
             }
 
             $product_option_value_ids = [];
-            foreach($combinations as $combination)
-            {
+            foreach($combinations as $combination) {
                 $option_name = $combination->getOptionName();
                 $product_option = $this->createProductOptions($this->product->id, $option_name);
                 $value_name = $combination->getOptionValueName();
@@ -128,7 +131,12 @@ class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
         }
     }
 
-    protected function checkAndApplyOperationForOldCombination($combination,$sku)
+    /**
+     * @param CombinationUpdateDetailsObject[] $combination
+     * @param ProductUpdateDetailsObjects $sku
+     * @return int|null
+     */
+    protected function checkAndApplyOperationForOldCombination(array $combination, ProductUpdateDetailsObjects $sku): ?int
     {
         $old_product_option_value_ids = [];
         foreach($combination as $option_values)
@@ -137,15 +145,20 @@ class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
         }
         $stock = $sku->getStock();
         $old_sku = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
-        $this->skuRepository->where('id',$old_sku)->update(['stock' => $stock ]);
+        $this->skuRepository->where('id', $old_sku)->update(['stock' => $stock ]);
         $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
         return $old_sku;
     }
 
-    protected function checkAndApplyOperationIfOldCombination($combination,$sku)
+    /**
+     * @param CombinationUpdateDetailsObject[] $combination
+     * @param ProductUpdateDetailsObjects $sku
+     * @return array
+     */
+    protected function checkAndApplyOperationIfOldCombination(array $combination, ProductUpdateDetailsObjects $sku): array
     {
-        $is_old =  !is_null($combination[0]->getOptionValueId());
-        $old_skus = null;
+        $is_old = !is_null($combination[0]->getOptionValueId());
+        $old_sku = null;
         if($is_old)
         {
             $old_product_option_value_ids = [];
@@ -154,10 +167,10 @@ class ValuesUpdate extends VariantProductUpdate implements ProductUpdateStrategy
                 array_push($old_product_option_value_ids,$option_values->getOptionValueId());
             }
             $stock = $sku->getStock();
-            $old_sku = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
+            $old_sku = $this->combinationRepository->whereIn('product_option_value_id', $old_product_option_value_ids)->pluck('sku_id')->first();
             $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
         }
-        return [$is_old, $old_skus];
+        return [$is_old, $old_sku];
     }
 
 

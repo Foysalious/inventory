@@ -1,10 +1,9 @@
 <?php namespace App\Services\Product\Update\Strategy\Variant;
 
 
-use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
-class OptionsDelete extends OptionsUpdate implements ProductUpdateStrategy
+class OptionsDelete extends OptionsUpdate
 {
 
     public function update()
@@ -19,11 +18,11 @@ class OptionsDelete extends OptionsUpdate implements ProductUpdateStrategy
     /**
      * @throws UnknownProperties
      */
-    public function createSkuAndSkuChannels()
+    public function createSkuAndSkuChannels(): void
     {
         $sku = $this->createSku($this->product, $this->updateDataObjects[0]);
         $channels = $this->createSKUChannels($sku, $this->updateDataObjects[0]->getChannelData());
         $this->createProductChannel($this->product->id, $channels);
-        $this->productStockBatchUpdater->createBatchStock($sku, $this->updateDataObjects);
+        $this->productStockBatchUpdater->createBatchStock($sku, $this->updateDataObjects[0]);
     }
 }

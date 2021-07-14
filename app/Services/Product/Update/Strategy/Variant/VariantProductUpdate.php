@@ -16,7 +16,7 @@ use App\Services\SkuBatch\Updater as SkuStockUpdater;
 
 abstract class VariantProductUpdate extends ProductUpdate
 {
-    protected $hasVariants;
+    protected bool $hasVariants;
 
     public function __construct(
         protected SkuRepositoryInterface $skuRepository,
@@ -35,7 +35,7 @@ abstract class VariantProductUpdate extends ProductUpdate
 
     public abstract function update();
 
-    protected function createCombination($sku_id, $product_option_value_ids)
+    protected function createCombination(int $sku_id, array $product_option_value_ids)
     {
         $combinations = collect($product_option_value_ids)->map(function ($product_option_value_id) use ($sku_id) {
             return [
@@ -46,12 +46,12 @@ abstract class VariantProductUpdate extends ProductUpdate
         return $this->combinationCreator->setData($combinations->toArray())->store();
     }
 
-    protected function createProductOptions($product_id, $option_name)
+    protected function createProductOptions(int $product_id, string $option_name)
     {
         return $this->productOptionCreator->setProductId($product_id)->setOptionName($option_name)->create();
     }
 
-    protected function createProductOptionValues($product_option_id, $value_name)
+    protected function createProductOptionValues(int $product_option_id, string $value_name)
     {
         return $this->productOptionValueCreator->setProductOptionId($product_option_id)->setValueName($value_name)->create();
     }

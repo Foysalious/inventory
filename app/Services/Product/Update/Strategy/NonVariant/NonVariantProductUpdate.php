@@ -2,8 +2,21 @@
 
 
 use App\Services\Product\Update\Strategy\ProductUpdate;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
-abstract class NonVariantProductUpdate extends ProductUpdate
+class NonVariantProductUpdate extends ProductUpdate
 {
-    public abstract function update();
+    /**
+     * @throws UnknownProperties
+     */
+    public function update()
+    {
+        $sku = $this->skuRepository->where('product_id',$this->product->id)->first();
+        $productUpdateObject = $this->updateDataObjects[0];
+        $sku_channels = $productUpdateObject->getChannelData();
+        $this->updateSkuChannels($sku_channels, $sku->id);
+        $this->deleteProductChannels();
+        $this->createProductChannel($this->product->id, $sku_channels);
+        $this->updateStock($sku, $this->updateDataObjects);
+    }
 }

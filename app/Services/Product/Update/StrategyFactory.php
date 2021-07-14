@@ -9,7 +9,10 @@ use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
-use App\Services\Product\Update\Strategy\NonVariant\NonVariant;
+use App\Models\Product;
+use App\Services\Product\ProductUpdateDetailsObjects;
+use App\Services\Product\Update\Strategy\NonVariant\NonVariantProductUpdate;
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use App\Services\Product\Update\Strategy\Variant\OptionsAdd;
 use App\Services\Product\Update\Strategy\Variant\OptionsDelete;
 use App\Services\Product\Update\Strategy\Variant\OptionsUpdate;
@@ -19,38 +22,32 @@ use App\Services\Product\Update\Strategy\Variant\ValuesUpdate;
 
 class StrategyFactory
 {
-    protected $optionRepositoryInterface;
-    protected $valueRepositoryInterface;
-    protected $productOptionRepositoryInterface;
-    protected $productOptionValueRepositoryInterface;
-    protected $combinationRepositoryInterface;
-    protected $productChannelRepositoryInterface;
-    protected $skuRepositoryInterface;
-    protected ProductRepositoryInterface $productRepositoryInterface;
-    private $deletedValues = null;
+    public function __construct(
+        protected ProductRepositoryInterface $productRepositoryInterface,
+        protected OptionRepositoryInterface $optionRepositoryInterface,
+        protected ValueRepositoryInterface  $valueRepositoryInterface,
+        protected ProductOptionRepositoryInterface $productOptionRepositoryInterface,
+        protected ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface,
+        protected CombinationRepositoryInterface  $combinationRepositoryInterface,
+        protected ProductChannelRepositoryInterface $productChannelRepositoryInterface,
+        protected SkuRepositoryInterface $skuRepositoryInterface,
+        private array|null $deletedValues = null){}
 
-    public function __construct(ProductRepositoryInterface $productRepositoryInterface, OptionRepositoryInterface $optionRepositoryInterface, ValueRepositoryInterface  $valueRepositoryInterface, ProductOptionRepositoryInterface $productOptionRepositoryInterface,
-                                ProductOptionValueRepositoryInterface $productOptionValueRepositoryInterface, CombinationRepositoryInterface  $combinationRepositoryInterface,
-                                ProductChannelRepositoryInterface $productChannelRepositoryInterface, SkuRepositoryInterface $skuRepositoryInterface)
+    /**
+     * @param Product $product
+     * @param ProductUpdateDetailsObjects[] $skus
+     * @param bool $has_variant
+     * @return ProductUpdateStrategy
+     */
+    public function getStrategy(Product $product, array $skus, bool $has_variant): ProductUpdateStrategy
     {
-        $this->productRepositoryInterface = $productRepositoryInterface;
-        $this->optionRepositoryInterface = $optionRepositoryInterface;
-        $this->valueRepositoryInterface = $valueRepositoryInterface;
-        $this->combinationRepositoryInterface = $combinationRepositoryInterface;
-        $this->productOptionRepositoryInterface = $productOptionRepositoryInterface;
-        $this->productOptionValueRepositoryInterface = $productOptionValueRepositoryInterface;
-        $this->productChannelRepositoryInterface =  $productChannelRepositoryInterface;
-        $this->skuRepositoryInterface = $skuRepositoryInterface;
-
-    }
-
-    public function getStrategy($product, $skus, $has_variant)
-    {
+        /** @var bool $is_new_values_added */
+        /** @var array $updatedValues */
         list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
         list($is_values_deleted, $this->deletedValues) = $this->checkIsValuesDeleted($product, $updatedValues);
         $created_with_variants = $this->productOptionRepositoryInterface->where('product_id',$product->id)->count() > 0;
         if(!$created_with_variants && !$has_variant)
-            return app(NonVariant::class);
+            return app(NonVariantProductUpdate::class);
         elseif(!$created_with_variants && $has_variant)
             return app(OptionsAdd::class);
         elseif($created_with_variants && !$has_variant)
@@ -66,7 +63,7 @@ class StrategyFactory
 
     }
 
-    private function checkIsValuesDeleted($product, $updatedValues)
+    private function checkIsValuesDeleted($product, $updatedValues): array
     {
         $is_deleted = false;
         $created_product_option_value_ids = $this->combinationRepositoryInterface->whereIn('sku_id', $product->skus()->pluck('id'))->pluck('product_option_value_id')->toArray();
@@ -77,15 +74,15 @@ class StrategyFactory
         if($created_product_option_value_ids != $filtered_updated_values)
             $is_deleted = true;
 
-        return $is_deleted ? [true,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false,null];
+        return $is_deleted ? [true,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false, null];
     }
 
-    private function checkIsValuesAdded($skus)
+    private function checkIsValuesAdded($skus): array
     {
         $product_option_value_ids = [];
         foreach ($skus as $sku) {
             $combination = $sku->getCombination();
-            if (!$combination) return [false,null];
+            if (!$combination) return [false, null];
             foreach ($combination as $option_values) {
                 array_push($product_option_value_ids, $option_values->getOptionValueId());
             }
@@ -93,7 +90,7 @@ class StrategyFactory
         return [in_array(null, $product_option_value_ids, true), $product_option_value_ids];
     }
 
-    private function checkIsOptionChanged($first_options_values)
+    private function checkIsOptionChanged($first_options_values): bool
     {
         $updated_option_ids = [];
         foreach ($first_options_values as $option_value) {
@@ -102,14 +99,14 @@ class StrategyFactory
         return $this->containsOnlyNull($updated_option_ids);
     }
 
-    private function containsOnlyNull($input)
+    private function containsOnlyNull($input): bool
     {
         return empty(array_filter($input, function ($a) {
             return $a !== null;
         }));
     }
 
-    public function getDeletedValues()
+    public function getDeletedValues(): ?array
     {
         return $this->deletedValues;
     }
