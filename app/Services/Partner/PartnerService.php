@@ -8,6 +8,7 @@ class PartnerService extends  BaseService
 {
     public function __construct(
         protected Updater $partnerUpdater,
+        protected Creator $partnerCreator,
         protected PartnerRepository $partnerRepository
     )
     {
@@ -16,13 +17,17 @@ class PartnerService extends  BaseService
     public function updatePartner(int $partner_id, PartnerUpdateRequest $request)
     {
         $partner = $this->partnerRepository->where('id', $partner_id)->first();
-        if(!$partner) {
-            return $this->error("Bad Request", 400);
+        $partner_dto = new PartnerDto([
+            'id' => $partner_id,
+            'sub_domain' => $request->sub_domain ?? null,
+            'vat_percentage' => $request->vat_percentage ?? null,
+        ]);
+        if(is_null($partner)) {
+            $this->partnerCreator->setPartnerDto($partner_dto)->create();
+        } else {
+            $this->partnerUpdater->setPartner($partner)->setPartnerDto($partner_dto)->update();
         }
-        $this->partnerUpdater->setPartner($partner)
-            ->setSubDomain($request->sub_domain ?? null)
-            ->setVatPercentage($request->vat_percentage ?? null)
-            ->update();
+
         return $this->success('successful', [], 200);
     }
 }
