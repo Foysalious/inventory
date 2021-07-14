@@ -33,7 +33,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function() {
-    //Route::group(['middleware' => 'ip.whitelist'], function () {
+    Route::group(['middleware' => 'ip.whitelist'], function () {
         Route::group(['prefix'=>'webstore'], function() {
             Route::group(['prefix'=>'partners'], function() {
                 Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
@@ -51,6 +51,7 @@ Route::group(['prefix'=>'v1'], function() {
                 Route::post('/', [CategoryController::class, 'store']);
                 Route::post('{category_id}', [CategoryController::class, 'update']);
             });
+            Route::apiResource('collection', CollectionController::class);
             Route::group(['prefix'=>'webstore'], function() {
                 Route::get('products', [ProductController::class, 'getWebstoreProducts']);
             });
@@ -74,5 +75,5 @@ Route::group(['prefix'=>'v1'], function() {
         Route::apiResource('partners.skus', SkuController::class);
         Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
         Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
-    //});
+    });
 });
