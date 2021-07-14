@@ -18,7 +18,53 @@ class ProductController extends Controller
         $this->productService = $productService;
     }
 
+
     /**
+     *
+     * * @OA\Get(
+     *      path="/api/v1/webstore/partners/{partner}/products",
+     *      operationId="index",
+     *      tags={"Partners Webstore Products API"},
+     *      summary="Get Products List for Webstore by Partner",
+     *      description="",
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="offset", description="pagination offset", required=false, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="limit", description="pagination limit", required=false, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="limit", description="pagination limit", required=false, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="category_ids", description="category ids", required=false, in="query", @OA\Schema(type="array", @OA\Items(type="integer")) ),
+     *      @OA\Parameter(name="collection_ids", description="collection ids", required=false, in="query", @OA\Schema(type="array", @OA\Items(type="integer")) ),
+     *      @OA\Parameter(name="ratings", description="ratings", required=false, in="query", @OA\Schema(type="array", @OA\Items(type="integer")) ),
+     *      @OA\Parameter(name="price_range", description="price range", required=false, in="query", @OA\Schema(type="array", @OA\Items(type="integer")) ),
+     *      @OA\Parameter(name="order_by", description="ratings", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Parameter(name="order", description="price range", required=false, in="query", @OA\Schema(type="string")),
+     *      @OA\Response(response=200, description="Successful operation",
+     *          @OA\JsonContent(
+     *          type="object",
+     *          example={
+     *               "message": "Successful",
+     *               "product_count": 21,
+     *                "products": {
+     *                     {
+     *                    "id": 1000328,
+     *                   "category_id": 10052,
+     *                   "collection_id": {},
+     *                    "name": "Vegetable",
+     *                    "rating": null,
+     *                   "rating_count": null,
+     *                   "app_thumb": "https://s3.ap-south-1.amazonaws.com/cdn-shebadev/images/pos/services/thumbs/default.jpg",
+     *                   "original_price": 99.75,
+     *                    "discounted_price": 99.75,
+     *                   "discount_percentage": 0
+     *                   }}
+     *           },
+     *       ),
+     *      ),
+     *      @OA\Response(response=404, description="message: স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।"),
+     *     )
+     * @param $partner
+     * @param Request $request
+     * @return JsonResponse
+     *
      * @throws ProductNotFoundException
      */
     public function index($partner, Request $request): JsonResponse
