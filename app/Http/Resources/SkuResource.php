@@ -1,13 +1,14 @@
 <?php namespace App\Http\Resources;
 
 
+use App\Models\Sku;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SkuResource extends JsonResource
 {
     public function toArray($request)
     {
-
+        /** @var $this Sku */
         return [
 
             'id' => $this->id,
@@ -19,7 +20,8 @@ class SkuResource extends JsonResource
             'unit' => $this->product->unit,
             'stock' => $this->stock(),
             'sku_channel' => $this->skuChannels,
-            'combination' => $this->sku_details->combinations
+            'combination' => $this->sku_details->combinations,
+            'batches' => $this->batch()->selectRaw('id as batch_id,stock,cost')->orderBy('id')->get(),
         ];
     }
 
