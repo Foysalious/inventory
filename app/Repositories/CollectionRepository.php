@@ -29,9 +29,11 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
     {
 
         return $this->model->where('is_published', 1)->where('partner_id', $partner_id)->whereHas('products', function ($q) {
-            $q->whereHas('skuChannels', function ($q) {
-                $q->select(DB::raw('SUM(stock) as total_stock'))
-                    ->havingRaw('total_stock > 0');
+            $q->whereHas('skus', function ($q) {
+                $q->whereHas('batch', function ($q) {
+                    $q->select(DB::raw('SUM(stock) as total_stock'))
+                        ->havingRaw('total_stock > 0');
+                });
             })->whereHas('skuChannels', function ($q) {
                 $q->where('channel_id', Channels::WEBSTORE);
             });
