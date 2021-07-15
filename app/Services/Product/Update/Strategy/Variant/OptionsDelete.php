@@ -1,12 +1,13 @@
 <?php namespace App\Services\Product\Update\Strategy\Variant;
 
 
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class OptionsDelete extends OptionsUpdate
 {
 
-    public function update()
+    public function update()  : ProductUpdateStrategy
     {
         $this->deleteBatchStock();
         $this->deleteProductOptions();

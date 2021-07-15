@@ -4,21 +4,11 @@
 use App\Models\ProductOption;
 use App\Models\Sku;
 use App\Models\SkuChannel;
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class OptionsUpdate extends VariantProductUpdate
 {
-    /**
-     * @throws UnknownProperties
-     */
-    public function update()
-    {
-        $this->deleteProductOptions();
-        $this->deleteSkuAndCombination();
-        $this->deleteProductChannels();
-        $this->deleteBatchStock();
-        $this->createNewProductVariantsData();
-    }
 
     protected function deleteProductOptions()
     {
@@ -67,4 +57,17 @@ class OptionsUpdate extends VariantProductUpdate
         $all_channels = array_merge(... $all_channels);
         $this->createProductChannel($product->id, $all_channels);
     }
+
+    /**
+     * @throws UnknownProperties
+     */
+    public function update() : ProductUpdateStrategy
+    {
+        $this->deleteProductOptions();
+        $this->deleteSkuAndCombination();
+        $this->deleteProductChannels();
+        $this->deleteBatchStock();
+        $this->createNewProductVariantsData();
+    }
+
 }

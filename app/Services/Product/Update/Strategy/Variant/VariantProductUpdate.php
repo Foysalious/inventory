@@ -11,6 +11,7 @@ use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\ProductStockBatchUpdater;
 use App\Services\Product\Update\Strategy\ProductUpdate;
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use App\Services\Sku\Creator as SkuCreator;
 use App\Services\SkuBatch\Updater as SkuStockUpdater;
 
@@ -29,11 +30,12 @@ abstract class VariantProductUpdate extends ProductUpdate
         protected ProductChannelCreator $productChannelCreator,
         protected CombinationCreator $combinationCreator,
         protected ProductOptionCreator $productOptionCreator,
-        protected ProductOptionValueCreator $productOptionValueCreator){
+        protected ProductOptionValueCreator $productOptionValueCreator)
+    {
         parent::__construct($skuRepository, $skuCreator, $skuStockUpdater, $skuChannelRepository, $productStockBatchUpdater, $discountRepository, $discountCreator, $productChannelCreator);
     }
 
-    public abstract function update();
+    public abstract function update(): ProductUpdateStrategy;
 
     protected function createCombination(int $sku_id, array $product_option_value_ids)
     {
