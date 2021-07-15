@@ -23,12 +23,12 @@ class Updater
     protected Product $product;
     protected int $partnerId;
     protected int $categoryId;
-    protected string $name;
-    protected string $description;
-    protected int $warranty;
-    protected string $warrantyUnit;
-    protected float $vatPercentage;
-    protected int $unitId;
+    protected ?string $name;
+    protected ?string $description;
+    protected ?int $warranty;
+    protected ?string $warrantyUnit;
+    protected ?float $vatPercentage;
+    protected ?int $unitId;
     /** @var ProductUpdateDetailsObjects[] */
     protected array $productUpdateRequestObjects;
     private bool $hasVariants;
@@ -106,7 +106,7 @@ class Updater
      * @param string $description
      * @return $this
      */
-    public function setDescription(string $description): Updater
+    public function setDescription(?string $description): Updater
     {
         $this->description = $description;
         return $this;
@@ -116,7 +116,7 @@ class Updater
      * @param int $warranty
      * @return $this
      */
-    public function setWarranty(int $warranty): Updater
+    public function setWarranty(?int $warranty): Updater
     {
         $this->warranty = $warranty;
         return $this;
@@ -127,7 +127,7 @@ class Updater
      * @param string $warrantyUnit
      * @return $this
      */
-    public function setWarrantyUnit(string $warrantyUnit): Updater
+    public function setWarrantyUnit(?string $warrantyUnit): Updater
     {
         $this->warrantyUnit = $warrantyUnit;
         return $this;
@@ -137,7 +137,7 @@ class Updater
      * @param float $vatPercentage
      * @return $this
      */
-    public function setVatPercentage(float $vatPercentage): Updater
+    public function setVatPercentage(?float $vatPercentage): Updater
     {
         $this->vatPercentage = $vatPercentage;
         return $this;
@@ -147,7 +147,7 @@ class Updater
      * @param int $unitId
      * @return $this
      */
-    public function setUnitId(int $unitId): Updater
+    public function setUnitId(?int $unitId): Updater
     {
         $this->unitId = $unitId;
         return $this;
