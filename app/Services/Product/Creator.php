@@ -11,6 +11,7 @@ use App\Services\SkuBatch\SkuBatchDto;
 use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\SkuBatch\Creator as SkuBatchCreator;
+use Illuminate\Http\UploadedFile;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Creator
@@ -45,6 +46,8 @@ class Creator
     private $productChannelCreator;
     private $productRequestObjects;
     private $hasVariants;
+    private UploadedFile $app_thumb;
+    private string $app_thumb_url;
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
@@ -167,6 +170,16 @@ class Creator
     }
 
     /**
+     * @param mixed $app_thumb
+     * @return Creator
+     */
+    public function setAppThumb($app_thumb)
+    {
+        $this->app_thumb = $app_thumb;
+        return $this;
+    }
+
+    /**
      * @param ProductRepositoryInterface $productRepositoryInterface
      * @return Creator
      */
@@ -247,12 +260,13 @@ class Creator
      */
     public function create()
     {
+        if ($this->app_thumb) $this->saveAppThumbImage();
         $product =  $this->productRepositoryInterface->create($this->makeData());
         $this->hasVariants ? $this->createVariantsSKUAndSKUChannels($product) : $this->createSKUAndSKUChannels($product);
         if ($this->discountAmount)
-            $this->createProductDiscount($product);
+        $this->createProductDiscount($product);
         if ($this->images)
-            $this->createImageGallery($product);
+        $this->createImageGallery($product);
         return $product;
     }
 
@@ -411,6 +425,11 @@ class Creator
         $this->productImageCreator->setProductId($product->id)->setImages($this->images)->create();
     }
 
+    private function saveAppThumbImage()
+    {
+        $this->app_thumb_url = $this->productImageCreator->setAppThumb($this->app_thumb)->setFilename($this->name)->createAppThumb();
+    }
+
     /**
      * @return array
      */
@@ -425,6 +444,7 @@ class Creator
             'warranty_unit' => $this->warrantyUnit ?: WarrantyUnits::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
             'unit_id' => $this->unitId,
+            'app_thumb' => $this->app_thumb_url
         ];
     }
 

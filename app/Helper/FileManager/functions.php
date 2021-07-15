@@ -31,6 +31,20 @@ if (!function_exists('getPosServiceImageGalleryFolder')) {
     }
 }
 
+/**
+ * Get Service Thumb Folder.
+ *
+ * @param bool $with_base_url
+ * @return string
+ */
+function getPosServiceThumbFolder($with_base_url = false)
+{
+    $url = '';
+    if ($with_base_url) $url = config('s3.url');
+
+    return $url . 'images/pos/services/thumbs/';
+}
+
 
 if (!function_exists('getProductDefaultThumb')) {
 

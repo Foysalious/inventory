@@ -4,6 +4,7 @@
 use App\Interfaces\ProductImageRepositoryInterface;
 use App\Services\FileManagers\CdnFileManager;
 use App\Services\Product\ProductFileManager;
+use Illuminate\Http\UploadedFile;
 
 class Creator
 {
@@ -12,8 +13,10 @@ class Creator
     protected $productId;
     protected $images;
     protected $imagesLinks;
+    protected ?UploadedFile $appThumb;
     /** @var ProductImageRepositoryInterface */
     protected ProductImageRepositoryInterface $productImageRepositoryInterface;
+    protected string $filename;
 
     public function __construct(ProductImageRepositoryInterface $productImageRepositoryInterface)
     {
@@ -37,6 +40,27 @@ class Creator
     public function setImages($images)
     {
         $this->images = $images;
+        return $this;
+    }
+
+    /**
+     * @param mixed $filename
+     * @return Creator
+     */
+    public function setFilename($filename)
+    {
+        $this->filename = $filename;
+        return $this;
+    }
+
+
+    /**
+     * @param mixed $appThumb
+     * @return Creator
+     */
+    public function setAppThumb($appThumb)
+    {
+        $this->appThumb = $appThumb;
         return $this;
     }
 
@@ -69,5 +93,13 @@ class Creator
     {
         $this->imagesLinks = $this->saveImages($this->images);
         return $this->saveImagesLinks(json_decode($this->imagesLinks, true));
+    }
+
+    public function createAppThumb(): string
+    {
+        /** @var UploadedFile $avatar */
+        /** @var string $avatar_filename */
+        list($avatar, $avatar_filename) = $this->makeProductAppThumb($this->appThumb, $this->filename);
+        return $this->saveImageToCDN($avatar, getPosServiceThumbFolder(), $avatar_filename);
     }
 }
