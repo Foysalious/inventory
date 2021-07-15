@@ -61,7 +61,7 @@ class OptionsUpdate extends VariantProductUpdate
     /**
      * @throws UnknownProperties
      */
-    public function update() : ProductUpdateStrategy
+    public function update()
     {
         $this->deleteProductOptions();
         $this->deleteSkuAndCombination();

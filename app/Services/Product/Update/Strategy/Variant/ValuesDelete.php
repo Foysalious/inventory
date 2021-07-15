@@ -5,7 +5,7 @@ use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 
 class ValuesDelete extends ValuesUpdate
 {
-    public function update(): ProductUpdateStrategy
+    public function update()
     {
         $this->deleteDiscardedCombinations();
         $this->operationsForOldValues();

@@ -7,7 +7,7 @@ use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 class OptionsDelete extends OptionsUpdate
 {
 
-    public function update()  : ProductUpdateStrategy
+    public function update()
     {
         $this->deleteBatchStock();
         $this->deleteProductOptions();

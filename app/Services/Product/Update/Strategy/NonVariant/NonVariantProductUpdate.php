@@ -10,7 +10,7 @@ class NonVariantProductUpdate extends ProductUpdate
     /**
      * @throws UnknownProperties
      */
-    public function update() : ProductUpdateStrategy
+    public function update()
     {
         $sku = $this->skuRepository->where('product_id',$this->product->id)->first();
         $productUpdateObject = $this->updateDataObjects[0];

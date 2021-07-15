@@ -57,7 +57,7 @@ class ValuesUpdate extends VariantProductUpdate
     /**
      * @throws UnknownProperties
      */
-    public function update(): ProductUpdateStrategy
+    public function update()
     {
         $this->deleteDiscardedCombinations();
         $this->operationsForValueAdd();

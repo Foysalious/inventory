@@ -228,5 +228,5 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         return [$is_deleted, $deleted_sku_channel_ids];
     }
 
-    abstract public function update(): ProductUpdateStrategy;
+    abstract public function update();
 }

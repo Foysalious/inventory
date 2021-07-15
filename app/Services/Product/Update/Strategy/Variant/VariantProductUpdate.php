@@ -35,7 +35,7 @@ abstract class VariantProductUpdate extends ProductUpdate
         parent::__construct($skuRepository, $skuCreator, $skuStockUpdater, $skuChannelRepository, $productStockBatchUpdater, $discountRepository, $discountCreator, $productChannelCreator);
     }
 
-    public abstract function update(): ProductUpdateStrategy;
+    public abstract function update();
 
     protected function createCombination(int $sku_id, array $product_option_value_ids)
     {

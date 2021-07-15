@@ -11,5 +11,5 @@ interface ProductUpdateStrategy
 
     public function setDeletedValues(?array $deletedValues): ProductUpdateStrategy;
 
-    public function update(): ProductUpdateStrategy;
+    public function update();
 }
