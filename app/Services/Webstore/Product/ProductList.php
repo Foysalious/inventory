@@ -6,6 +6,7 @@ use App\Http\Resources\Webstore\ProductsResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Services\Channel\Channels;
+use App\Services\Webstore\PosOrderServerClient;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 
@@ -24,15 +25,19 @@ class ProductList
     protected $productCount;
     protected $priceRange;
     protected $ratings;
+    protected PosOrderServerClient $posServerClient;
 
 
     public function __construct(
         CategoryRepositoryInterface $categoryRepository,
-        ProductRepositoryInterface $productRepository
+        ProductRepositoryInterface $productRepository,
+        PosOrderServerClient $posServerClient
     )
     {
         $this->categoryRepository = $categoryRepository;
         $this->productRepository = $productRepository;
+        $this->posServerClient = $posServerClient;
+
     }
 
     /**
@@ -73,51 +78,6 @@ class ProductList
         return $this;
     }
 
-    /**
-     * @param $subCategoryIds
-     * @return ProductList
-     */
-    public function setSubCategoryIds($subCategoryIds)
-    {
-        $this->subCategoryIds = $subCategoryIds;
-        return $this;
-    }
-
-
-
-    /**
-     * @param mixed $webstorePublicationStatus
-     * @return ProductList
-     */
-    public function setWebstorePublicationStatus($webstorePublicationStatus)
-    {
-        $this->webstorePublicationStatus = $webstorePublicationStatus;
-        return $this;
-    }
-
-    private function getProducts()
-    {
-        $products_query = $this->productRepository->where('partner_id', $this->partnerId)->whereHas('skus', function ($q) {
-            $q->whereHas('batch', function ($q) {
-                $q->select(DB::raw('SUM(stock) as total_stock'))
-                    ->havingRaw('total_stock > 0');
-            });
-        })->whereHas('skuChannels', function ($q) {
-            $q->where('channel_id', Channels::WEBSTORE);
-        });
-
-        $this->productCount = $products_query->count();
-        if (isset($this->categoryIds))
-            $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-        if(isset($this->collectionIds))
-            $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        if(isset($this->priceRange))
-            $products_query = $this->filterByPrice($products_query, $this->priceRange);
-        if(isset($this->ratings))
-            $products_query = $this->filterByRatings($products_query, $this->ratings);
-        return $products_query->offset($this->offset)->limit($this->limit)->get();
-    }
-
 
     public function setCollectionIds($collectionIds)
     {
@@ -137,8 +97,43 @@ class ProductList
         return $this;
     }
 
+    /**
+     * @param $subCategoryIds
+     * @return ProductList
+     */
+    public function setSubCategoryIds($subCategoryIds)
+    {
+        $this->subCategoryIds = $subCategoryIds;
+        return $this;
+    }
 
-    public function get()
+    private function getProducts()
+    {
+        $products_query = $this->productRepository->where('partner_id', $this->partnerId)
+            ->whereHas('skus', function ($q) {
+                $q->whereHas('batch', function ($q) {
+                    $q->select(DB::raw('SUM(stock) as total_stock'))
+                        ->havingRaw('total_stock > 0');
+                });
+            })->whereHas('skuChannels', function ($q) {
+                $q->where('channel_id', Channels::WEBSTORE);
+            });
+        if (isset($this->categoryIds))
+            $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+        if(isset($this->collectionIds))
+            $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
+        if(isset($this->priceRange))
+            $products_query = $this->filterByPrice($products_query, $this->priceRange);
+        if(isset($this->ratings))
+            $products_query = $this->filterByRatings($products_query, $this->ratings);
+        $this->productCount = $products_query->count();
+        return $products_query->offset($this->offset)->limit($this->limit)->get();
+    }
+
+    /**
+     * @throws ProductNotFoundException
+     */
+    public function get(): array
     {
         $products = $this->getProducts();
         if ($products->isEmpty())
@@ -155,11 +150,6 @@ class ProductList
             if (!$children->isEmpty()) $subCategoryIds->push($children);
             $subCategoryIds->push($category->id);
         }
-        return $products_query->whereIn('category_id', $subCategoryIds);
-    }
-
-    private function filterBySubCategories($products_query, $subCategoryIds)
-    {
         return $products_query->whereIn('category_id', $subCategoryIds);
     }
 
@@ -181,7 +171,8 @@ class ProductList
 
     public function filterByRatings($products_query,$ratings)
     {
-
+        $products_by_ratings =  $this->posServerClient->get('api/v1/webstore/partners/'.$this->partnerId.'/products-by-ratings?ratings='. json_encode($ratings))['product_ids_by_ratings'];
+        return $products_query->whereIn('id',$products_by_ratings);
     }
 
 }

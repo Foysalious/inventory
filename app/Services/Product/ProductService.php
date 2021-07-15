@@ -14,6 +14,7 @@ use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class ProductService extends BaseService
 {
@@ -125,19 +126,24 @@ class ProductService extends BaseService
         return $this->success("Successful", ['product' => $product],201);
     }
 
+
     /**
      * @param $productId
      * @param ProductUpdateRequest $request
+     * @param $partner
      * @return JsonResponse
+     * @throws UnknownProperties
      */
-    public function update($productId, ProductUpdateRequest $request, $partner)
+    public function update($productId, ProductUpdateRequest $request, $partner): JsonResponse
     {
         $product = $this->productRepositoryInterface->findOrFail($productId);
         if($product->partner_id != $partner)
             return $this->error("This product does not belong this partner", 403);
-        /** @var $productUpdateRequestObjects ProductUpdateRequestObjects */
+        /** @var ProductUpdateRequestObjects $productUpdateRequestObjects */
         $productUpdateRequestObjects = app(ProductUpdateRequestObjects::class);
-        list($has_variant,$product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
+        /** @var ProductUpdateDetailsObjects[] $product_update_request_objs */
+        /** @var bool $has_variant */
+        list($has_variant, $product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
         $this->updater->setProduct($product)
             ->setCategoryId($request->sub_category_id ?? ($this->categoryRepository->getDefaultSubCategory($partner, $request->category_id))->id)
             ->setName($request->name)

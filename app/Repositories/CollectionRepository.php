@@ -22,7 +22,7 @@ class CollectionRepository extends BaseRepository implements CollectionRepositor
 
     public function getAllCollection($offset, $limit, $partner_id)
     {
-        return $this->model->where('partner_id', $partner_id)->offset($offset)->limit($limit)->latest()->get();
+        return $this->model->withCount('products')->where('partner_id', $partner_id)->offset($offset)->limit($limit)->latest()->get();
     }
 
     public function getAllCollectionForWebstore(int $offset, int $limit, int $partner_id)

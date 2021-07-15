@@ -18,6 +18,7 @@ class CategoryResource extends JsonResource
             'is_default' => $this->categoryPartner()->get()->pluck('is_default')->first(),
             'is_published_for_sheba' => $this->is_published_for_sheba,
             'sub_categories' => $this->children,
+            'products'  => $this->products_count
         ];
     }
 

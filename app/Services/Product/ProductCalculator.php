@@ -1,7 +1,7 @@
 <?php namespace App\Services\Product;
 
 use App\Models\Discount;
-use App\Services\Webstore\PosServerClient;
+use App\Services\Webstore\PosOrderServerClient;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Product;
 use GuzzleHttp\Client;
@@ -13,7 +13,7 @@ class ProductCalculator
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
     private $channel;
 
-    public function __construct(SkuChannelRepositoryInterface $skuChannelRepositoryInterface, PosServerClient $client)
+    public function __construct(SkuChannelRepositoryInterface $skuChannelRepositoryInterface, PosOrderServerClient $client)
     {
         $this->skuChannelRepositoryInterface = $skuChannelRepositoryInterface;
         $this->client = $client;
