@@ -46,8 +46,8 @@ class Creator
     private $productChannelCreator;
     private $productRequestObjects;
     private $hasVariants;
-    private UploadedFile $app_thumb;
-    private string $app_thumb_url;
+    private ?UploadedFile $app_thumb;
+    private ?string $app_thumb_url = null;
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
@@ -435,7 +435,7 @@ class Creator
      */
     private function makeData(): array
     {
-        return [
+        $data = [
             'partner_id' => $this->partnerId,
             'category_id' => $this->categoryId,
             'name' => $this->name,
@@ -443,9 +443,10 @@ class Creator
             'warranty' => $this->warranty ?: 0,
             'warranty_unit' => $this->warrantyUnit ?: WarrantyUnits::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
-            'unit_id' => $this->unitId,
-            'app_thumb' => $this->app_thumb_url
+            'unit_id' => $this->unitId
         ];
+       if ($this->app_thumb_url)  $data = array_merge($data, ['app_thumb' => $this->app_thumb_url ?? null]);
+       return $data;
     }
 
     private function createSkuBatch(Sku $sku, ProductDetailsObject $product_detail_object)

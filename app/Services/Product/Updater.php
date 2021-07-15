@@ -24,11 +24,11 @@ class Updater
     protected int $partnerId;
     protected int $categoryId;
     protected string $name;
-    protected string $description;
-    protected int $warranty;
-    protected string $warrantyUnit;
-    protected float $vatPercentage;
-    protected int $unitId;
+    protected ?string $description;
+    protected ?int $warranty;
+    protected ?string $warrantyUnit;
+    protected ?float $vatPercentage;
+    protected ?int $unitId;
     /** @var ProductUpdateDetailsObjects[] */
     protected array $productUpdateRequestObjects;
     private bool $hasVariants;
@@ -103,20 +103,20 @@ class Updater
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      * @return $this
      */
-    public function setDescription(string $description): Updater
+    public function setDescription(?string $description): Updater
     {
         $this->description = $description;
         return $this;
     }
 
     /**
-     * @param int $warranty
+     * @param int|null $warranty
      * @return $this
      */
-    public function setWarranty(int $warranty): Updater
+    public function setWarranty(?int $warranty): Updater
     {
         $this->warranty = $warranty;
         return $this;
@@ -124,30 +124,30 @@ class Updater
 
 
     /**
-     * @param string $warrantyUnit
+     * @param string|null $warrantyUnit
      * @return $this
      */
-    public function setWarrantyUnit(string $warrantyUnit): Updater
+    public function setWarrantyUnit(?string $warrantyUnit): Updater
     {
         $this->warrantyUnit = $warrantyUnit;
         return $this;
     }
 
     /**
-     * @param float $vatPercentage
+     * @param float|null $vatPercentage
      * @return $this
      */
-    public function setVatPercentage(float $vatPercentage): Updater
+    public function setVatPercentage(?float $vatPercentage): Updater
     {
         $this->vatPercentage = $vatPercentage;
         return $this;
     }
 
     /**
-     * @param int $unitId
+     * @param int|null $unitId
      * @return $this
      */
-    public function setUnitId(int $unitId): Updater
+    public function setUnitId(?int $unitId): Updater
     {
         $this->unitId = $unitId;
         return $this;

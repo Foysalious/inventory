@@ -16,7 +16,7 @@ class NonVariantProductUpdate extends ProductUpdate
         $sku_channels = $productUpdateObject->getChannelData();
         $this->updateSkuChannels($sku_channels, $sku->id);
         $this->deleteProductChannels();
-        $this->createProductChannel($this->product->id, $sku_channels);
+        $this->createProductChannel($this->product->id, $this->channels);
         $this->updateStock($sku, $this->updateDataObjects);
     }
 }
