@@ -41,25 +41,53 @@ class StrategyFactory
      */
     public function getStrategy(Product $product, array $skus, bool $has_variant): ProductUpdateStrategy
     {
-        /** @var bool $is_new_values_added */
-        /** @var array $updatedValues */
-        list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
-        list($is_values_deleted, $this->deletedValues) = $this->checkIsValuesDeleted($product, $updatedValues);
+//        /** @var bool $is_new_values_added */
+//        /** @var array $updatedValues */
+//        list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
+//        list($is_values_deleted, $this->deletedValues) = $this->checkIsValuesDeleted($product, $updatedValues);
+//        $created_with_variants = $this->productOptionRepositoryInterface->where('product_id',$product->id)->count() > 0;
+//        if(!$created_with_variants && !$has_variant)
+//            return app(NonVariantProductUpdate::class);
+//        elseif(!$created_with_variants && $has_variant)
+//            return app(OptionsAdd::class);
+//        elseif($created_with_variants && !$has_variant)
+//            return app(OptionsDelete::class);
+//        elseif($this->checkIsOptionChanged($skus[0]->getCombination()))
+//            return app(OptionsUpdate::class);
+//        elseif ($is_new_values_added && $is_values_deleted)
+//            return app(ValuesUpdate::class);
+//        elseif ($is_new_values_added && !$is_values_deleted)
+//            return app(ValuesAdd::class);
+//        else
+//            return app(ValuesDelete::class);
+
+        $deleted_values = null;
         $created_with_variants = $this->productOptionRepositoryInterface->where('product_id',$product->id)->count() > 0;
-        if(!$created_with_variants && !$has_variant)
+        if(!$created_with_variants && !$has_variant) {
+            $this->deletedValues = $deleted_values;
             return app(NonVariantProductUpdate::class);
-        elseif(!$created_with_variants && $has_variant)
+        } elseif (!$created_with_variants && $has_variant) {
+            $this->deletedValues = $deleted_values;
             return app(OptionsAdd::class);
-        elseif($created_with_variants && !$has_variant)
+        } elseif ($created_with_variants && !$has_variant) {
+            $this->deletedValues = $deleted_values;
             return app(OptionsDelete::class);
-        elseif($this->checkIsOptionChanged($skus[0]->getCombination()))
+        } elseif ($this->checkIsOptionChanged($skus[0]->getCombination())) {
+            $this->deletedValues = $deleted_values;
             return app(OptionsUpdate::class);
-        elseif ($is_new_values_added && $is_values_deleted)
+        }
+        list($is_new_values_added, $updatedValues) = $this->checkIsValuesAdded($skus);
+        list($is_values_deleted,$deleted_values) = $this->checkIsValuesDeleted($product, $updatedValues);
+        if ($is_new_values_added && $is_values_deleted) {
+            $this->deletedValues = $deleted_values;
             return app(ValuesUpdate::class);
-        elseif ($is_new_values_added && !$is_values_deleted)
+        } elseif ($is_new_values_added && !$is_values_deleted) {
+            $this->deletedValues = $deleted_values;
             return app(ValuesAdd::class);
-        else
+        } else {
+            $this->deletedValues = $deleted_values;
             return app(ValuesDelete::class);
+        }
 
     }
 
@@ -77,7 +105,11 @@ class StrategyFactory
         return $is_deleted ? [true,array_diff($created_product_option_value_ids,$filtered_updated_values)] : [false, null];
     }
 
-    private function checkIsValuesAdded($skus): array
+    /**
+     * @param ProductUpdateDetailsObjects[] $skus
+     * @return array
+     */
+    private function checkIsValuesAdded(array $skus): array
     {
         $product_option_value_ids = [];
         foreach ($skus as $sku) {

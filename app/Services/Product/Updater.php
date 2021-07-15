@@ -23,7 +23,7 @@ class Updater
     protected Product $product;
     protected int $partnerId;
     protected int $categoryId;
-    protected ?string $name;
+    protected string $name;
     protected ?string $description;
     protected ?int $warranty;
     protected ?string $warrantyUnit;
@@ -103,7 +103,7 @@ class Updater
     }
 
     /**
-     * @param string $description
+     * @param string|null $description
      * @return $this
      */
     public function setDescription(?string $description): Updater
@@ -113,7 +113,7 @@ class Updater
     }
 
     /**
-     * @param int $warranty
+     * @param int|null $warranty
      * @return $this
      */
     public function setWarranty(?int $warranty): Updater
@@ -124,7 +124,7 @@ class Updater
 
 
     /**
-     * @param string $warrantyUnit
+     * @param string|null $warrantyUnit
      * @return $this
      */
     public function setWarrantyUnit(?string $warrantyUnit): Updater
@@ -134,7 +134,7 @@ class Updater
     }
 
     /**
-     * @param float $vatPercentage
+     * @param float|null $vatPercentage
      * @return $this
      */
     public function setVatPercentage(?float $vatPercentage): Updater
@@ -144,7 +144,7 @@ class Updater
     }
 
     /**
-     * @param int $unitId
+     * @param int|null $unitId
      * @return $this
      */
     public function setUnitId(?int $unitId): Updater

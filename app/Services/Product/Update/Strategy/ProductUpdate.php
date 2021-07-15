@@ -91,15 +91,18 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         ));
     }
 
+
     /**
+     * @param $sku
+     * @param ProductUpdateDetailsObjects[] $updateDataObjects
      * @throws UnknownProperties
      */
-    protected function updateStock($sku, $updateDataObjects): void
+    protected function updateStock($sku, array $updateDataObjects): void
     {
         $sku_dto = new SkuBatchDto(
             [
                 "sku_id" => $sku->id,
-                "cost" => $updateDataObjects->getCost(),
+                "cost" => $updateDataObjects[0]->getCost(),
                 "stock" => $this->updateDataObjects[0]->getStock(),
             ]
         );
