@@ -118,13 +118,13 @@ class ProductList
             })->whereHas('skuChannels', function ($q) {
                 $q->where('channel_id', Channels::WEBSTORE);
             });
-        if (isset($this->categoryIds))
+        if (!empty($this->categoryIds))
             $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-        if(isset($this->collectionIds))
+        if(!empty($this->collectionIds))
             $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        if(isset($this->priceRange))
+        if(!empty($this->priceRange))
             $products_query = $this->filterByPrice($products_query, $this->priceRange);
-        if(isset($this->ratings))
+        if(!empty($this->ratings))
             $products_query = $this->filterByRatings($products_query, $this->ratings);
         $this->productCount = $products_query->count();
         return $products_query->offset($this->offset)->limit($this->limit)->get();
@@ -137,7 +137,7 @@ class ProductList
     {
         $products = $this->getProducts();
         if ($products->isEmpty())
-            throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
+            throw new ProductNotFoundException('No Products Found');
         return  [$this->productCount,ProductsResource::collection($products)];
     }
 
