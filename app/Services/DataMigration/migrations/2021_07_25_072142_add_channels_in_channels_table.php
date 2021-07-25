@@ -12,7 +12,7 @@ class AddChannelsInChannelsTable extends DataMigrationBase implements DataMigrat
      */
     public function handle()
     {
-        $data = [
+        $channels = [
             [
                 'id' => 1,
                 'name' => 'pos'
@@ -22,9 +22,7 @@ class AddChannelsInChannelsTable extends DataMigrationBase implements DataMigrat
                 'name' => 'webstore'
             ]
         ];
-        foreach ($data as $channel) {
-            DB::table('channels')->insert($this->withCreateModificationField($channel));
-        }
+        DB::table('channels')->insert($channels);
         dump('channels data migrated successfully');
     }
 }
