@@ -119,7 +119,7 @@ class ProductList
                 $q->where('channel_id', Channels::WEBSTORE);
             });
         if (!empty($this->categoryIds))
-            $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+            $products_query->whereIn('category_id', $this->categoryRepository->getProductsByCategoryId($this->categoryIds)->pluck('id'));
         if (!empty($this->collectionIds))
             $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
         if (!empty($this->priceRange))
@@ -141,10 +141,6 @@ class ProductList
         return [$this->productCount, ProductsResource::collection($products)];
     }
 
-    private function filterByCategories($products_query, $categoryIds)
-    {
-        return $products_query->whereIn('category_id', $this->categoryRepository->whereIn('parent_id', $categoryIds)->select('id')->pluck('id'));
-    }
 
     private function filterByCollectionIds($products_query, $collectionIds)
     {

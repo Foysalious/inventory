@@ -97,7 +97,7 @@ class ProductList
     private function getProducts()
     {
         $products_query = $this->productRepository->where('partner_id', $this->partnerId);
-        if (isset($this->categoryIds)) $products_query = $this->filterByCategories($products_query, $this->categoryIds);
+        if (isset($this->categoryIds)) $products_query = $products_query->whereIn('category_id', $this->categoryRepository->getProductsByCategoryId($this->categoryIds)->pluck('id'));;
         if (isset($this->setSubCategoryIds))
             $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
         if (isset($this->updatedAfter)) $products_query = $this->filterByUpdatedAfter($products_query, $this->updatedAfter);
@@ -134,17 +134,6 @@ class ProductList
         return new ProductsInfoResource($products_with_deleted_products);
     }
 
-    private function filterByCategories($products_query, $categoryIds)
-    {
-        $subCategoryIds = collect([]);
-        foreach ($categoryIds as $categoryId) {
-            $category = $this->categoryRepository->find($categoryId);
-            $children = $category->children()->pluck('id');
-            if (!$children->isEmpty()) $subCategoryIds->push($children);
-            $subCategoryIds->push($category->id);
-        }
-        return $products_query->whereIn('category_id', $subCategoryIds);
-    }
 
     private function filterBySubCategories($products_query, $subCategoryIds)
     {
@@ -155,14 +144,14 @@ class ProductList
     {
         return $products_query->where(function ($q) use ($updatedAfter) {
             $q->where('updated_at', '>=', $updatedAfter);
-            $q->orWhere('created_at', '>=',$updatedAfter);
+            $q->orWhere('created_at', '>=', $updatedAfter);
         });
     }
 
     private function filterByWebstorePublicationStatus($products_query, $webstorePublicationStatus)
     {
         return $products_query->whereHas('productChannels', function ($query) use ($webstorePublicationStatus) {
-            $query->whereHas('channel', function ($q) use ($webstorePublicationStatus){
+            $query->whereHas('channel', function ($q) use ($webstorePublicationStatus) {
                 $q->where('name', 'webstore');
                 $q->where('is_published', $webstorePublicationStatus);
             });
@@ -178,22 +167,22 @@ class ProductList
         ];
         $items = $this->productRepository->where('partner_id', $this->partnerId)
             ->select('id')
-            ->whereHas('skus', function ($query){
-                        /** @var $query Builder */
-                    return $query->with(['batch' => function ($query){
-                        /** @var $query Builder */
-                     return $query->where('cost', '>', 0 )
-                         ->orderBy('id', 'desc')
-                         ->limit(1);
-                 }]);
+            ->whereHas('skus', function ($query) {
+                /** @var $query Builder */
+                return $query->with(['batch' => function ($query) {
+                    /** @var $query Builder */
+                    return $query->where('cost', '>', 0)
+                        ->orderBy('id', 'desc')
+                        ->limit(1);
+                }]);
             })->get();
 
-        foreach ($items as $product){
+        foreach ($items as $product) {
             $skus = $product->skus;
             foreach ($skus as $each_sku) {
                 $return_data['total_items']++;
                 $batch = $each_sku->batch->where('cost', '>', 0)->sortByDesc('id')->first();
-                if($batch){
+                if ($batch) {
                     $return_data['items_with_buying_price']++;
                     $return_data['total_buying_price'] += $batch->cost;
                 }

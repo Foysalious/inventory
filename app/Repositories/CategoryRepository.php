@@ -44,12 +44,16 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         })->select('id', 'name')->where('parent_id', NULL)->get();
     }
 
-    public function getDefaultSubCategory(int $partner_id,int $category_id)
+    public function getDefaultSubCategory(int $partner_id, int $category_id)
     {
-         return $this->model->where('parent_id', $category_id)
-             ->whereHas(self::CATEGORY_PARTNER, function ($q) use ($partner_id){
-                 $q->where(self::PARTNER_ID, $partner_id)->where('is_default', 1);
-             })->first();
+        return $this->model->where('parent_id', $category_id)
+            ->whereHas(self::CATEGORY_PARTNER, function ($q) use ($partner_id) {
+                $q->where(self::PARTNER_ID, $partner_id)->where('is_default', 1);
+            })->first();
     }
 
+    public function getSubCategoryIds(array $category_ids)
+    {
+        return $this->model->whereIn('parent_id', $category_ids)->select('id')->get();
+    }
 }
