@@ -15,7 +15,7 @@ class ProductList
     protected CategoryRepositoryInterface $categoryRepository;
     protected ProductRepositoryInterface $productRepository;
     protected int $partnerId;
-    protected $categoryIds;
+    protected array $categoryIds;
     protected $subCategoryIds;
     protected $collectionIds;
     protected $updatedAfter;
@@ -54,7 +54,7 @@ class ProductList
      * @param $categoryIds
      * @return $this
      */
-    public function setCategoryIds($categoryIds)
+    public function setCategoryIds(array $categoryIds)
     {
         $this->categoryIds = $categoryIds;
         return $this;
@@ -120,11 +120,11 @@ class ProductList
             });
         if (!empty($this->categoryIds))
             $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-        if(!empty($this->collectionIds))
+        if (!empty($this->collectionIds))
             $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        if(!empty($this->priceRange))
+        if (!empty($this->priceRange))
             $products_query = $this->filterByPrice($products_query, $this->priceRange);
-        if(!empty($this->ratings))
+        if (!empty($this->ratings))
             $products_query = $this->filterByRatings($products_query, $this->ratings);
         $this->productCount = $products_query->count();
         return $products_query->offset($this->offset)->limit($this->limit)->get();
@@ -138,41 +138,34 @@ class ProductList
         $products = $this->getProducts();
         if ($products->isEmpty())
             throw new ProductNotFoundException('No Products Found');
-        return  [$this->productCount,ProductsResource::collection($products)];
+        return [$this->productCount, ProductsResource::collection($products)];
     }
 
     private function filterByCategories($products_query, $categoryIds)
     {
-        $subCategoryIds = collect([]);
-        foreach ($categoryIds as $categoryId) {
-            $category = $this->categoryRepository->find($categoryId);
-            $children = $category->children()->pluck('id');
-            if (!$children->isEmpty()) $subCategoryIds->push($children);
-            $subCategoryIds->push($category->id);
-        }
-        return $products_query->whereIn('category_id', $subCategoryIds);
+        return $products_query->whereIn('category_id', $this->categoryRepository->whereIn('parent_id', $categoryIds)->select('id')->pluck('id'));
     }
 
     private function filterByCollectionIds($products_query, $collectionIds)
     {
-        return $products_query->whereHas('collections',function($q) use ($collectionIds){
+        return $products_query->whereHas('collections', function ($q) use ($collectionIds) {
             $q->whereIn('id', $collectionIds);
         });
     }
 
-    public function filterByPrice($products_query,$priceRange)
+    public function filterByPrice($products_query, $priceRange)
     {
-        return $products_query->whereHas('skus',function($q) use ($priceRange){
-            $q->whereHas('skuChannels',function($q) use($priceRange){
-                $q->where('channel_id',Channels::WEBSTORE)->whereBetween('price',$priceRange);
+        return $products_query->whereHas('skus', function ($q) use ($priceRange) {
+            $q->whereHas('skuChannels', function ($q) use ($priceRange) {
+                $q->where('channel_id', Channels::WEBSTORE)->whereBetween('price', $priceRange);
             });
         });
     }
 
-    public function filterByRatings($products_query,$ratings)
+    public function filterByRatings($products_query, $ratings)
     {
-        $products_by_ratings =  $this->posServerClient->get('api/v1/webstore/partners/'.$this->partnerId.'/products-by-ratings?ratings='. json_encode($ratings))['product_ids_by_ratings'];
-        return $products_query->whereIn('id',$products_by_ratings);
+        $products_by_ratings = $this->posServerClient->get('api/v1/webstore/partners/' . $this->partnerId . '/products-by-ratings?ratings=' . json_encode($ratings))['product_ids_by_ratings'];
+        return $products_query->whereIn('id', $products_by_ratings);
     }
 
 }
