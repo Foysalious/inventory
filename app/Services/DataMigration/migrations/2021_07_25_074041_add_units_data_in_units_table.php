@@ -1,6 +1,7 @@
 <?php namespace App\Services\DataMigration\migrations;
 
 use App\Models\Unit;
+use Carbon\Carbon;
 
 class AddUnitsDataInUnitsTable extends DataMigrationBase implements DataMigrationInterface
 {
@@ -18,7 +19,7 @@ class AddUnitsDataInUnitsTable extends DataMigrationBase implements DataMigratio
 
     private function getData()
     {
-        return [
+        $data = [
             [
                 'name_bn' => 'ফুট',
                 'name_en' => 'ft'
@@ -84,5 +85,10 @@ class AddUnitsDataInUnitsTable extends DataMigrationBase implements DataMigratio
                 'name_en' => 'gauze'
             ]
         ];
+        foreach ($data as &$each) {
+            $each['created_at'] = Carbon::now();
+            $each['created_by_name'] = 'automatic';
+        }
+        return $data;
     }
 }
