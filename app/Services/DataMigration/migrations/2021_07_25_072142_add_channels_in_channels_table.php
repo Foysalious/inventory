@@ -15,13 +15,13 @@ class AddChannelsInChannelsTable extends DataMigrationBase implements DataMigrat
     {
         $channels = [
             [
-                'id' => 5,
+                'id' => 1,
                 'name' => 'pos',
                 'created_at' => Carbon::now(),
                 'created_by_name' => 'automatic'
             ],
             [
-                'id' => 6,
+                'id' => 2,
                 'name' => 'webstore',
                 'created_at' => Carbon::now(),
                 'created_by_name' => 'automatic'
