@@ -69,11 +69,43 @@ class ProductUpdateLogCreateRequest
 
     private function getUpdatedFieldNames($oldProductDetails, $updatedProductDetails)
     {
-        $diff = array_diff($oldProductDetails->toArray(), $updatedProductDetails->toArray());
-        unset($diff['updated_at']);
-        unset($diff['updated_by_name']);
+        $oldProductArray = collect($oldProductDetails)->toArray();
+        $updatedProductArray = collect($updatedProductDetails)->toArray();
+
+        $diff = $this->getOldUpdatedProductDifference($oldProductArray, $updatedProductArray);
+        //dd($oldProductArray);
+//        dd(array_diff($oldProductArray, $updatedProductArray));
+//        $diff = $oldProductArray->diff($updatedProductArray);
+//        dd($diff->all());
+//        $unitDiff = $this->getUnitIdDiff($oldProductArray['unit'], $updatedProductArray['unit']);
+//        if($unitDiff) array_push($diff, $unitDiff);
+//        unset($diff['updated_at']);
+//        unset($diff['updated_by_name']);
         return array_keys($diff);
     }
 
+    private function getOldUpdatedProductDifference($oldProductArray, $updatedProductArray)
+    {
+        $diff = [];
+        if(isset($updatedProductArray['name'])) $oldProductArray['name'] !== $updatedProductArray['name'] ? $diff['name'] = $updatedProductArray['name'] : [];
+        if(isset($updatedProductArray['category_id']))  $oldProductArray['category_id'] !== $updatedProductArray['category_id'] ?  $diff['category_id'] = $updatedProductArray['category_id'] : [];
+        if(isset($updatedProductArray['sub_category_id'])) $oldProductArray['sub_category_id'] !== $updatedProductArray['sub_category_id'] ? $diff['sub_category_id'] = $updatedProductArray['sub_category_id'] : [];
+        if(isset($updatedProductArray['description']))  $oldProductArray['description'] !== $updatedProductArray['description'] ? $diff['description'] = $updatedProductArray['description'] : [];
+        if(isset($updatedProductArray['vat_percentage']))   $oldProductArray['vat_percentage'] !== $updatedProductArray['vat_percentage'] ? $diff['vat_percentage'] = $updatedProductArray['vat_percentage'] : [];
+        if(isset($updatedProductArray['app_thumb']))    $oldProductArray['app_thumb'] !== $updatedProductArray['app_thumb'] ? $diff['app_thumb'] = $updatedProductArray['app_thumb'] : [];
+        if(isset($updatedProductArray['warranty'])) $oldProductArray['warranty'] !== $updatedProductArray['warranty'] ? $diff['warranty'] = $updatedProductArray['warranty'] : [];
+        if(isset($updatedProductArray['warranty_unit']))    $oldProductArray['warranty_unit'] !== $updatedProductArray['warranty_unit'] ? $diff['warranty_unit'] = $updatedProductArray['warranty_unit'] : [];
+        if(isset($updatedProductArray['original_price']))   $oldProductArray['original_price'] !== $updatedProductArray['original_price'] ? $diff['original_price'] = $updatedProductArray['original_price'] : [];
+
+        if(isset($updatedProductArray['unit']['id'])) $oldProductArray['unit']['id'] !== $updatedProductArray['unit']['id'] ? $diff['unit'] = $updatedProductArray['unit']['id'] : [];
+
+        return $diff;
+    }
+
+    private function getUnitIdDiff($oldUnitId, $updatedUnitId) : array
+    {
+        if($oldUnitId === $updatedUnitId) return [];
+        else return ["unit" => $updatedUnitId];
+    }
 
 }

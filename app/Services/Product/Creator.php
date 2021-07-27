@@ -4,6 +4,7 @@ use App\Interfaces\DiscountRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Sku;
 use App\Services\Discount\Types;
+use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\Sku\CreateSkuDto;
 use App\Services\Sku\Creator as SkuCreator;
@@ -53,7 +54,7 @@ class Creator
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
                                 ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator,
-                                protected SkuBatchCreator $skuBatchCreator
+                                protected SkuBatchCreator $skuBatchCreator, protected ProductUpdateLogCreateRequest $logCreateRequest
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -267,6 +268,7 @@ class Creator
         $this->createProductDiscount($product);
         if ($this->images)
         $this->createImageGallery($product);
+        $this->logCreateRequest->setOldProductDetails($product)->setUpdatedProductDetails($product)->create();
         return $product;
     }
 
