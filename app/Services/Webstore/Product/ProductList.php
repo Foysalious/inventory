@@ -16,15 +16,14 @@ class ProductList
     protected ProductRepositoryInterface $productRepository;
     protected int $partnerId;
     protected array $categoryIds;
-    protected $subCategoryIds;
     protected $collectionIds;
-    protected $updatedAfter;
     protected $offset;
     protected $limit;
     protected $webstorePublicationStatus;
     protected $productCount;
     protected $priceRange;
     protected $ratings;
+    protected $searchKey;
     protected PosOrderServerClient $posServerClient;
 
 
@@ -79,31 +78,27 @@ class ProductList
     }
 
 
-    public function setCollectionIds($collectionIds)
+    public function setCollectionIds(array $collectionIds)
     {
         $this->collectionIds = $collectionIds;
         return $this;
     }
 
-    public function setPriceRange($priceRange)
+    public function setPriceRange(array $priceRange)
     {
         $this->priceRange = $priceRange;
         return $this;
     }
 
-    public function setRatings($ratings)
+    public function setRatings(array $ratings)
     {
         $this->ratings = $ratings;
         return $this;
     }
 
-    /**
-     * @param $subCategoryIds
-     * @return ProductList
-     */
-    public function setSubCategoryIds($subCategoryIds)
+    public function setSearchKey($searchKey)
     {
-        $this->subCategoryIds = $subCategoryIds;
+        $this->searchKey = $searchKey;
         return $this;
     }
 
@@ -119,13 +114,15 @@ class ProductList
                 $q->where('channel_id', Channels::WEBSTORE);
             });
         if (!empty($this->categoryIds))
-            $products_query->whereIn('category_id', $this->categoryRepository->getProductsByCategoryId($this->categoryIds)->pluck('id'));
+            $products_query->whereIn('category_id', $this->categoryRepository->getSubCategoryIds($this->categoryIds)->pluck('id'));
         if (!empty($this->collectionIds))
             $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
         if (!empty($this->priceRange))
             $products_query = $this->filterByPrice($products_query, $this->priceRange);
         if (!empty($this->ratings))
             $products_query = $this->filterByRatings($products_query, $this->ratings);
+        if($this->searchKey)
+            $products_query = $this->filterBySearchKey($products_query, $this->searchKey);
         $this->productCount = $products_query->count();
         return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
@@ -164,4 +161,11 @@ class ProductList
         return $products_query->whereIn('id', $products_by_ratings);
     }
 
+    public function filterBySearchKey($products_query, $searchKey)
+    {
+        return $products_query->where(function ($q) use ($searchKey) {
+            $q->where('name', 'LIKE', '%' . $searchKey . '%')
+                ->orWhere('description', 'LIKE', '%' . $searchKey . '%');
+        });
+    }
 }

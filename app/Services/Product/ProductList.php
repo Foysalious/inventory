@@ -97,7 +97,7 @@ class ProductList
     private function getProducts()
     {
         $products_query = $this->productRepository->where('partner_id', $this->partnerId);
-        if (isset($this->categoryIds)) $products_query = $products_query->whereIn('category_id', $this->categoryRepository->getProductsByCategoryId($this->categoryIds)->pluck('id'));;
+        if (isset($this->categoryIds)) $products_query = $products_query->whereIn('category_id', $this->categoryRepository->getSubCategoryIds($this->categoryIds)->pluck('id'));
         if (isset($this->setSubCategoryIds))
             $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
         if (isset($this->updatedAfter)) $products_query = $this->filterByUpdatedAfter($products_query, $this->updatedAfter);
