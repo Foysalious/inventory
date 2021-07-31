@@ -17,6 +17,7 @@ use App\Services\Product\Update\Strategy\Updater as ProductUpdater;
 use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\ProductImage\Updater as ProductImageUpdater;
+use Illuminate\Support\Facades\DB;
 
 class Updater
 {
@@ -215,16 +216,21 @@ class Updater
 
     public function update()
     {
-        $oldProductDetails = clone $this->product;
-        $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
-        $this->productRepositoryInterface->update($this->product, $this->makeData());
-        $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
-        $this->productUpdater->setStrategy($strategy)
-            ->setProduct($this->product)
-            ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-            ->setDeletedValues($this->strategyFactory->getDeletedValues())
-            ->update();
-        $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
+        try {
+            DB::beginTransaction();
+            $oldProductDetails = clone $this->product;
+            $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
+            $this->productRepositoryInterface->update($this->product, $this->makeData());
+            $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
+            $this->productUpdater->setStrategy($strategy)
+                ->setProduct($this->product)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->setDeletedValues($this->strategyFactory->getDeletedValues())
+                ->update();
+            $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
     }
 
     private function makeData(): array
