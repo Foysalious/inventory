@@ -228,6 +228,7 @@ class Updater
                 ->setDeletedValues($this->strategyFactory->getDeletedValues())
                 ->update();
             $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
         }
