@@ -53,7 +53,7 @@ class Product extends BaseModel
     {
         $array = $this->toArray();
 
-        $data = [
+       return $data = [
             'id' => $array['id'],
             'name' => $array['name'],
             'description' => $array['description'],
@@ -61,7 +61,6 @@ class Product extends BaseModel
             'warranty_unit' => $array['warranty_unit']
         ];
 
-        return $data;
     }
     public function images()
     {
@@ -166,11 +165,13 @@ class Product extends BaseModel
     public function getDiscountPercentage()
     {
         $original_price = $this->getOriginalPrice();
-        if($original_price == 0)
+        if($original_price == 0){
             return 0;
+        }
         $discount = $this->discount();
-        if ($discount->is_amount_percentage)
+        if ($discount->is_amount_percentage){
             return $discount->amount;
+        }
         return round((($discount->amount / $original_price) * 100), 1);
     }
 
