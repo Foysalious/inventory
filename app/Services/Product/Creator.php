@@ -13,6 +13,7 @@ use App\Services\Warranty\WarrantyUnits;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\SkuBatch\Creator as SkuBatchCreator;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class Creator
@@ -261,15 +262,20 @@ class Creator
      */
     public function create()
     {
-        if ($this->app_thumb) $this->saveAppThumbImage();
-        $product =  $this->productRepositoryInterface->create($this->makeData());
-        $this->hasVariants ? $this->createVariantsSKUAndSKUChannels($product) : $this->createSKUAndSKUChannels($product);
-        if ($this->discountAmount)
-        $this->createProductDiscount($product);
-        if ($this->images)
-        $this->createImageGallery($product);
-        $this->logCreateRequest->setOldProductDetails($product)->setUpdatedProductDetails($product)->create();
-        return $product;
+        try {
+            DB::beginTransaction();
+            if ($this->app_thumb) $this->saveAppThumbImage();
+            $product =  $this->productRepositoryInterface->create($this->makeData());
+            $this->hasVariants ? $this->createVariantsSKUAndSKUChannels($product) : $this->createSKUAndSKUChannels($product);
+            if ($this->discountAmount)
+                $this->createProductDiscount($product);
+            if ($this->images)
+                $this->createImageGallery($product);
+            DB::commit();
+            return $product;
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
     }
 
     /**

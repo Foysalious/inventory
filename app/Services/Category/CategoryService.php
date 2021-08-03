@@ -4,7 +4,6 @@
 use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\CategoryWithSubCategory;
-use App\Http\Resources\CategoryProductResource;
 use App\Http\Resources\CategoryResource;
 use App\Http\Resources\CategoryWiseProductResource;
 use App\Interfaces\CategoryRepositoryInterface;
@@ -12,7 +11,6 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Services\BaseService;
-
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -60,8 +58,9 @@ class CategoryService extends BaseService
     public function getCategoriesByPartner($partner_id)
     {
         $categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
-        if ($categories->isEmpty())
+        if ($categories->isEmpty()) {
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
+        }
         $resource = CategoryResource::collection($categories);
         $data['total_categories'] = count($categories);
         $data['categories'] = $resource;
@@ -86,7 +85,7 @@ class CategoryService extends BaseService
      */
     public function create(CategoryRequest $request, $partner_id)
     {
-        $category = $this->creator->setModifyBy($request->modifier)
+        $this->creator->setModifyBy($request->modifier)
             ->setPartner($partner_id)
             ->setName($request->name)
             ->setThumb($request->thumb ?? null)
@@ -105,8 +104,9 @@ class CategoryService extends BaseService
     public function update(CategoryRequest $request, $partner_id, $category_id): JsonResponse
     {
         $category = $this->categoryRepositoryInterface->find($category_id);
-        if (!$category)
+        if (!$category) {
             throw new ModelNotFoundException();
+        }
         $this->authorization->setPartnerId($partner_id)->setCategory($category)->canUpdateOrDeleteThisCategory();
         $this->updater->setModifyBy($request->modifier)->setCategory($category)->setCategoryId($category->id)->setName($request->name)->setThumb($request->thumb)->update();
         return $this->success("Successful", ['category' => $category],200);

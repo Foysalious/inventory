@@ -18,6 +18,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
 {
@@ -104,11 +105,12 @@ class ProductService extends BaseService
      */
     public function create($partnerId, ProductRequest $request)
     {
+        $default_sub_category = $this->getDefaultSubCategory($partnerId, $request->category_id);
         /** @var ProductCreateRequest $productCreateRequest */
         $productCreateRequest = app(ProductCreateRequest::class);
         list($has_variant,$product_create_request_objs) = $productCreateRequest->setProductDetails($request->product_details)->get();
         $product = $this->creator->setPartnerId($partnerId)
-            ->setCategoryId($request->sub_category_id ?? ($this->categoryRepository->getDefaultSubCategory($partnerId, $request->category_id))->id)
+            ->setCategoryId($request->sub_category_id ?? $default_sub_category)
             ->setName($request->name)
             ->setDescription($request->description)
             ->setWarranty($request->warranty)
@@ -140,6 +142,7 @@ class ProductService extends BaseService
      */
     public function update($productId, ProductUpdateRequest $request, $partner): JsonResponse
     {
+        $default_sub_category = $this->getDefaultSubCategory($partner, $request->category_id);
         $product = $this->productRepositoryInterface->findOrFail($productId);
         if($product->partner_id != $partner)
             return $this->error("This product does not belong this partner", 403);
@@ -149,7 +152,7 @@ class ProductService extends BaseService
         /** @var bool $has_variant */
         list($has_variant, $product_update_request_objs) =  $productUpdateRequestObjects->setProductDetails($request->product_details)->get();
         $this->updater->setProduct($product)
-            ->setCategoryId($request->sub_category_id ?? ($this->categoryRepository->getDefaultSubCategory($partner, $request->category_id))->id)
+            ->setCategoryId($request->sub_category_id ?? $default_sub_category)
             ->setName($request->name)
             ->setDescription($request->description)
             ->setWarranty($request->warranty)
@@ -178,6 +181,16 @@ class ProductService extends BaseService
             return $this->error("This product does not belong to this partner", 403);
         $product->delete();
         return $this->success("Successful", ['product' => $product],200, false);
+    }
+
+    private function getDefaultSubCategory($partner_id, $category_id)
+    {
+        $sub_category = $this->categoryRepository->getDefaultSubCategory($partner_id, $category_id);
+        if(is_null($sub_category)) {
+            throw new NotFoundHttpException("This category does not belong to this partner");
+        } else {
+            return $sub_category->id;
+        }
     }
 
     public function getLogs($request, $partner, $product)

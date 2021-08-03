@@ -31,15 +31,18 @@ class CollectionService extends BaseService
         $resource = $this->collectionRepositoryInterface->getAllCollection($offset, $limit, $partner_id);
 
         $collections = CollectionResource::collection($resource);
-        if(!$collections) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
+        if (!$collections) {
+            return $this->error("কালেকশন পাওয়া যায় নি!", 404);
+        }
         return $this->success("Successful", ['collections' => $collections], 200);
     }
 
     public function getDetails($partnerId, $collectionId)
     {
         $singleCollection = $this->collectionRepositoryInterface->where('partner_id', $partnerId)->find($collectionId);
-        if(!$singleCollection) return $this->error("কালেকশন পাওয়া যায় নি!", 404);
-
+        if (!$singleCollection) {
+            return $this->error("কালেকশন পাওয়া যায় নি!", 404);
+        }
         $collection = new CollectionProductResource($singleCollection);
         return $this->success('Successful', ['collection' => $collection], 200);
     }
@@ -83,7 +86,9 @@ class CollectionService extends BaseService
     public function delete($partner_id, $collection_id)
     {
         $collection = $this->collectionRepositoryInterface->where('partner_id', $partner_id)->find($collection_id);
-        if(!$collection) return $this->error("কালেকশন পাওয়া যায় নি", 404);
+        if (!$collection) {
+            return $this->error("কালেকশন পাওয়া যায় নি", 404);
+        }
 
         try {
             $this->imageUpdater->deleteAllCollectionImages($partner_id, $collection_id);

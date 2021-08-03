@@ -1,6 +1,7 @@
 <?php namespace App\Services\Product\Update\Strategy\Variant;
 
 
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class OptionsDelete extends OptionsUpdate

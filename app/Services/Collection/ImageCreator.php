@@ -20,22 +20,22 @@ class ImageCreator
     {
         $collection_images = [];
 
-        if(($thumb)) {
+        if ($thumb) {
             list($file, $fileName) = $this->prepareCollectionImage($thumb, '_' . getFileName($thumb) . '_collection_thumb');
             $collection_images['thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
         }
 
-        if(($banner)) {
+        if ($banner) {
             list($file, $fileName) = $this->prepareCollectionImage($banner, '_' . getFileName($banner) . '_collection_banner');
             $collection_images['banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultBannerFolder(), $fileName);
         }
 
-        if(($app_thumb)) {
+        if ($app_thumb) {
             list($file, $fileName) = $this->prepareCollectionImage($app_thumb, '_' . getFileName($app_thumb) . '_collection_app_thumb');
             $collection_images['app_thumb_link'] = $this->saveFileToCDN($file, getCollectionDefaultAppThumbFolder(), $fileName);
         }
 
-        if(($app_banner)) {
+        if ($app_banner) {
             list($file, $fileName) = $this->prepareCollectionImage($app_banner, '_' . getFileName($app_banner) . '_collection_app_banner');
             $collection_images['app_banner_link'] = $this->saveFileToCDN($file, getCollectionDefaultThumbFolder(), $fileName);
         }

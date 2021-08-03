@@ -16,13 +16,6 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         parent::__construct($model);
     }
 
-    public function getProductsByPartnerId(int $partnerId, int $offset = 0, int $limit = 50)
-    {
-        $filer_by  = 'category';
-        $filter_values = [10053];
-        return  $this->model->where('partner_id', $partnerId)->skip($offset)->take($limit)->get();
-    }
-
     public function getProductsByCategoryId($category_id)
     {
         return $this->model->where('category_id', $category_id)->get();

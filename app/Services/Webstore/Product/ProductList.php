@@ -15,16 +15,15 @@ class ProductList
     protected CategoryRepositoryInterface $categoryRepository;
     protected ProductRepositoryInterface $productRepository;
     protected int $partnerId;
-    protected $categoryIds;
-    protected $subCategoryIds;
+    protected array $categoryIds;
     protected $collectionIds;
-    protected $updatedAfter;
     protected $offset;
     protected $limit;
     protected $webstorePublicationStatus;
     protected $productCount;
     protected $priceRange;
     protected $ratings;
+    protected $searchKey;
     protected PosOrderServerClient $posServerClient;
 
 
@@ -54,7 +53,7 @@ class ProductList
      * @param $categoryIds
      * @return $this
      */
-    public function setCategoryIds($categoryIds)
+    public function setCategoryIds(array $categoryIds)
     {
         $this->categoryIds = $categoryIds;
         return $this;
@@ -79,31 +78,27 @@ class ProductList
     }
 
 
-    public function setCollectionIds($collectionIds)
+    public function setCollectionIds(array $collectionIds)
     {
         $this->collectionIds = $collectionIds;
         return $this;
     }
 
-    public function setPriceRange($priceRange)
+    public function setPriceRange(array $priceRange)
     {
         $this->priceRange = $priceRange;
         return $this;
     }
 
-    public function setRatings($ratings)
+    public function setRatings(array $ratings)
     {
         $this->ratings = $ratings;
         return $this;
     }
 
-    /**
-     * @param $subCategoryIds
-     * @return ProductList
-     */
-    public function setSubCategoryIds($subCategoryIds)
+    public function setSearchKey($searchKey)
     {
-        $this->subCategoryIds = $subCategoryIds;
+        $this->searchKey = $searchKey;
         return $this;
     }
 
@@ -118,14 +113,16 @@ class ProductList
             })->whereHas('skuChannels', function ($q) {
                 $q->where('channel_id', Channels::WEBSTORE);
             });
-        if (isset($this->categoryIds))
-            $products_query = $this->filterByCategories($products_query, $this->categoryIds);
-        if(isset($this->collectionIds))
+        if (!empty($this->categoryIds))
+            $products_query->whereIn('category_id', $this->categoryRepository->getSubCategoryIds($this->categoryIds)->pluck('id'));
+        if (!empty($this->collectionIds))
             $products_query = $this->filterByCollectionIds($products_query, $this->collectionIds);
-        if(isset($this->priceRange))
+        if (!empty($this->priceRange))
             $products_query = $this->filterByPrice($products_query, $this->priceRange);
-        if(isset($this->ratings))
+        if (!empty($this->ratings))
             $products_query = $this->filterByRatings($products_query, $this->ratings);
+        if($this->searchKey)
+            $products_query = $this->filterBySearchKey($products_query, $this->searchKey);
         $this->productCount = $products_query->count();
         return $products_query->offset($this->offset)->limit($this->limit)->get();
     }
@@ -137,42 +134,38 @@ class ProductList
     {
         $products = $this->getProducts();
         if ($products->isEmpty())
-            throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        return  [$this->productCount,ProductsResource::collection($products)];
+            throw new ProductNotFoundException('No Products Found');
+        return [$this->productCount, ProductsResource::collection($products)];
     }
 
-    private function filterByCategories($products_query, $categoryIds)
-    {
-        $subCategoryIds = collect([]);
-        foreach ($categoryIds as $categoryId) {
-            $category = $this->categoryRepository->find($categoryId);
-            $children = $category->children()->pluck('id');
-            if (!$children->isEmpty()) $subCategoryIds->push($children);
-            $subCategoryIds->push($category->id);
-        }
-        return $products_query->whereIn('category_id', $subCategoryIds);
-    }
 
     private function filterByCollectionIds($products_query, $collectionIds)
     {
-        return $products_query->whereHas('collections',function($q) use ($collectionIds){
+        return $products_query->whereHas('collections', function ($q) use ($collectionIds) {
             $q->whereIn('id', $collectionIds);
         });
     }
 
-    public function filterByPrice($products_query,$priceRange)
+    public function filterByPrice($products_query, $priceRange)
     {
-        return $products_query->whereHas('skus',function($q) use ($priceRange){
-            $q->whereHas('skuChannels',function($q) use($priceRange){
-                $q->where('channel_id',Channels::WEBSTORE)->whereBetween('price',$priceRange);
+        return $products_query->whereHas('skus', function ($q) use ($priceRange) {
+            $q->whereHas('skuChannels', function ($q) use ($priceRange) {
+                $q->where('channel_id', Channels::WEBSTORE)->whereBetween('price', $priceRange);
             });
         });
     }
 
-    public function filterByRatings($products_query,$ratings)
+    public function filterByRatings($products_query, $ratings)
     {
-        $products_by_ratings =  $this->posServerClient->get('api/v1/webstore/partners/'.$this->partnerId.'/products-by-ratings?ratings='. json_encode($ratings))['product_ids_by_ratings'];
-        return $products_query->whereIn('id',$products_by_ratings);
+        $products_by_ratings = $this->posServerClient->get('api/v1/webstore/partners/' . $this->partnerId . '/products-by-ratings?ratings=' . json_encode($ratings))['product_ids_by_ratings'];
+        return $products_query->whereIn('id', $products_by_ratings);
     }
 
+    public function filterBySearchKey($products_query, $searchKey)
+    {
+        return $products_query->where(function ($q) use ($searchKey) {
+            $q->where('name', 'LIKE', '%' . $searchKey . '%')
+                ->orWhere('description', 'LIKE', '%' . $searchKey . '%');
+        });
+    }
 }

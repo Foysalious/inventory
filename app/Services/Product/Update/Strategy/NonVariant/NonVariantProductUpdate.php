@@ -2,6 +2,7 @@
 
 
 use App\Services\Product\Update\Strategy\ProductUpdate;
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class NonVariantProductUpdate extends ProductUpdate

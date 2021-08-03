@@ -20,6 +20,7 @@ use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\ProductImage\Updater as ProductImageUpdater;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\DB;
 
 class Updater
 {
@@ -218,22 +219,29 @@ class Updater
 
     public function update()
     {
-        $oldProductDetails = clone $this->product;
-        $oldProductResource = new WebstoreProductResource($oldProductDetails);
-        $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
-        $this->productRepositoryInterface->update($this->product, $this->makeData());
-        $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
-        $this->productUpdater->setStrategy($strategy)
-            ->setProduct($this->product)
-            ->setUpdatedDataObjects($this->productUpdateRequestObjects)
-            ->setDeletedValues($this->strategyFactory->getDeletedValues())
-            ->update();
-        $updatedProductResource = new WebstoreProductResource($this->product);
-        $this->logCreateRequest->setOldProductDetails($oldProductDetails)
-            ->setOldProductResource($oldProductResource)
-            ->setUpdatedProductDetails($this->product)
-            ->setUpdatedProductDetailsResource($updatedProductResource)
-            ->create();
+        try {
+            DB::beginTransaction();
+            $oldProductDetails = clone $this->product;
+            $oldProductResource = new WebstoreProductResource($oldProductDetails);
+            $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
+            $this->productRepositoryInterface->update($this->product, $this->makeData());
+            $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
+            $this->productUpdater->setStrategy($strategy)
+                ->setProduct($this->product)
+                ->setUpdatedDataObjects($this->productUpdateRequestObjects)
+                ->setDeletedValues($this->strategyFactory->getDeletedValues())
+                ->update();
+            $updatedProductResource = new WebstoreProductResource($this->product);
+            $this->logCreateRequest->setOldProductDetails($oldProductDetails)
+                ->setOldProductResource($oldProductResource)
+                ->setUpdatedProductDetails($this->product)
+                ->setUpdatedProductDetailsResource($updatedProductResource)
+                ->create();
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollback();
+        }
+
     }
 
     private function makeData(): array

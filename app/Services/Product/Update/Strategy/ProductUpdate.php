@@ -35,7 +35,9 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         protected ProductStockBatchUpdater $productStockBatchUpdater,
         protected DiscountRepositoryInterface $discountRepository,
         protected DiscountCreator $discountCreator,
-        protected ProductChannelCreator $productChannelCreator){}
+        protected ProductChannelCreator $productChannelCreator)
+    {
+    }
 
     public function setProduct(Product $product): ProductUpdate
     {
@@ -76,7 +78,7 @@ abstract class ProductUpdate implements ProductUpdateStrategy
     {
         $combinations = $updateDataObject->getCombination();
         $values = [];
-        foreach($combinations as $combination) {
+        foreach ($combinations as $combination) {
             $value_name = $combination->getOptionValueName();
             array_push($values, $value_name);
         }
@@ -146,7 +148,7 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         /** @var bool $is_deleted */
         /** @var array $deleted_sku_Channels */
         list($is_deleted, $deleted_sku_Channels) = $this->checkAndApplyOperationIfSkuChannelsDeleted($sku_channels, $related_skus);
-        if($is_deleted) {
+        if ($is_deleted) {
             $this->skuChannelRepository->whereIn('id', $deleted_sku_Channels)->delete();
             $this->discountRepository->whereIn('type_id', $deleted_sku_Channels)->where('type', Types::SKU_CHANNEL)->delete();
         }
@@ -184,9 +186,9 @@ abstract class ProductUpdate implements ProductUpdateStrategy
             $sku_channel_id = $sku_channel->getSkuChannelId();
             array_push($this->channels, $sku_channel->getChannelId());
             array_push($updated_sku_channels_ids, $sku_channel_id);
-            if($sku_channel_id) //old sku_channel
+            if ($sku_channel_id) //old sku_channel
             {
-                $this->skuChannelRepository->where('id',$sku_channel_id)->update([
+                $this->skuChannelRepository->where('id', $sku_channel_id)->update([
                     'price' => $sku_channel->getPrice(),
                     'wholesale_price' => $sku_channel->getWholesalePrice()
                 ]);
@@ -197,8 +199,7 @@ abstract class ProductUpdate implements ProductUpdateStrategy
                     'is_amount_percentage' => $sku_channel->getIsPercentage(),
                     'end_date' => $sku_channel->getDiscountEndDate()
                 ]);
-            }
-            else { //new sku_channel
+            } else { //new sku_channel
                 $this->skuChannelRepository->create([
                     'sku_id' => $related_skus,
                     'channel_id' => $sku_channel->getChannelId(),
@@ -222,11 +223,10 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         /** @var ?array $deleted_sku_channel_ids */
         $deleted_sku_channel_ids = null;
         $is_deleted = $created_sku_channels_ids != $filtered_updated_sku_channels_ids;
-        if($is_deleted)
-            $deleted_sku_channel_ids  = array_diff($created_sku_channels_ids,$filtered_updated_sku_channels_ids);
-        return [$is_deleted , $deleted_sku_channel_ids];
+        if ($is_deleted)
+            $deleted_sku_channel_ids = array_diff($created_sku_channels_ids, $filtered_updated_sku_channels_ids);
+        return [$is_deleted, $deleted_sku_channel_ids];
     }
 
-    abstract function update();
-
+    abstract public function update();
 }

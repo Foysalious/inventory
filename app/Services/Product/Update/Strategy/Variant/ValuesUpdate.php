@@ -16,6 +16,7 @@ use App\Services\Product\ProductOptionCreator;
 use App\Services\Product\ProductOptionValueCreator;
 use App\Services\Product\ProductStockBatchUpdater;
 use App\Services\Product\ProductUpdateDetailsObjects;
+use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use App\Services\Sku\Creator as SkuCreator;
 use App\Services\SkuBatch\Updater as SkuStockUpdater;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
@@ -92,21 +93,20 @@ class ValuesUpdate extends VariantProductUpdate
      */
     protected function operationsForValueAdd()
     {
-        foreach($this->updateDataObjects as $productDetailObject)
-        {
+        foreach ($this->updateDataObjects as $productDetailObject) {
             $combinations = $productDetailObject->getCombination();
             $sku_channels = $productDetailObject->getChannelData();
 
             /** @var bool $is_old */
             /** @var ?int $related_skus */
             list($is_old, $related_skus) = $this->checkAndApplyOperationIfOldCombination($combinations, $productDetailObject);
-            if($is_old) {
-                $this->updateSkuChannels($sku_channels,$related_skus);
+            if ($is_old) {
+                $this->updateSkuChannels($sku_channels, $related_skus);
                 continue;
             }
 
             $product_option_value_ids = [];
-            foreach($combinations as $combination) {
+            foreach ($combinations as $combination) {
                 $option_name = $combination->getOptionName();
                 $product_option = $this->createProductOptions($this->product->id, $option_name);
                 $value_name = $combination->getOptionValueName();
@@ -139,13 +139,12 @@ class ValuesUpdate extends VariantProductUpdate
     protected function checkAndApplyOperationForOldCombination(array $combination, ProductUpdateDetailsObjects $sku): ?int
     {
         $old_product_option_value_ids = [];
-        foreach($combination as $option_values)
-        {
-            array_push($old_product_option_value_ids,$option_values->getOptionValueId());
+        foreach ($combination as $option_values) {
+            array_push($old_product_option_value_ids, $option_values->getOptionValueId());
         }
         $stock = $sku->getStock();
-        $old_sku = $this->combinationRepository->whereIn('product_option_value_id',$old_product_option_value_ids)->pluck('sku_id')->first();
-        $this->skuRepository->where('id', $old_sku)->update(['stock' => $stock ]);
+        $old_sku = $this->combinationRepository->whereIn('product_option_value_id', $old_product_option_value_ids)->pluck('sku_id')->first();
+        $this->skuRepository->where('id', $old_sku)->update(['stock' => $stock]);
         $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
         return $old_sku;
     }
@@ -159,12 +158,10 @@ class ValuesUpdate extends VariantProductUpdate
     {
         $is_old = !is_null($combination[0]->getOptionValueId());
         $old_sku = null;
-        if($is_old)
-        {
+        if ($is_old) {
             $old_product_option_value_ids = [];
-            foreach($combination as $option_values)
-            {
-                array_push($old_product_option_value_ids,$option_values->getOptionValueId());
+            foreach ($combination as $option_values) {
+                array_push($old_product_option_value_ids, $option_values->getOptionValueId());
             }
             $stock = $sku->getStock();
             $old_sku = $this->combinationRepository->whereIn('product_option_value_id', $old_product_option_value_ids)->pluck('sku_id')->first();
