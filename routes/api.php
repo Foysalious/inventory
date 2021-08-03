@@ -33,13 +33,14 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::group(['prefix'=>'v1'], function() {
-    Route::group(['middleware' => 'ip.whitelist'], function () {
+    //Route::group(['middleware' => 'ip.whitelist'], function () {
         Route::group(['prefix'=>'webstore'], function() {
             Route::group(['prefix'=>'partners'], function() {
                 Route::get('{partner_id}/products/search', [WebstoreProductController::class, 'search']);
                 Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
                 Route::get('{partner_id}/categories', [WebstoreCategoryController::class, 'getAllCategory']);
                 Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
+                Route::get('{partner_id}/products/{product_id}/logs', [ProductController::class, 'getLogs']);
             });
             Route::apiResource('partners.products', WebstoreProductController::class);
         });
@@ -76,6 +77,6 @@ Route::group(['prefix'=>'v1'], function() {
         Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
         Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
         Route::put('partners/{partner_id}',[DataMigrationController::class, 'updatePartnersTable']);
-    });
+    //});
 
 });

@@ -12,8 +12,10 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
+use App\Services\Product\Constants\Log\FieldType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 
 class ProductService extends BaseService
@@ -175,5 +177,64 @@ class ProductService extends BaseService
             return $this->error("This product does not belong to this partner", 403);
         $product->delete();
         return $this->success("Successful", ['product' => $product],200, false);
+    }
+
+    public function getLogs($request, $partner, $product)
+    {
+        try {
+            $product = $this->productRepositoryInterface->findOrFail($product);
+            $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
+            $product->combinations = collect($combinations);
+            $product_resource = new WebstoreProductResource($product);
+            $logs = [];
+            $identifier = [
+                FieldType::STOCK => $unit_bn = $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit]['bn'] : 'একক',
+                FieldType::VAT => '%',
+                FieldType::PRICE => '৳',
+            ];
+
+            $service = $product->load('logs');
+
+            $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
+            $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $unit_bn, $identifier) {
+                $log->field_names->each(function ($field) use (&$logs, $log, $displayable_field_name, $unit_bn, $identifier) {
+                    if (!in_array($field, FieldType::fields())) return false;
+                    array_push($logs, [
+                        'log_type' => $field,
+                        'log_type_show_name' => [
+                            'bn' => $displayable_field_name[$field]['bn'],
+                            'en' => $displayable_field_name[$field]['en']
+                        ],
+                        'log' => [
+                            'bn' => $this->generateBanglaLog($field, $log, $identifier)
+                        ],
+                        'created_by' => $log->created_by_name,
+                        'created_at' => $log->created_at->format('Y-m-d h:i a')
+                    ]);
+                });
+            });
+
+            return $this->success('Successful', ['logs' => $logs], 200, true);
+        } catch (\Throwable $e) {
+            return $this->error(['Error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function generateBanglaLog($field, $log, array $identifier)
+    {
+        $old_value = is_numeric($log->old_value->toArray()[$field]) ? convertNumbersToBangla($log->old_value->toArray()[$field]) : convertNumbersToBangla(0);
+        $new_value = is_numeric($log->new_value->toArray()[$field]) ? convertNumbersToBangla($log->new_value->toArray()[$field]) : convertNumbersToBangla(0);
+        switch ($field) {
+            case FieldType::STOCK:
+            case FieldType::VAT:
+                $log = "$old_value $identifier[$field] থেকে $new_value $identifier[$field]";
+                break;
+            case FieldType::PRICE:
+                $log = "$identifier[$field] $old_value থেকে $identifier[$field] $new_value";
+                break;
+            default:
+                $log = "{$log->old_value->toArray()[$field]} থেকে {$log->new_value->toArray()[$field]}";
+        }
+        return $log;
     }
 }

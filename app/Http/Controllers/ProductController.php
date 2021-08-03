@@ -271,40 +271,8 @@ class ProductController extends Controller
      * @return JsonResponse
      */
 
-//    public function getLogs(Request $request, $partner, $product)
-//    {
-//        try {
-//            $logs = [];
-//            $identifier = [
-//                FieldType::STOCK => $unit_bn = $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit]['bn'] : 'একক',
-//                FieldType::VAT => '%',
-//                FieldType::PRICE => '৳',
-//            ];
-//            $service = $product->load('logs');
-//
-//            $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
-//            $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $unit_bn, $identifier) {
-//                $log->field_names->each(function ($field) use (&$logs, $log, $displayable_field_name, $unit_bn, $identifier) {
-//                    if (!in_array($field, FieldType::fields())) return false;
-//                    array_push($logs, [
-//                        'log_type' => $field,
-//                        'log_type_show_name' => [
-//                            'bn' => $displayable_field_name[$field]['bn'],
-//                            'en' => $displayable_field_name[$field]['en']
-//                        ],
-//                        'log' => [
-//                            'bn' => $this->generateBanglaLog($field, $log, $identifier)
-//                        ],
-//                        'created_by' => $log->created_by_name,
-//                        'created_at' => $log->created_at->format('Y-m-d h:i a')
-//                    ]);
-//                });
-//            });
-//
-//            return api_response($request, null, 200, ['logs' => $logs]);
-//        } catch (\Throwable $e) {
-//            app('sentry')->captureException($e);
-//            return api_response($request, null, 500);
-//        }
-//    }
+    public function getLogs(Request $request, $partner, $product)
+    {
+        return $this->productService->getLogs($request, $partner, $product);
+    }
 }

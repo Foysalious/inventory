@@ -229,7 +229,11 @@ class Updater
             ->setDeletedValues($this->strategyFactory->getDeletedValues())
             ->update();
         $updatedProductResource = new WebstoreProductResource($this->product);
-        $this->logCreateRequest->setOldProductDetails($oldProductResource)->setUpdatedProductDetails($updatedProductResource)->create();
+        $this->logCreateRequest->setOldProductDetails($oldProductDetails)
+            ->setOldProductResource($oldProductResource)
+            ->setUpdatedProductDetails($this->product)
+            ->setUpdatedProductDetailsResource($updatedProductResource)
+            ->create();
     }
 
     private function makeData(): array
