@@ -199,19 +199,19 @@ class ProductService extends BaseService
             $product = $this->productRepositoryInterface->findOrFail($product);
             $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
             $product->combinations = collect($combinations);
-            $product_resource = new WebstoreProductResource($product);
+            $product = new WebstoreProductResource($product);
             $logs = [];
             $identifier = [
-                FieldType::STOCK => $unit_bn = $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit]['bn'] : 'একক',
+                FieldType::STOCK => $unit_bn = $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit['name_en']]['bn']: 'একক',
                 FieldType::VAT => '%',
                 FieldType::PRICE => '৳',
+                FieldType::CATEGORY_ID => 'ক্যাটাগরি'
             ];
 
             $service = $product->load('logs');
-
             $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
             $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $unit_bn, $identifier) {
-                $log->field_names->each(function ($field) use (&$logs, $log, $displayable_field_name, $unit_bn, $identifier) {
+                collect(json_decode($log->field_names))->each(function ($field) use (&$logs, $log, $displayable_field_name, $unit_bn, $identifier) {
                     if (!in_array($field, FieldType::fields())) return false;
                     array_push($logs, [
                         'log_type' => $field,
@@ -222,8 +222,8 @@ class ProductService extends BaseService
                         'log' => [
                             'bn' => $this->generateBanglaLog($field, $log, $identifier)
                         ],
-                        'created_by' => $log->created_by_name,
-                        'created_at' => $log->created_at->format('Y-m-d h:i a')
+                        'created_by' => $log->created_by_name ?? '',
+                        'created_at' => isset($log->created_at) ? $log->created_at->format('Y-m-d h:i a') : ''
                     ]);
                 });
             });
@@ -236,8 +236,12 @@ class ProductService extends BaseService
 
     public function generateBanglaLog($field, $log, array $identifier)
     {
-        $old_value = is_numeric($log->old_value->toArray()[$field]) ? convertNumbersToBangla($log->old_value->toArray()[$field]) : convertNumbersToBangla(0);
-        $new_value = is_numeric($log->new_value->toArray()[$field]) ? convertNumbersToBangla($log->new_value->toArray()[$field]) : convertNumbersToBangla(0);
+        $old_field = $this->objectToArray($log->old_value)[$field];
+        $new_field = $this->objectToArray($log->new_value)[$field];
+
+        $old_value = is_numeric($old_field) ? convertNumbersToBangla($old_field) : convertNumbersToBangla(0);
+        $new_value = is_numeric($new_field) ? convertNumbersToBangla($new_field) : convertNumbersToBangla(0);
+
         switch ($field) {
             case FieldType::STOCK:
             case FieldType::VAT:
@@ -246,9 +250,19 @@ class ProductService extends BaseService
             case FieldType::PRICE:
                 $log = "$identifier[$field] $old_value থেকে $identifier[$field] $new_value";
                 break;
+            case FieldType::CATEGORY_ID:
+                $category_name_old = $this->categoryRepository->find($old_field)['name'];
+                $category_name_new = $this->categoryRepository->find($new_field)['name'];
+                $log = "$identifier[$field] $category_name_old থেকে $identifier[$field] $category_name_new";
+                break;
             default:
-                $log = "{$log->old_value->toArray()[$field]} থেকে {$log->new_value->toArray()[$field]}";
+                $log = "{$old_field} থেকে {$new_field}";
         }
         return $log;
+    }
+
+    private function objectToArray($object) {
+        $old = json_decode($object);
+        return json_decode(json_encode($old), true);
     }
 }

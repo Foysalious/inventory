@@ -12,6 +12,8 @@ class FieldType
     const UNIT = 'unit';
     const PRICE = 'price';
     const VAT = 'vat';
+    const NAME = 'name';
+    const CATEGORY_ID = 'category_id';
 
     public static function getFieldsDisplayableNameInBangla() : array
     {
@@ -19,7 +21,9 @@ class FieldType
             self::STOCK => ['en' => 'Inventory', 'bn' => 'ইনভেন্টোরিঃ'],
             self::UNIT => ['en' => 'Unit', 'bn' => 'একক'],
             self::PRICE => ['en' => 'Price', 'bn' => 'ক্রয়মূল্যঃ'],
-            self::VAT => ['en' => 'Vat', 'bn' => 'ভ্যাটঃ']
+            self::VAT => ['en' => 'Vat', 'bn' => 'ভ্যাটঃ'],
+            self::NAME => ['en' => 'Name', 'bn' => 'নাম'],
+            self::CATEGORY_ID => ['en' => 'Category', 'bn' => 'ক্যাটাগরি']
         ];
     }
 
