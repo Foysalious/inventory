@@ -40,7 +40,6 @@ Route::group(['prefix'=>'v1'], function() {
                 Route::get('{partner_id}/products/{product_id}', [WebstoreProductController::class, 'show']);
                 Route::get('{partner_id}/categories', [WebstoreCategoryController::class, 'getAllCategory']);
                 Route::get('{partner_id}/collections', [WebstoreCollectionController::class, 'index']);
-                Route::get('{partner_id}/products/{product_id}/logs', [ProductController::class, 'getLogs']);
             });
             Route::apiResource('partners.products', WebstoreProductController::class);
         });
@@ -57,6 +56,7 @@ Route::group(['prefix'=>'v1'], function() {
                 Route::get('products', [ProductController::class, 'getWebstoreProducts']);
             });
             Route::apiResource('collections', CollectionController::class);
+            Route::get('/products/{product_id}/logs', [ProductController::class, 'getLogs']);
         });
         Route::apiResource('partners.options', OptionController::class);
         Route::apiResource('partners.options.values', ValueController::class)->only('store');
