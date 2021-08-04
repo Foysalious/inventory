@@ -52,3 +52,16 @@ if (!function_exists('getIp')) {
         return request()->ip();
     }
 }
+
+if (!function_exists('constants')) {
+    /**
+     * Get the constant from config constants file.
+     *
+     * @param String $key
+     * @return mixed
+     */
+    function constants($key)
+    {
+        return config('constants.' . $key);
+    }
+}

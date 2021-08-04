@@ -1,6 +1,8 @@
 <?php namespace App\Services\Product;
 
 
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\CombinationRepositoryInterface;
 use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\ProductChannelRepositoryInterface;
@@ -17,6 +19,7 @@ use App\Services\Product\Update\Strategy\Updater as ProductUpdater;
 use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\ProductImage\Updater as ProductImageUpdater;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\DB;
 
 class Updater
@@ -219,6 +222,7 @@ class Updater
         try {
             DB::beginTransaction();
             $oldProductDetails = clone $this->product;
+            $oldProductResource = new WebstoreProductResource($oldProductDetails);
             $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
             $this->productRepositoryInterface->update($this->product, $this->makeData());
             $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
@@ -227,11 +231,17 @@ class Updater
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->setDeletedValues($this->strategyFactory->getDeletedValues())
                 ->update();
-            $this->logCreateRequest->setOldProductDetails($oldProductDetails)->setUpdatedProductDetails($this->product)->create();
+            $updatedProductResource = new WebstoreProductResource($this->product);
+            $this->logCreateRequest->setOldProductDetails($oldProductDetails)
+                ->setOldProductResource($oldProductResource)
+                ->setUpdatedProductDetails($this->product)
+                ->setUpdatedProductDetailsResource($updatedProductResource)
+                ->create();
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
         }
+
     }
 
     private function makeData(): array

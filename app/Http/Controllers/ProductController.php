@@ -3,6 +3,8 @@
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Models\Product;
+use App\Services\Product\Constants\Log\FieldType;
 use App\Services\Product\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -260,5 +262,54 @@ class ProductController extends Controller
     public function destroy($partner, $product)
     {
         return $this->productService->delete($partner,$product);
+    }
+
+    /**
+     *
+     * * @OA\Get(
+     *      path="/api/v1/partners/{partner}/products/{product}/logs",
+     *      operationId="getProductsLog",
+     *      tags={"Partners Products API"},
+     *      summary="Get Products Update Log",
+     *      description="",
+     *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="product", description="product id", required=true, in="query", @OA\Schema(type="integer")),
+     *      @OA\Response(response=200, description="Successful operation",
+     *          @OA\JsonContent(
+     *          type="object",
+     *          example={
+     *               "message": "Successful",
+     *               "data": {
+     *                  "message": "Successful",
+     *                  "logs": {{
+     *                      "log_type": "category_id",
+     *                      "log_type_show_name": {
+     *                          "bn": "ক্যাটাগরি",
+     *                          "en": "Category"
+     *                       },
+     *                       "log": {
+     *                          "bn": "ক্যাটাগরি comilla থেকে updatedcat"
+     *                        },
+     *                       "created_by": "",
+     *                       "created_at": ""
+     *                   }}
+     *             }
+     *         }
+     *       ),
+     *      ),
+     *      @OA\Response(response=404, description="message: This product does not belong to this partner"),
+     *      @OA\Response(response=500, description="Internal Server Error")
+     *     )
+
+    /**
+     * @param Request $request
+     * @param $partner
+     * @param Product $product
+     * @return JsonResponse
+     */
+
+    public function getLogs(Request $request, $partner, $product)
+    {
+        return $this->productService->getLogs($request, $partner, $product);
     }
 }

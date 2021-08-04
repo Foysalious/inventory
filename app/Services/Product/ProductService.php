@@ -6,14 +6,17 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Http\Resources\ProductResource;
 use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
+use App\Services\Product\Constants\Log\FieldType;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -188,5 +191,108 @@ class ProductService extends BaseService
         } else {
             return $sub_category->id;
         }
+    }
+
+    public function getLogs($request, $partner, $product)
+    {
+        try {
+            $product = $this->productRepositoryInterface->findOrFail($product);
+            if($product->partner_id !== $partner)
+                throw new NotFoundHttpException("This product does not belong to this partner");
+            $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
+            $product->combinations = collect($combinations);
+            $product = new WebstoreProductResource($product);
+            $logs = [];
+            $identifier = [
+                FieldType::STOCK => $unit_bn = $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit['name_en']]['bn']: 'একক',
+                FieldType::VAT => '%',
+                FieldType::PRICE => '৳',
+                FieldType::CATEGORY_ID => 'ক্যাটাগরি',
+                FieldType::NAME => 'নাম',
+                FieldType::UNIT => 'একক',
+                FieldType::WARRANTY_UNIT => 'ওয়ারেন্টি একক',
+                FieldType::WARRANTY => 'ওয়ারেন্টি',
+                FieldType::APP_THUMB => 'ছবি',
+                FieldType::SUB_CATEGORY_ID => 'সাব ক্যাটাগরি'
+            ];
+
+            $service = $product->load('logs');
+            $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
+            $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $unit_bn, $identifier) {
+                collect(json_decode($log->field_names))->each(function ($field) use (&$logs, $log, $displayable_field_name, $unit_bn, $identifier) {
+                    if (!in_array($field, FieldType::fields())) return false;
+                    array_push($logs, [
+                        'log_type' => $field,
+                        'log_type_show_name' => [
+                            'bn' => $displayable_field_name[$field]['bn'],
+                            'en' => $displayable_field_name[$field]['en']
+                        ],
+                        'log' => [
+                            'bn' => $this->generateBanglaLog($field, $log, $identifier)
+                        ],
+                        'created_by' => $log->created_by_name ?? '',
+                        'created_at' => isset($log->created_at) ? $log->created_at->format('Y-m-d h:i a') : ''
+                    ]);
+                });
+            });
+
+            return $this->success('Successful', ['logs' => $logs], 200, true);
+        } catch (\Throwable $e) {
+            return $this->error([
+                [
+                    'Error: ' => $e->getMessage(),
+                    'StatusCode' => $e->getCode() === 0 ? 500 : $e->getCode(),
+                    'File Name' => $e->getFile(),
+                    'Line' => $e->getLine()]
+                ], 500);
+        }
+    }
+
+    public function generateBanglaLog($field, $log, array $identifier)
+    {
+        $old_field = $this->objectToArray($log->old_value)[$field];
+        $new_field = $this->objectToArray($log->new_value)[$field];
+
+        $old_value = is_numeric($old_field) ? convertNumbersToBangla($old_field) : convertNumbersToBangla(0);
+        $new_value = is_numeric($new_field) ? convertNumbersToBangla($new_field) : convertNumbersToBangla(0);
+
+        switch ($field) {
+            case FieldType::STOCK:
+            case FieldType::VAT:
+                $log = "$old_value $identifier[$field] থেকে $new_value $identifier[$field]";
+                break;
+            case FieldType::PRICE:
+                $log = "$identifier[$field] $old_value থেকে $identifier[$field] $new_value";
+                break;
+            case FieldType::SUB_CATEGORY_ID:
+                $sub_category_name_old = $this->categoryRepository->find($old_field)['name'];
+                $sub_category_name_new = $this->categoryRepository->find($new_field)['name'];
+                $log = "$identifier[$field] $sub_category_name_old থেকে $sub_category_name_new";
+                break;
+            case FieldType::CATEGORY_ID:
+                $category_name_old = $this->categoryRepository->find($old_field)['name'];
+                $category_name_new = $this->categoryRepository->find($new_field)['name'];
+                $log = "$identifier[$field] $category_name_old থেকে $category_name_new";
+                break;
+            case FieldType::UNIT:
+                $unit_name_old = $old_field['name_bn'];
+                $unit_name_new = $new_field['name_bn'];
+                $log = "$identifier[$field] $unit_name_old থেকে $unit_name_new";
+                break;
+            case FieldType::WARRANTY:
+                $log = "$identifier[$field] $old_field দিন থেকে $new_field";
+                break;
+            case FieldType::NAME || FieldType::WARRANTY_UNIT || FieldType::APP_THUMB:
+                $log = "$identifier[$field] $old_field থেকে $new_field";
+                break;
+            default:
+                $log = "{$old_field} থেকে {$new_field}";
+        }
+        return $log;
+    }
+
+    private function objectToArray($object) {
+        $old = json_decode($object);
+        return json_decode(json_encode($old), true);
     }
 }

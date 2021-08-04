@@ -56,6 +56,7 @@ Route::group(['prefix'=>'v1'], function() {
                 Route::get('products', [ProductController::class, 'getWebstoreProducts']);
             });
             Route::apiResource('collections', CollectionController::class);
+            Route::get('/products/{product_id}/logs', [ProductController::class, 'getLogs']);
         });
         Route::apiResource('partners.options', OptionController::class);
         Route::apiResource('partners.options.values', ValueController::class)->only('store');
@@ -77,5 +78,4 @@ Route::group(['prefix'=>'v1'], function() {
         Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
         Route::put('partners/{partner_id}',[DataMigrationController::class, 'updatePartnersTable']);
     });
-
 });

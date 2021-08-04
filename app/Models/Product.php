@@ -200,4 +200,9 @@ class Product extends BaseModel
         });
         return $total_stock;
     }
+
+    public function logs()
+    {
+        return $this->hasMany(ProductUpdateLog::class);
+    }
 }

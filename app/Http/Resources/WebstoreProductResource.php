@@ -34,7 +34,7 @@ class WebstoreProductResource extends JsonResource
             'app_thumb'=> $this->app_thumb,
             'warranty' => $this->warranty,
             'warranty_unit' => $this->warranty_unit,
-            'orginal_price'=> (double) $this->getOriginalPrice(),
+            'original_price'=> (double) $this->getOriginalPrice(),
             'variations' => $this->combinations(),
             'created_at' => $this->created_at,
             'image_gallery' => $this->images()->get() ?? [],
