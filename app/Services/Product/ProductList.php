@@ -4,7 +4,9 @@ use App\Exceptions\ProductNotFoundException;
 use App\Http\Resources\ProductsInfoResource;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
-use Illuminate\Database\Eloquent\Builder;
+use App\Interfaces\SkuRepositoryInterface;
+use App\Repositories\SkuBatchRepository;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProductList
 {
@@ -18,7 +20,11 @@ class ProductList
     protected ?int $limit;
     protected ?int $webstorePublicationStatus;
 
-    public function __construct(CategoryRepositoryInterface $categoryRepository, ProductRepositoryInterface $productRepository)
+    public function __construct(CategoryRepositoryInterface $categoryRepository,
+                                ProductRepositoryInterface $productRepository,
+                                protected SkuBatchRepository $skuBatchRepository,
+                                protected SkuRepositoryInterface $skuRepository,
+    )
     {
         $this->categoryRepository = $categoryRepository;
         $this->productRepository = $productRepository;
@@ -128,7 +134,8 @@ class ProductList
         $products_with_deleted_products = collect([]);
         $products_with_deleted_products->products = $products;
         $products_with_deleted_products->deleted_products = $deleted_products;
-        $products_with_deleted_products->total_items = $additional_data['total_items'];
+        $products_with_deleted_products->total_products = $additional_data['total_products'];
+        $products_with_deleted_products->total_products_with_variation = $additional_data['total_products_with_variation'];
         $products_with_deleted_products->total_buying_price = $additional_data['total_buying_price'];
         $products_with_deleted_products->items_with_buying_price = $additional_data['items_with_buying_price'];
         return new ProductsInfoResource($products_with_deleted_products);
@@ -161,31 +168,21 @@ class ProductList
     private function getPartnerProductsAdditionalInfo()
     {
         $return_data = [
-            'total_items' => 0,
+            'total_products' => 0,
+            'total_products_with_variation' => 0,
             'items_with_buying_price' => 0,
             'total_buying_price' => 0,
         ];
-        $items = $this->productRepository->where('partner_id', $this->partnerId)
-            ->select('id')
-            ->whereHas('skus', function ($query) {
-                /** @var $query Builder */
-                return $query->with(['batch' => function ($query) {
-                    /** @var $query Builder */
-                    return $query->where('cost', '>', 0)
-                        ->orderBy('id', 'desc')
-                        ->limit(1);
-                }]);
-            })->get();
-
-        foreach ($items as $product) {
-            $skus = $product->skus;
-            foreach ($skus as $each_sku) {
-                $return_data['total_items']++;
-                $batch = $each_sku->batch->where('cost', '>', 0)->sortByDesc('id')->first();
-                if ($batch) {
-                    $return_data['items_with_buying_price']++;
-                    $return_data['total_buying_price'] += $batch->cost;
-                }
+        $items = $this->productRepository->where('partner_id', $this->partnerId)->select('id')->get();
+        $return_data['total_products'] += $items->count();
+        $skus_ids = $this->skuRepository->whereIn('product_id', $items)->select('id')->get();
+        $return_data['total_products_with_variation'] = $skus_ids->count();
+        /** @var Collection $batches */
+        $batches = $this->skuBatchRepository->whereIn('sku_id', $skus_ids)->where('cost', '>', 0)->get()->groupBy('sku_id');
+        if ($batches) {
+            $return_data['items_with_buying_price'] = $batches->count();
+            foreach ($batches as $each) {
+                $return_data['total_buying_price'] += $each->last()->cost;
             }
         }
         return $return_data;
