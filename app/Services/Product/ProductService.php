@@ -197,6 +197,8 @@ class ProductService extends BaseService
     {
         try {
             $product = $this->productRepositoryInterface->findOrFail($product);
+            if($product->partner_id !== $partner)
+                throw new NotFoundHttpException("This product does not belong to this partner");
             $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
             $product->combinations = collect($combinations);
             $product = new WebstoreProductResource($product);
@@ -236,7 +238,13 @@ class ProductService extends BaseService
 
             return $this->success('Successful', ['logs' => $logs], 200, true);
         } catch (\Throwable $e) {
-            return $this->error(['Error' => $e->getMessage()], 500);
+            return $this->error([
+                [
+                    'Error: ' => $e->getMessage(),
+                    'StatusCode' => $e->getCode() === 0 ? 500 : $e->getCode(),
+                    'File Name' => $e->getFile(),
+                    'Line' => $e->getLine()]
+                ], 500);
         }
     }
 
