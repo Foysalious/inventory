@@ -17,7 +17,8 @@ class ProductsInfoResource extends JsonResource
     {
         $products = ProductResource::collection($this->products);
         return [
-            'total_items' => $this->total_items,
+            'total_products' => $this->total_products,
+            'total_products_with_variation' => $this->total_products_with_variation,
             'total_buying_price' => $this->total_buying_price,
             'items_with_buying_price' => $this->items_with_buying_price,
             'products' => $products,
