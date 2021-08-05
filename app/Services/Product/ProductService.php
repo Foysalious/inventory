@@ -14,6 +14,7 @@ use App\Interfaces\SkuRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
+use App\Traits\ResponseAPI;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -193,62 +194,51 @@ class ProductService extends BaseService
         }
     }
 
-    public function getLogs($request, $partner, $product)
+    public function getLogs($partner, $product) : JsonResponse
     {
-        try {
-            $product = $this->productRepositoryInterface->findOrFail($product);
-            if($product->partner_id != $partner)
-                throw new NotFoundHttpException("This product does not belong to this partner");
-            $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
-            $product->combinations = collect($combinations);
-            $product = new WebstoreProductResource($product);
-            $logs = [];
-            $identifier = [
-                FieldType::STOCK => $unit_bn = $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit['name_en']]['bn']: 'একক',
-                FieldType::VAT => '%',
-                FieldType::PRICE => '৳',
-                FieldType::CATEGORY_ID => 'ক্যাটাগরি',
-                FieldType::NAME => 'নাম',
-                FieldType::UNIT => 'একক',
-                FieldType::WARRANTY_UNIT => 'ওয়ারেন্টি একক',
-                FieldType::WARRANTY => 'ওয়ারেন্টি',
-                FieldType::APP_THUMB => 'ছবি',
-                FieldType::SUB_CATEGORY_ID => 'সাব ক্যাটাগরি'
-            ];
+        $product = $this->productRepositoryInterface->findOrFail($product);
+        if($product->partner_id != $partner)
+            throw new NotFoundHttpException("This product does not belong to this partner");
+        $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
+        $product->combinations = collect($combinations);
+        $product = new WebstoreProductResource($product);
+        $logs = [];
+        $identifier = [
+            FieldType::STOCK => $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit['name_en']]['bn']: 'একক',
+            FieldType::VAT => '%',
+            FieldType::PRICE => '৳',
+            FieldType::CATEGORY_ID => 'ক্যাটাগরি',
+            FieldType::NAME => 'নাম',
+            FieldType::UNIT => 'একক',
+            FieldType::WARRANTY_UNIT => 'ওয়ারেন্টি একক',
+            FieldType::WARRANTY => 'ওয়ারেন্টি',
+            FieldType::APP_THUMB => 'ছবি',
+            FieldType::SUB_CATEGORY_ID => 'সাব ক্যাটাগরি'
+        ];
 
-            $service = $product->load('logs');
-            $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
-            $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $unit_bn, $identifier) {
-                collect(json_decode($log->field_names))->each(function ($field) use (&$logs, $log, $displayable_field_name, $unit_bn, $identifier) {
-                    if (!in_array($field, FieldType::fields())) return false;
-                    array_push($logs, [
-                        'log_type' => $field,
-                        'log_type_show_name' => [
-                            'bn' => $displayable_field_name[$field]['bn'],
-                            'en' => $displayable_field_name[$field]['en']
-                        ],
-                        'log' => [
-                            'bn' => $this->generateBanglaLog($field, $log, $identifier)
-                        ],
-                        'created_by' => $log->created_by_name ?? '',
-                        'created_at' => isset($log->created_at) ? $log->created_at->format('Y-m-d h:i a') : ''
-                    ]);
-                });
+        $service = $product->load('logs');
+        $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
+        $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $identifier) {
+            collect(json_decode($log->field_names))->each(function ($field) use (&$logs, $log, $displayable_field_name, $identifier) {
+                if (!in_array($field, FieldType::fields())) return false;
+                array_push($logs, [
+                    'log_type' => $field,
+                    'log_type_show_name' => [
+                        'bn' => $displayable_field_name[$field]['bn'],
+                        'en' => $displayable_field_name[$field]['en']
+                    ],
+                    'log' => [
+                        'bn' => $this->generateBanglaLog($field, $log, $identifier)
+                    ],
+                    'created_by' => $log->created_by_name ?? '',
+                    'created_at' => isset($log->created_at) ? $log->created_at->format('Y-m-d h:i a') : ''
+                ]);
             });
-
-            return $this->success('Successful', ['logs' => $logs], 200, true);
-        } catch (\Throwable $e) {
-            return $this->error([
-                [
-                    'Error: ' => $e->getMessage(),
-                    'StatusCode' => $e->getCode() === 0 ? 500 : $e->getCode(),
-                    'File Name' => $e->getFile(),
-                    'Line' => $e->getLine()]
-                ], 500);
-        }
+        });
+        return $this->success('Successful', ['logs' => $logs], 200, true);
     }
 
-    public function generateBanglaLog($field, $log, array $identifier)
+    public function generateBanglaLog($field, $log, array $identifier) : string
     {
         $old_field = $this->objectToArray($log->old_value)[$field];
         $new_field = $this->objectToArray($log->new_value)[$field];
@@ -291,7 +281,7 @@ class ProductService extends BaseService
         return $log;
     }
 
-    private function objectToArray($object) {
+    private function objectToArray($object) : array {
         $old = json_decode($object);
         return json_decode(json_encode($old), true);
     }
