@@ -15,6 +15,7 @@ use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
 use App\Traits\ResponseAPI;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -255,15 +256,15 @@ class ProductService extends BaseService
                 $log = "$identifier[$field] $old_value থেকে $identifier[$field] $new_value";
                 break;
             case FieldType::SUB_CATEGORY_ID:
-                $sub_category_name = $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
-                $sub_category_name_old = $sub_category_name[0]['name'];
-                $sub_category_name_new = $sub_category_name[1]['name'];
+                $sub_category_name = $this->getCategoryName($old_field, $new_field);
+                $sub_category_name_old = $sub_category_name[0]['name'] ?? '';
+                $sub_category_name_new = $sub_category_name[1]['name'] ?? '';
                 $log = "$identifier[$field] $sub_category_name_old থেকে $sub_category_name_new";
                 break;
             case FieldType::CATEGORY_ID:
-                $category_name = $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
-                $category_name_old = $category_name[0]['name'];
-                $category_name_new = $category_name[1]['name'];
+                $category_name = $this->getCategoryName($old_field, $new_field);
+                $category_name_old = $category_name[0]['name'] ?? '';
+                $category_name_new = $category_name[1]['name'] ?? '';
                 $log = "$identifier[$field] $category_name_old থেকে $category_name_new";
                 break;
             case FieldType::UNIT:
@@ -286,5 +287,10 @@ class ProductService extends BaseService
     private function objectToArray($object) : array {
         $old = json_decode($object);
         return json_decode(json_encode($old), true);
+    }
+
+    private function getCategoryName($old_field, $new_field) : Collection
+    {
+        return $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
     }
 }
