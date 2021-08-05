@@ -13,6 +13,4 @@ class Types
     const SKU = 'sku';
     const COLLECTION = 'collection';
     const CATEGORY = 'category';
-
-
 }

@@ -19,9 +19,10 @@ class CreateProductCreateRequestInformation extends Migration
             $table->bigInteger('product_id')->nullable()->unsigned()->index();
             $table->foreign('product_id')->references('id')->on('products')
                 ->onUpdate('cascade')->onDelete('set null');
-            $table->enum('portal_name',PortalNames::get())->nullable();
+            $table->string('route')->nullable();
+            $table->enum('portal',PortalNames::get())->nullable();
             $table->string('portal_version')->nullable();
-            $table->string('ip_address')->nullable();
+            $table->string('ip')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamps();
         });
