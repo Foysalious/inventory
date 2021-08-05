@@ -1,10 +1,13 @@
 <?php namespace App\Models;
 
+use App\Repositories\SkuBatchRepository;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\App;
 
 
 class Product extends BaseModel
@@ -190,14 +193,11 @@ class Product extends BaseModel
 
     public function stock(){
         $total_stock = 0;
-        $this->skus()->each(function ($each_sku) use (&$total_stock) {
-            $batches = $each_sku->batch;
-            if(count($batches) > 0) {
-                foreach ($batches as $batch) {
-                    $total_stock = $total_stock + $batch->stock;
-                }
-            }
-        });
+        $skus_ids = $this->skus()->select('id')->get();
+        /** @var Builder $batch_repo */
+        $batch_repo = App::make(SkuBatchRepository::class);
+        $batches = $batch_repo->whereIn('sku_id', $skus_ids)->get();
+        $total_stock += $batches->sum('stock');
         return $total_stock;
     }
 
