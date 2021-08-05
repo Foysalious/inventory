@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers;
 
 
+use App\Exceptions\CategoryNotFoundException;
 use App\Http\Requests\CategoryRequest;
 use App\Http\Requests\CategoryWithSubCategory;
 use App\Models\Category;
@@ -41,11 +42,13 @@ class CategoryController extends Controller
      *      @OA\Response(response=403, description="Forbidden")
      *     )
      * @param $partner_id
+     * @param Request $request
      * @return JsonResponse
+     * @throws CategoryNotFoundException
      */
-    public function index($partner_id)
+    public function index($partner_id,Request $request): JsonResponse
     {
-        return $this->categoryService->getCategoriesByPartner($partner_id);
+        return $this->categoryService->getCategoriesByPartner($partner_id, $request);
     }
 
     public function getCategoryProduct($category_id,Request $request)

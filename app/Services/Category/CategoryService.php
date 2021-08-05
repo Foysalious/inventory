@@ -50,23 +50,32 @@ class CategoryService extends BaseService
 
     }
 
+
     /**
      * @param $partner_id
+     * @param $request
      * @return JsonResponse
      * @throws CategoryNotFoundException
      */
-    public function getCategoriesByPartner($partner_id)
+    public function getCategoriesByPartner($partner_id, $request): JsonResponse
     {
-        $categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id);
+        $updated_after = $request->updated_after;
+        $categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id,$updated_after);
         if ($categories->isEmpty()) {
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');
         }
+        $deleted_categories = $request->updated_after ? $this->getDeletedCategories($partner_id,$updated_after) : [];
         $resource = CategoryResource::collection($categories);
         $data['total_categories'] = count($categories);
         $data['categories'] = $resource;
+        $data['deleted_categories'] = $deleted_categories;
         return $this->success("Successful", $data);
     }
 
+    public function getDeletedCategories($partner_id,$updated_after)
+    {
+        return $this->categoryRepositoryInterface->getDeletedCategories($partner_id,$updated_after);
+    }
     public function getCategoryByID($category_id,Request $request)
     {
         $products= $this->productRepositoryInterface->getProductsByCategoryId($category_id);

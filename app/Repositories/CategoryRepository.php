@@ -14,17 +14,37 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
         parent::__construct($model);
     }
 
-    public function getCategoriesByPartner($partner_id)
+    public function getCategoriesByPartner($partner_id, $updated_after = null)
     {
-        return $this->model->where(function ($q) use ($partner_id) {
+        $category_query =  $this->model->where(function ($q) use ($partner_id) {
             $q->whereHas(self::CATEGORY_PARTNER, function ($q) use ($partner_id) {
                 $q->where(self::PARTNER_ID, $partner_id);
             });
         })->with('children', function ($q) {
             $q->leftJoin('category_partner', 'category_partner.category_id', '=', 'categories.id')
                 ->select('categories.id', 'categories.name', 'categories.parent_id', 'categories.thumb as thumb', 'categories.is_published_for_sheba', 'category_partner.is_default');
-        })->withCount('products')->where('parent_id', NULL)->get();
+        })->withCount('products')->where('parent_id', NULL);
 
+        if($updated_after)
+            $category_query = $category_query->where(function ($q) use ($updated_after) {
+                $q->where('updated_at', '>=', $updated_after);
+                $q->orWhere('created_at', '>=', $updated_after);
+            });
+
+        return $category_query->get();
+    }
+
+    public function getDeletedCategories( $partner_id, $updated_after)
+    {
+        $deleted_categories_query = $this->model->where(function ($q) use ($partner_id) {
+            $q->whereHas(self::CATEGORY_PARTNER, function ($q) use ($partner_id) {
+                $q->where(self::PARTNER_ID, $partner_id);
+            });
+        })->onlyTrashed();
+
+        if($updated_after)
+            $deleted_categories_query = $deleted_categories_query->where('deleted_at', '>=', $updated_after);
+        return $deleted_categories_query->select('id')->get();
     }
 
     public function getProductsByCategoryId($category_id)
