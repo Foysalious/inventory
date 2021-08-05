@@ -255,13 +255,15 @@ class ProductService extends BaseService
                 $log = "$identifier[$field] $old_value থেকে $identifier[$field] $new_value";
                 break;
             case FieldType::SUB_CATEGORY_ID:
-                $sub_category_name_old = $this->categoryRepository->find($old_field)['name'];
-                $sub_category_name_new = $this->categoryRepository->find($new_field)['name'];
+                $sub_category_name = $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
+                $sub_category_name_old = $sub_category_name[0]['name'];
+                $sub_category_name_new = $sub_category_name[1]['name'];
                 $log = "$identifier[$field] $sub_category_name_old থেকে $sub_category_name_new";
                 break;
             case FieldType::CATEGORY_ID:
-                $category_name_old = $this->categoryRepository->find($old_field)['name'];
-                $category_name_new = $this->categoryRepository->find($new_field)['name'];
+                $category_name = $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
+                $category_name_old = $category_name[0]['name'];
+                $category_name_new = $category_name[1]['name'];
                 $log = "$identifier[$field] $category_name_old থেকে $category_name_new";
                 break;
             case FieldType::UNIT:
