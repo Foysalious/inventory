@@ -197,7 +197,7 @@ class ProductService extends BaseService
     {
         try {
             $product = $this->productRepositoryInterface->findOrFail($product);
-            if($product->partner_id !== $partner)
+            if($product->partner_id != $partner)
                 throw new NotFoundHttpException("This product does not belong to this partner");
             $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
             $product->combinations = collect($combinations);
