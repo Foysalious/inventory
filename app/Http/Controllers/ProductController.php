@@ -273,7 +273,7 @@ class ProductController extends Controller
      *      summary="Get Products Update Log",
      *      description="",
      *      @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
-     *      @OA\Parameter(name="product", description="product id", required=true, in="query", @OA\Schema(type="integer")),
+     *      @OA\Parameter(name="product", description="product id", required=true, in="path", @OA\Schema(type="integer")),
      *      @OA\Response(response=200, description="Successful operation",
      *          @OA\JsonContent(
      *          type="object",
@@ -302,14 +302,13 @@ class ProductController extends Controller
      *     )
 
     /**
-     * @param Request $request
-     * @param $partner
-     * @param Product $product
+     * @param integer $partner
+     * @param integer $product
      * @return JsonResponse
      */
 
-    public function getLogs(Request $request, $partner, $product)
+    public function getLogs($partner, $product)
     {
-        return $this->productService->getLogs($request, $partner, $product);
+        return $this->productService->getLogs($partner, $product);
     }
 }
