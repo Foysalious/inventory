@@ -34,24 +34,24 @@ class Sku extends BaseModel
 
     public function stock()
     {
-        $last_batch = $this->batch()->orderByDesc('id')->first();
+        $last_batch = $this->batch->sortByDesc('id')->first();
         if (is_null($last_batch) || is_null($last_batch->stock)) return null;
         $total_stock = 0;
-        $batches = $this->batch()->get();
+        $batches = $this->batch;
         $total_stock +=  $batches->sum('stock');
         return $total_stock;
     }
 
     public function getPurchaseUnitPrice()
     {
-        $last_batch = $this->batch()->orderByDesc('id')->first();
+        $last_batch = $this->batch->sortByDesc('id')->first();
         return $last_batch ? $last_batch->cost : 0;
 
     }
 
     public function getLastBatchStock()
     {
-        $last_batch = $this->batch()->orderByDesc('id')->first();
+        $last_batch = $this->batch->sortByDesc('id')->first();
         return $last_batch ? $last_batch->stock : null;
     }
 

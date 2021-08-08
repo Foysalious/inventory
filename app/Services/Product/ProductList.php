@@ -102,7 +102,24 @@ class ProductList
 
     private function getProducts()
     {
-        $products_query = $this->productRepository->where('partner_id', $this->partnerId);
+        $products_query = $this->productRepository->where('partner_id', $this->partnerId)->with([
+            'unit' => function($q) {
+            $q->select('id', 'name_bn', 'name_en');
+            }, 'category' => function($q) {
+            $q->select('id', 'parent_id')->with(['parent' => function($q) {
+                $q->select('id');
+            }]);
+            }, 'skus' => function($q) {
+            $q->with(['batch', 'combinations' => function($q) {
+                $q->with(['productOptionValue' => function($q) {
+                    $q->with('productOption');
+                }]);
+            }, 'skuChannels' => function($q) {
+                $q->with(['validDiscounts', 'sku' => function($q) {
+                    $q->with('product');
+                }]);
+            }]);
+        }]);
         if (isset($this->categoryIds)) $products_query = $products_query->whereIn('category_id', $this->categoryRepository->getSubCategoryIds($this->categoryIds)->pluck('id'));
         if (isset($this->setSubCategoryIds))
             $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);

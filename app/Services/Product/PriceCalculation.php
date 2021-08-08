@@ -102,7 +102,7 @@ class PriceCalculation extends BaseService
     {
         if ($this->discount instanceof Discount) return;
         $this->calculateSkuChannel();
-        $this->discount = $this->skuChannel->validDiscounts()->orderBy('created_at', 'desc')->first();
+        $this->discount = $this->skuChannel->validDiscounts->sortByDesc('created_at')->first();
     }
 
     public function getDiscountAmount()
