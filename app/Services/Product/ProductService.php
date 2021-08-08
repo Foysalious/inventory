@@ -219,7 +219,7 @@ class ProductService extends BaseService
 
         $service = $product->load('logs');
         $displayable_field_name = FieldType::getFieldsDisplayableNameInBangla();
-        $service->logs()->orderBy('created_at', 'DESC')->each(function ($log) use (&$logs, $displayable_field_name, $identifier) {
+        $service->logs->sortByDesc('created_at')->each(function ($log) use (&$logs, $displayable_field_name, $identifier) {
             collect(json_decode($log->field_names))->each(function ($field) use (&$logs, $log, $displayable_field_name, $identifier) {
                 if (!in_array($field, FieldType::fields())) return false;
                 array_push($logs, [
