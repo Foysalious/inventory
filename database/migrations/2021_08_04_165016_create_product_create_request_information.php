@@ -14,17 +14,18 @@ class CreateProductCreateRequestInformation extends Migration
      */
     public function up()
     {
-        Schema::create('product_create_requests', function (Blueprint $table) {
+        Schema::create('api_requests', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('product_id')->nullable()->unsigned()->index();
-            $table->foreign('product_id')->references('id')->on('products')
-                ->onUpdate('cascade')->onDelete('set null');
             $table->string('route')->nullable();
-            $table->enum('portal',PortalNames::get())->nullable();
+            $table->enum('portal', PortalNames::get())->nullable();
             $table->string('portal_version')->nullable();
             $table->string('ip')->nullable();
             $table->string('user_agent')->nullable();
             $table->timestamps();
+        });
+        Schema::table('products', function (Blueprint $table) {
+            $table->bigInteger('api_request_id')->after('unit_id')->nullable()->unsigned();
+            $table->foreign('api_request_id')->references('id')->on('api_requests')->onUpdate('cascade')->onDelete('set null');
         });
     }
 
@@ -35,6 +36,9 @@ class CreateProductCreateRequestInformation extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('product_create_request_information');
+        Schema::table('products', function (Blueprint $table) {
+            $table->dropColumn('api_request_id');
+        });
+        Schema::dropIfExists('api_requests');
     }
 }
