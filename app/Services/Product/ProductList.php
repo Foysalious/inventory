@@ -128,9 +128,9 @@ class ProductList
     {
         $products = $this->getProducts();
         $additional_data = $this->getPartnerProductsAdditionalInfo();
-        if ($products->isEmpty())
+        $deleted_products = isset($this->updatedAfter) ? $this->getDeletedProducts() : collect([]);
+        if ($products->isEmpty() & $deleted_products->isEmpty())
             throw new ProductNotFoundException('স্টকে কোন পণ্য নেই! প্রয়োজনীয় তথ্য দিয়ে স্টকে পণ্য যোগ করুন।');
-        $deleted_products = isset($this->updatedAfter) ? $this->getDeletedProducts() : [];
         $products_with_deleted_products = collect([]);
         $products_with_deleted_products->products = $products;
         $products_with_deleted_products->deleted_products = $deleted_products;
