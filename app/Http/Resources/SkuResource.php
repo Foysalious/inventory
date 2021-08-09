@@ -19,7 +19,7 @@ class SkuResource extends JsonResource
             'vat_percentage' => $this->product->vat_percentage,
             'unit' => $this->product->unit,
             'stock' => $this->stock(),
-            'sku_channel' => $this->skuChannels,
+            'sku_channel' => $this->skuChannels()->with('discounts')->get(),
             'combination' => $this->sku_details->combinations,
             'batches' => $this->batch()->selectRaw('id as batch_id,stock,cost')->orderBy('id')->get(),
         ];
