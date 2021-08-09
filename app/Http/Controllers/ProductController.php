@@ -3,7 +3,6 @@
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Models\Product;
 use App\Services\Product\ProductService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

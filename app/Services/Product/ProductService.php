@@ -4,6 +4,7 @@ use App\Events\ProductStockAdded;
 use App\Events\ProductStockUpdated;
 use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
+use App\Helper\Miscellaneous\RequestIdentification;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\ProductResource;
@@ -24,6 +25,9 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
 {
+    private const PRODUCT_CREATE_REWARD_EVENT_NAME = 'pos_inventory_create';
+    private const PRODUCT_CREATE_REWARDABLE_TYPE = 'partner';
+
     /** @var ProductRepositoryInterface */
     protected ProductRepositoryInterface $productRepositoryInterface;
     /** @var Creator */
@@ -47,7 +51,8 @@ class ProductService extends BaseService
         SkuRepositoryInterface $skuRepositoryInterface,
         ProductCombinationService $productCombinationService,
         ProductList $productList,
-        protected CategoryRepository $categoryRepository
+        protected CategoryRepository $categoryRepository,
+        private ApiServerClient $apiServerClient
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -105,7 +110,7 @@ class ProductService extends BaseService
      * @return JsonResponse
      * @throws ProductDetailsPropertyValidationError
      */
-    public function create($partnerId, ProductRequest $request)
+    public function create($partnerId, ProductRequest $request): JsonResponse
     {
         $default_sub_category = $this->getDefaultSubCategory($partnerId, $request->category_id);
         /** @var ProductCreateRequest $productCreateRequest */
@@ -124,12 +129,21 @@ class ProductService extends BaseService
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
             ->create();
+            $this->callRewardApi($partnerId);
+            return $this->success("Successful", ['product' => $product],201);
+    }
 
-//        if($product && $request->has('accounting_info')) {
-//            event(new ProductStockAdded($product,$request));
-//        }
-
-        return $this->success("Successful", ['product' => $product],201);
+    private function callRewardApi($partnerId)
+    {
+        $data = [
+            'event' => self::PRODUCT_CREATE_REWARD_EVENT_NAME,
+            'rewardable_type' => self::PRODUCT_CREATE_REWARDABLE_TYPE,
+            'rewardable_id' => $partnerId,
+            'event_data' => [
+                'portal_name' => (new RequestIdentification())->get()['portal_name']
+            ]
+        ];
+        $this->apiServerClient->post('pos/v1/reward/action', $data);
     }
 
 
@@ -138,7 +152,6 @@ class ProductService extends BaseService
      * @param ProductUpdateRequest $request
      * @param $partner
      * @return JsonResponse
-     * @throws UnknownProperties
      */
     public function update($productId, ProductUpdateRequest $request, $partner): JsonResponse
     {
