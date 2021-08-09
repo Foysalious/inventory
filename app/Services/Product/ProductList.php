@@ -126,7 +126,7 @@ class ProductList
         if (isset($this->updatedAfter)) $products_query = $this->filterByUpdatedAfter($products_query, $this->updatedAfter);
         if (isset($this->webstorePublicationStatus))
             $products_query = $this->filterByWebstorePublicationStatus($products_query, $this->webstorePublicationStatus);
-        return $products_query->offset($this->offset)->limit($this->limit)->get();
+        return $products_query->offset($this->offset)->limit($this->limit)->orderBy('id','desc')->get();
     }
 
     private function getDeletedProducts()
