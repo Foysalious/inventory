@@ -6,9 +6,11 @@ use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\App;
 
+Relation::morphMap(['product'=>'App\Models\Product']);
 
 class Product extends BaseModel
 {
@@ -154,7 +156,7 @@ class Product extends BaseModel
 
     public function discounts()
     {
-        return $this->morphMany(Discount::class);
+        return $this->morphMany(Discount::class, 'type', 'type', 'type_id');
     }
 
     public function runningDiscounts()
