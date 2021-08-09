@@ -195,11 +195,10 @@ class Product extends BaseModel
 
     public function stock(){
         $total_stock = 0;
-        $skus_ids = $this->skus()->select('id')->get();
         /** @var Builder $batch_repo */
-        $batch_repo = App::make(SkuBatchRepository::class);
-        $batches = $batch_repo->whereIn('sku_id', $skus_ids)->get();
-        $total_stock += $batches->sum('stock');
+        foreach ($this->skus as $sku) {
+            $total_stock += $sku->batch->sum('stock');
+        }
         return $total_stock;
     }
 

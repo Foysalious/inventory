@@ -91,7 +91,7 @@ class ProductCombinationService
     public function getCombinationData(): array
     {
         $data = [];
-        $skus = $this->skuRepositoryInterface->where('product_id', $this->product->id)->with('combinations')->get();
+        $skus = $this->product->skus;
         /** @var Sku $sku */
         foreach ($skus as $sku) {
             $sku_data = [];

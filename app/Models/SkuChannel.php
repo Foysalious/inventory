@@ -24,10 +24,8 @@ class SkuChannel extends BaseModel
         return $this->morphMany(Discount::class, 'type', 'type', 'type_id');
     }
 
-    public function scopeValidDiscounts()
+    public function validDiscounts()
     {
-        return $this->discounts()->where(function ($query) {
-            return $query->valid();
-        });
+        return $this->morphMany(Discount::class, 'type', 'type', 'type_id')->valid();
     }
 }
