@@ -52,6 +52,31 @@ class DataMigrationController extends Controller
         return !is_array($data) ? json_decode($data,1) : $data;
     }
 
+
+   /**
+    *
+    *     @OA\Put (
+    *     path="/api/v1/partners/{partner}",
+    *     summary="Sync partners settings",
+    *     tags={"Partner Sync API"},
+    *     @OA\Parameter(name="partner", description="partner id", required=true, in="path", @OA\Schema(type="integer")),
+    *     @OA\RequestBody(
+    *          @OA\MediaType(mediaType="application/x-www-form-urlencoded",
+    *              @OA\Schema(
+    *                  @OA\Property(property="sub_domain", type="String"),
+    *                  @OA\Property(property="vat_percentage", type="float"),
+    *             )
+    *         )
+    *      ),
+    *     @OA\Response(response=200, description="Successful",
+    *          @OA\JsonContent(
+    *          type="object",
+    *          example={ "message": "Successful" }
+    *       ),
+    *     )
+    * )
+    */
+
     public function updatePartnersTable($partner_id, PartnerUpdateRequest $request)
     {
         return $this->partnerService->updatePartner($partner_id,$request);
