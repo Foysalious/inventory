@@ -131,7 +131,7 @@ class ProductService extends BaseService
             ->setHasVariant($has_variant)
             ->create();
            // $this->callRewardApi($partnerId);
-            return $this->success("Successful", ['product' => $product],201);
+            return $this->success("Successful", [], 201);
     }
 
     private function callRewardApi($partnerId)
