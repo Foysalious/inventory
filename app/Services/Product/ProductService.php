@@ -12,6 +12,7 @@ use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
+use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
@@ -198,7 +199,12 @@ class ProductService extends BaseService
 
     private function getDefaultSubCategory($partner_id, $category_id)
     {
-        $sub_category = $this->categoryRepository->getDefaultSubCategory($partner_id, $category_id);
+        $category = Category::find($category_id);
+        if($category->is_published_for_sheba) {
+            $sub_category = Category::where('name', 'Sub None Category')->where('parent_id', $category_id)->first();
+        } else {
+            $sub_category = $this->categoryRepository->getDefaultSubCategory($partner_id, $category_id);
+        }
         if(is_null($sub_category)) {
             throw new NotFoundHttpException("This category does not belong to this partner");
         } else {
