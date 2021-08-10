@@ -304,4 +304,9 @@ class ProductService extends BaseService
     {
         return $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
     }
+
+    public function getProductForReport(int $partner_id, Request $request)
+    {
+        $sku_ids = $request->sku_ids;
+    }
 }

@@ -309,4 +309,9 @@ class ProductController extends Controller
     {
         return $this->productService->getLogs($partner, $product);
     }
+
+    public function getProductForReport(int $partner_id, Request $request)
+    {
+        $this->productService->getProductForReport($partner_id,$request);
+    }
 }
