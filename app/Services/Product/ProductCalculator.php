@@ -59,8 +59,10 @@ class ProductCalculator
     public function getProductRatingReview($product)
     {
         try {
-            $request =  $this->client->get('api/v1/products/' . $product->id . '/reviews');
-            $rating = array_column($request['reviews'], 'rating');
+            $client = new Client();
+            $request = $client->get('https://pos-order.dev-sheba.xyz/api/v1/products/' . $product->id . '/reviews');
+            $response = json_decode($request->getBody()->getContents(), true);
+            $rating = array_column($response['reviews'], 'rating');
             $count_rating = count($rating);
             $sum_rating = array_sum($rating);
             $average_rating = round($sum_rating / $count_rating);
