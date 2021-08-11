@@ -101,10 +101,10 @@ class ProductCombinationService
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
                     $product_option_value = $combination->productOptionValue;
                     array_push($temp, [
-                        'option_id' => $product_option_value->productOption->id,
-                        'option_name' => $product_option_value->productOption->name,
-                        'option_value_id' => $product_option_value->id,
-                        'option_value_name' => $product_option_value->name
+                        'option_id' => $product_option_value?->productOption?->id,
+                        'option_name' => $product_option_value?->productOption?->name,
+                        'option_value_id' => $product_option_value?->id,
+                        'option_value_name' => $product_option_value?->name
                     ]);
                 });
             }
