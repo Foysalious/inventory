@@ -15,12 +15,9 @@ use App\Interfaces\SkuRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
-use App\Traits\ResponseAPI;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
@@ -305,8 +302,4 @@ class ProductService extends BaseService
         return $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
     }
 
-    public function getProductForReport(int $partner_id, Request $request)
-    {
-        $sku_ids = $request->sku_ids;
-    }
 }

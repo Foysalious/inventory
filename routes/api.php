@@ -77,6 +77,5 @@ Route::group(['prefix'=>'v1'], function() {
         Route::put('partners/{partner_id}/stock-update', [SkuController::class, 'updateSkuStock']);
         Route::post('partners/{partner_id}/products/{product_id}/add-stock', [SkuController::class, 'addStock']);
         Route::put('partners/{partner_id}',[DataMigrationController::class, 'updatePartnersTable']);
-        Route::get('partners/{partner_id}/product-for-report', [ProductController::class, 'getProductForReport']);
     });
 });
