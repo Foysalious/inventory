@@ -66,7 +66,7 @@ class ProductCombinationService
                 $sku->skuChannels->each(function ($sku_channel) use (&$temp, $sku) {
                     /** @var  $priceCalculation PriceCalculation */
                     $priceCalculation = app(PriceCalculation::class);
-                    $priceCalculation->setSkuChannel($sku_channel);
+                    $priceCalculation->setProduct($this->product)->setSku($sku)->setSkuChannel($sku_channel);
                     if($sku_channel->channel_id == 2)
                         $temp =  [
                             "sku_channel_id" => $sku_channel->id,
@@ -118,10 +118,10 @@ class ProductCombinationService
             $temp = [];
             if($sku->skuChannels)
             {
-                $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                $sku->skuChannels->each(function ($sku_channel) use ($sku, &$temp) {
                     /** @var  $priceCalculation PriceCalculation */
                     $priceCalculation = app(PriceCalculation::class);
-                    $priceCalculation->setSkuChannel($sku_channel);
+                    $priceCalculation->setProduct($this->product)->setSku($sku)->setSkuChannel($sku_channel);
                     array_push($temp, [
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,

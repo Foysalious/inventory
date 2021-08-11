@@ -10,4 +10,11 @@ class PartnerRepository extends BaseRepository implements PartnerRepositoryInter
     {
         parent::__construct($model);
     }
+
+    public function getProductsInfoByPartner(int $partnerId)
+    {
+        return $this->model->where('id', $partnerId)->withCount(['products', 'skus', 'batches' => function($q) {
+            $q->where('cost', '>', 0);
+        }])->withSum('batches', 'cost')->first();
+    }
 }

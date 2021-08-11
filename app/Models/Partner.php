@@ -11,7 +11,21 @@ class Partner extends BaseModel
     public function categories()
     {
         return $this->hasMany(CategoryPartner::class);
+    }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
+    function skus()
+    {
+        return $this->hasManyThrough(Sku::class, Product::class);
+    }
+
+    public function batches()
+    {
+        return $this->hasManyDeep(SkuBatch::class, [Product::class, Sku::class]);
     }
 
 
