@@ -1,13 +1,10 @@
 <?php namespace App\Services\Product;
 
-use App\Events\ProductStockAdded;
-use App\Events\ProductStockUpdated;
 use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Helper\Miscellaneous\RequestIdentification;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Http\Resources\ProductResource;
 use App\Http\Resources\WebstoreProductResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
@@ -16,12 +13,9 @@ use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
-use App\Traits\ResponseAPI;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
@@ -53,7 +47,7 @@ class ProductService extends BaseService
         ProductCombinationService $productCombinationService,
         ProductList $productList,
         protected CategoryRepository $categoryRepository,
-        private ApiServerClient $apiServerClient
+        protected ApiServerClient $apiServerClient
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -140,11 +134,9 @@ class ProductService extends BaseService
             'event' => self::PRODUCT_CREATE_REWARD_EVENT_NAME,
             'rewardable_type' => self::PRODUCT_CREATE_REWARDABLE_TYPE,
             'rewardable_id' => $partnerId,
-            'event_data' => [
-                'portal_name' => (new RequestIdentification())->get()['portal_name']
-            ]
+            'event_data' => ['portal_name' => (new RequestIdentification())->get()['portal_name']]
         ];
-        $this->apiServerClient->post('pos/v1/reward/action', $data);
+        $this->apiServerClient->setBaseUrl()->post('pos/v1/reward/action', $data);
     }
 
 
