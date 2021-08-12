@@ -302,4 +302,5 @@ class ProductService extends BaseService
     {
         return $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
     }
+
 }

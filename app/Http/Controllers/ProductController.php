@@ -312,4 +312,5 @@ class ProductController extends Controller
     {
         return $this->productService->getLogs($partner, $product);
     }
+
 }

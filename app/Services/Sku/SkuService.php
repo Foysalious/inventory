@@ -8,6 +8,7 @@ use App\Interfaces\SkuBatchRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Services\BaseService;
 use App\Services\SkuBatch\SkuBatchDto;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\SkuBatch\Creator as SkuBatchCreator;
@@ -30,28 +31,26 @@ class SkuService extends BaseService
     }
 
     /**
-     * @param $partner
+     * @param $partner_id
      * @param Request $request
      * @return JsonResponse
      */
-    public function getSkuList($partner, Request $request)
+    public function getSkuList($partner_id, Request $request)
     {
-        list($offset, $limit) = calculatePagination($request);
         $channel_id = $request->channel_id;
-        $skus = json_decode($request->skus, true);
-        if ($channel_id && $skus)
-            $skus = $this->skuRepository->getSkusByIdsAndChannel($skus, $channel_id);
-        else
-            $skus = $this->skuRepository->getSkusByPartnerId($partner, $offset, $limit);
+        $sku_ids = json_decode($request->skus, true);
+        $with_deleted = $request->with_deleted ?? null;
 
-
-        $skus->each(function ($sku) use ($channel_id) {
-             $sku->sku_details = $this->getSkuDetails($channel_id, $sku->id);
-        });
-
-
-        $skus = SkuResource::collection($skus);
-        return $this->success('Successful', ['skus' => $skus], 200);
+        if (!is_null($with_deleted) && $sku_ids) {
+            /** @var Collection $skus */
+            $skus = $this->skuRepository->getSkusWithTrashed($sku_ids,$partner_id)->keyBy('id');
+            return $this->success('Successful', ['skus' => $skus]);
+        }
+        if ($channel_id && $sku_ids) {
+            $skus = $this->skuRepository->getSkusByIdsAndChannel($sku_ids, $channel_id, $partner_id);
+        }
+        $skus = $skus ? SkuResource::collection($skus) : [];
+        return $this->success('Successful', ['skus' => $skus]);
     }
 
     public function getSkuDetails($channel_id,$sku_id)

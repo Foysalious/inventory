@@ -21,13 +21,15 @@ class SkuRepository extends BaseRepository implements SkuRepositoryInterface
             ->get();
     }
 
-    public function getSkusByIdsAndChannel(array $skus,$channelId)
+    public function getSkusByIdsAndChannel(array $skus,$channelId,$partner_id)
     {
-        return $this->model->whereIn('id', $skus)->with(['skuChannels' => function ($q) use ($channelId) {
+        return $this->model->whereIn('id', $skus)->with(['skuChannels' => function ($q) use ($channelId,$partner_id) {
                 $q->where('channel_id',$channelId)->select('id as  sku_channel_id','sku_id','channel_id', 'price','wholesale_price');
-            },'product'=> function($q) {
-            $q->select('id','warranty','warranty_unit','vat_percentage', 'name', 'unit_id')->with('unit');
-        }])->get();
+            },'product'=> function($q) use ($partner_id) {
+            $q->select('id','warranty','warranty_unit','vat_percentage', 'name', 'unit_id')
+                ->with('unit')
+                ->where('partner_id', $partner_id);
+        }])->get()->whereNotNull('product');
     }
 
     public function getSkuDetails($channelId, $skuId)
@@ -37,6 +39,13 @@ class SkuRepository extends BaseRepository implements SkuRepositoryInterface
                 $q->with('productOption');
             });
         }])->select('id')->first();
+    }
+
+    public function getSkusWithTrashed(array $skus_id, int $partner_id)
+    {
+        return $this->model->whereIn('id', $skus_id)->with(['product' => function($q) use ($partner_id){
+            $q->select('id','name')->where('partner_id', $partner_id)->withTrashed();
+        }])->withTrashed()->get();
     }
 
 }

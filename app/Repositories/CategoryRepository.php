@@ -37,10 +37,10 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
     public function getDeletedCategories( $partner_id, $updated_after)
     {
         $deleted_categories_query = $this->model->where(function ($q) use ($partner_id) {
-            $q->whereHas(self::CATEGORY_PARTNER, function ($q) use ($partner_id) {
+            $q->whereHas('deletedCategoryPartner', function ($q) use ($partner_id) {
                 $q->where(self::PARTNER_ID, $partner_id);
             });
-        })->onlyTrashed();
+        })->where('parent_id', null)->onlyTrashed();
 
         if($updated_after)
             $deleted_categories_query = $deleted_categories_query->where('deleted_at', '>=', $updated_after);
