@@ -56,6 +56,11 @@ class Category extends BaseModel
         return $this->hasMany(CategoryPartner::class, 'category_id');
     }
 
+    public function deletedCategoryPartner(): HasMany
+    {
+        return $this->hasMany(CategoryPartner::class, 'category_id')->withTrashed();
+    }
+
     public function isPublishedForSheba()
     {
         return $this->is_published_for_sheba;
