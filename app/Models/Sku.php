@@ -1,13 +1,16 @@
 <?php namespace App\Models;
 
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sku extends BaseModel
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes, CascadeSoftDeletes;
+
     protected $guarded = ['id'];
     protected $casts = ['stock' => 'double'];
+    protected $cascadeDeletes = ['combinations', 'skuChannels'];
 
     public function skuChannels()
     {

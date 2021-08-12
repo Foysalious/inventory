@@ -12,6 +12,7 @@
         "ext-json": "*",
         "algolia/scout-extended": "^1.13",
         "darkaonline/l5-swagger": "^8.0",
+        "dyrynda/laravel-cascade-soft-deletes": "^4.1",
         "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -21,7 +22,8 @@
         "laravel/tinker": "^2.5",
         "league/flysystem-aws-s3-v3": "~1.0",
         "predis/predis": "^1.1",
-        "spatie/data-transfer-object": "^3.3"
+        "spatie/data-transfer-object": "^3.3",
+        "staudenmeir/eloquent-has-many-deep": "^1.7"
     },
     "require-dev": {
         "facade/ignition": "^2.5",

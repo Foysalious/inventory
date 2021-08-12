@@ -66,7 +66,7 @@ class ProductCombinationService
                 $sku->skuChannels->each(function ($sku_channel) use (&$temp, $sku) {
                     /** @var  $priceCalculation PriceCalculation */
                     $priceCalculation = app(PriceCalculation::class);
-                    $priceCalculation->setSkuChannel($sku_channel);
+                    $priceCalculation->setProduct($this->product)->setSku($sku)->setSkuChannel($sku_channel);
                     if($sku_channel->channel_id == 2)
                         $temp =  [
                             "sku_channel_id" => $sku_channel->id,
@@ -101,10 +101,10 @@ class ProductCombinationService
                 $sku->combinations->each(function ($combination) use (&$sku_data, &$temp, &$data) {
                     $product_option_value = $combination->productOptionValue;
                     array_push($temp, [
-                        'option_id' => $product_option_value->productOption->id,
-                        'option_name' => $product_option_value->productOption->name,
-                        'option_value_id' => $product_option_value->id,
-                        'option_value_name' => $product_option_value->name
+                        'option_id' => $product_option_value?->productOption?->id,
+                        'option_name' => $product_option_value?->productOption?->name,
+                        'option_value_id' => $product_option_value?->id,
+                        'option_value_name' => $product_option_value?->name
                     ]);
                 });
             }
@@ -118,10 +118,10 @@ class ProductCombinationService
             $temp = [];
             if($sku->skuChannels)
             {
-                $sku->skuChannels->each(function ($sku_channel) use (&$temp) {
+                $sku->skuChannels->each(function ($sku_channel) use ($sku, &$temp) {
                     /** @var  $priceCalculation PriceCalculation */
                     $priceCalculation = app(PriceCalculation::class);
-                    $priceCalculation->setSkuChannel($sku_channel);
+                    $priceCalculation->setProduct($this->product)->setSku($sku)->setSkuChannel($sku_channel);
                     array_push($temp, [
                         "sku_channel_id" => $sku_channel->id,
                         "channel_id" => $sku_channel->channel_id,

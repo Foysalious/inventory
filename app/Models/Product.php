@@ -1,23 +1,24 @@
 <?php namespace App\Models;
 
-use App\Repositories\SkuBatchRepository;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
+use Dyrynda\Database\Support\CascadeSoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\App;
 
 Relation::morphMap(['product'=>'App\Models\Product']);
 
 class Product extends BaseModel
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, CascadeSoftDeletes;
+
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];
+    protected $cascadeDeletes = ['skus', 'images', 'productOptions', 'productChannels', 'discounts'];
 
     public function setNameAttribute($name)
     {

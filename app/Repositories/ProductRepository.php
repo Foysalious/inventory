@@ -59,4 +59,31 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         });
     }
 
+    public function getProductsByPartnerQuery(int $partnerId)
+    {
+        return $this->model->select('id', 'category_id', 'name', 'vat_percentage', 'unit_id', 'app_thumb', 'created_at')
+            ->where('partner_id', $partnerId)->with(['unit' => function($q) {
+                $q->select('id', 'name_bn', 'name_en');
+            }, 'category' => function($q) {
+                $q->select('id', 'parent_id')->with(['parent' => function($q) {
+                    $q->select('id');
+                }]);
+            }, 'skus' => function($q) {
+                $q->select('id', 'product_id')->with(['batch' => function($q) {
+                    $q->select('id', 'sku_id', 'stock', 'cost');
+                }, 'combinations' => function($q) {
+                    $q->select('id', 'sku_id', 'product_option_value_id')->with(['productOptionValue' => function($q) {
+                        $q->select('id', 'product_option_id', 'name', 'details')->with(['productOption' => function($q) {
+                            $q->select('id', 'product_id', 'name');
+                        }]);
+                    }]);
+                }, 'skuChannels' => function($q) {
+                    $q->select('id', 'sku_id', 'channel_id', 'price', 'wholesale_price')->with(['validDiscounts' => function($q) {
+                        $q->select('id', 'amount', 'is_amount_percentage', 'created_at');
+                    }]);
+                }]);
+            }
+        ]);
+    }
+
 }

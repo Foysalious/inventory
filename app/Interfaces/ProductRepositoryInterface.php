@@ -15,4 +15,5 @@ interface ProductRepositoryInterface extends BaseRepositoryInterface
      * @return mixed
      */
     public function searchProductFromWebstore(string $searchKey, int $partnerId, $limit = 10, $offset = 0);
+    public function getProductsByPartnerQuery(int $partnerId);
 }

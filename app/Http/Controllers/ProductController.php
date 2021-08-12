@@ -1,5 +1,6 @@
 <?php namespace App\Http\Controllers;
 
+use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
@@ -187,9 +188,11 @@ class ProductController extends Controller
      *      @OA\Response(response=404, description="message: Partner Not Found!"),
      *      @OA\Response(response=403, description="Forbidden")
      *     )
-     **/
+     *
+     * @throws ProductDetailsPropertyValidationError
+     */
 
-    public function store($partner, ProductRequest $request)
+    public function store($partner, ProductRequest $request): JsonResponse
     {
         return $this->productService->create($partner, $request);
     }

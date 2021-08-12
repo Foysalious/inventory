@@ -67,15 +67,17 @@ class ValuesUpdate extends VariantProductUpdate
 
     protected function deleteDiscardedCombinations()
     {
-        $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
+        if ($this->getDeletedValues()) {
+            $this->productOptionValueRepository->whereIn('id', $this->getDeletedValues())->delete();
         /** @var array $skus_to_delete */
-        $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
-        $this->deleteSkusStockBatch($skus_to_delete);
-        $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
-        $this->skuRepository->whereIn('id', $skus_to_delete)->delete();
-        $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->delete();
-        $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->delete();
-        $this->deleteSkuChannelDiscount($skus_channels_to_delete);
+            $skus_to_delete = $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->pluck('sku_id');
+            $this->deleteSkusStockBatch($skus_to_delete);
+            $skus_channels_to_delete = $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->pluck('id');
+            $this->skuRepository->whereIn('id', $skus_to_delete)->delete();
+            $this->skuChannelRepository->whereIn('sku_id', $skus_to_delete)->delete();
+            $this->combinationRepository->whereIn('product_option_value_id', $this->deletedValues)->delete();
+            $this->deleteSkuChannelDiscount($skus_channels_to_delete);
+        }
     }
 
     protected function deleteSkusStockBatch(array $sku_ids)

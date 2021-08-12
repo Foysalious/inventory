@@ -3,10 +3,11 @@
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Resources\ProductsInfoResource;
 use App\Interfaces\CategoryRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Repositories\SkuBatchRepository;
-use Illuminate\Database\Eloquent\Collection;
+use DB;
 
 class ProductList
 {
@@ -24,6 +25,7 @@ class ProductList
                                 ProductRepositoryInterface $productRepository,
                                 protected SkuBatchRepository $skuBatchRepository,
                                 protected SkuRepositoryInterface $skuRepository,
+                                protected PartnerRepositoryInterface $partnerRepository
     )
     {
         $this->categoryRepository = $categoryRepository;
@@ -102,24 +104,7 @@ class ProductList
 
     private function getProducts()
     {
-        $products_query = $this->productRepository->where('partner_id', $this->partnerId)->with([
-            'unit' => function($q) {
-            $q->select('id', 'name_bn', 'name_en');
-            }, 'category' => function($q) {
-            $q->select('id', 'parent_id')->with(['parent' => function($q) {
-                $q->select('id');
-            }]);
-            }, 'skus' => function($q) {
-            $q->with(['batch', 'combinations' => function($q) {
-                $q->with(['productOptionValue' => function($q) {
-                    $q->with('productOption');
-                }]);
-            }, 'skuChannels' => function($q) {
-                $q->with(['validDiscounts', 'sku' => function($q) {
-                    $q->with('product');
-                }]);
-            }]);
-        }]);
+        $products_query = $this->productRepository->getProductsByPartnerQuery($this->partnerId);
         if (isset($this->categoryIds)) $products_query = $products_query->whereIn('category_id', $this->categoryRepository->getSubCategoryIds($this->categoryIds)->pluck('id'));
         if (isset($this->setSubCategoryIds))
             $products_query = $this->filterBySubCategories($products_query, $this->setSubCategoryIds);
@@ -182,26 +167,19 @@ class ProductList
         });
     }
 
-    private function getPartnerProductsAdditionalInfo()
+    private function getPartnerProductsAdditionalInfo(): array
     {
-        $return_data = [
+        $data = [
             'total_products' => 0,
             'total_products_with_variation' => 0,
             'items_with_buying_price' => 0,
             'total_buying_price' => 0,
         ];
-        $items = $this->productRepository->where('partner_id', $this->partnerId)->select('id')->get();
-        $return_data['total_products'] += $items->count();
-        $skus_ids = $this->skuRepository->whereIn('product_id', $items)->select('id')->get();
-        $return_data['total_products_with_variation'] = $skus_ids->count();
-        /** @var Collection $batches */
-        $batches = $this->skuBatchRepository->whereIn('sku_id', $skus_ids)->where('cost', '>', 0)->get()->groupBy('sku_id');
-        if ($batches) {
-            $return_data['items_with_buying_price'] = $batches->count();
-            foreach ($batches as $each) {
-                $return_data['total_buying_price'] += $each->last()->cost;
-            }
-        }
-        return $return_data;
+        $partner_products_info = $this->partnerRepository->getProductsInfoByPartner($this->partnerId);
+        $data['total_products'] = $partner_products_info->products_count;
+        $data['total_products_with_variation'] = $partner_products_info->skus_count;
+        $data['items_with_buying_price'] = (int) $partner_products_info->batches_count;
+        $data['total_buying_price'] = (double) $partner_products_info->batches_sum_cost;
+        return $data;
     }
 }

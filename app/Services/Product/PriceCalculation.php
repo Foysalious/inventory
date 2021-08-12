@@ -4,12 +4,14 @@
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Models\Channel;
 use App\Models\Discount;
+use App\Models\Product;
 use App\Models\Sku;
 use App\Models\SkuChannel;
 use App\Services\BaseService;
 
 class PriceCalculation extends BaseService
 {
+    private Product $product;
     private Sku $sku;
     private Channel $channel;
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
@@ -24,6 +26,17 @@ class PriceCalculation extends BaseService
     {
         $this->skuChannelRepositoryInterface = $skuChannelRepositoryInterface;
     }
+
+    /**
+     * @param Product $product
+     * @return PriceCalculation
+     */
+    public function setProduct(Product $product): PriceCalculation
+    {
+        $this->product = $product;
+        return $this;
+    }
+
 
     /**
      * @param Sku $sku
@@ -78,7 +91,7 @@ class PriceCalculation extends BaseService
     public function getVatPercentage()
     {
         $this->calculateSkuChannel();
-        return $this->skuChannel->sku->product->vat_percentage;
+        return $this->product->vat_percentage;
     }
 
     public function getPurchaseUnitPrice()
