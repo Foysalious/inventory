@@ -22,6 +22,7 @@ use Spatie\DataTransferObject\Exceptions\UnknownProperties;
 abstract class ProductUpdate implements ProductUpdateStrategy
 {
     protected Product $product;
+    protected bool $hasVariant;
     /** @var ProductUpdateDetailsObjects[] */
     protected array $updateDataObjects;
     protected ?array $deletedValues;
@@ -42,6 +43,16 @@ abstract class ProductUpdate implements ProductUpdateStrategy
     public function setProduct(Product $product): ProductUpdate
     {
         $this->product = $product;
+        return $this;
+    }
+
+    /**
+     * @param bool $hasVariant
+     * @return ProductUpdate
+     */
+    public function setHasVariant(bool $hasVariant): ProductUpdate
+    {
+        $this->hasVariant = $hasVariant;
         return $this;
     }
 

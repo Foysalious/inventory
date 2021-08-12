@@ -11,6 +11,7 @@ class Updater
     /** @var ProductUpdateDetailsObjects[] */
     protected array $updateDataObjects;
     private ?array $deletedValues;
+    protected bool $hasVariant;
 
     /**
      * @param ProductUpdateStrategy $strategy
@@ -29,6 +30,16 @@ class Updater
     public function setProduct(Product $product): Updater
     {
         $this->product = $product;
+        return $this;
+    }
+
+    /**
+     * @param bool $hasVariant
+     * @return Updater
+     */
+    public function setHasVariant(bool $hasVariant): Updater
+    {
+        $this->hasVariant = $hasVariant;
         return $this;
     }
 
@@ -54,6 +65,6 @@ class Updater
 
     public function update()
     {
-        $this->strategy->setProduct($this->product)->setUpdatedDataObjects($this->updateDataObjects)->setDeletedValues($this->deletedValues)->update();
+        $this->strategy->setProduct($this->product)->setHasVariant($this->hasVariant)->setUpdatedDataObjects($this->updateDataObjects)->setDeletedValues($this->deletedValues)->update();
     }
 }

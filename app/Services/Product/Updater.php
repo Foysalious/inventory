@@ -228,6 +228,7 @@ class Updater
             $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
             $this->productUpdater->setStrategy($strategy)
                 ->setProduct($this->product)
+                ->setHasVariant($this->hasVariants)
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->setDeletedValues($this->strategyFactory->getDeletedValues())
                 ->update();

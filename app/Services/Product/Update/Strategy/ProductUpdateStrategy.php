@@ -7,6 +7,8 @@ interface ProductUpdateStrategy
 {
     public function setProduct(Product $product): ProductUpdateStrategy;
 
+    public function setHasVariant(bool $hasVariant): ProductUpdateStrategy;
+
     public function setUpdatedDataObjects(array $updateDataObjects): ProductUpdateStrategy;
 
     public function setDeletedValues(?array $deletedValues): ProductUpdateStrategy;

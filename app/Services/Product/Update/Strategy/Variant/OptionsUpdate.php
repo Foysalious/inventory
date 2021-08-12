@@ -21,7 +21,7 @@ class OptionsUpdate extends VariantProductUpdate
     protected function deleteSkuAndCombination()
     {
         $this->product->skus()->get()->each(function (Sku $sku) {
-            if ($this->hasVariants) $sku->combinations()->delete();
+            if ($this->hasVariant) $sku->combinations()->delete();
             $sku->skuChannels()->get()->each(function (SkuChannel $skuChannel) {
                 $skuChannel->discounts()->delete();
             });
