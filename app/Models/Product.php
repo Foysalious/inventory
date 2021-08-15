@@ -1,6 +1,6 @@
 <?php namespace App\Models;
 
-use App\Repositories\SkuBatchRepository;
+use App\Events\RewardOnProductCreate;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
@@ -8,13 +8,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\App;
+
+
 
 Relation::morphMap(['product'=>'App\Models\Product']);
 
 class Product extends BaseModel
 {
     use HasFactory, SoftDeletes;
+    public static  $savedEventClass = RewardOnProductCreate::class;
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];

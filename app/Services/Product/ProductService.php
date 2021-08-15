@@ -2,7 +2,6 @@
 
 use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
-use App\Helper\Miscellaneous\RequestIdentification;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\WebstoreProductResource;
@@ -19,9 +18,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
 {
-    private const PRODUCT_CREATE_REWARD_EVENT_NAME = 'pos_inventory_create';
-    private const PRODUCT_CREATE_REWARDABLE_TYPE = 'partner';
-
     /** @var ProductRepositoryInterface */
     protected ProductRepositoryInterface $productRepositoryInterface;
     /** @var Creator */
@@ -123,21 +119,8 @@ class ProductService extends BaseService
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
             ->create();
-            $this->callRewardApi($partnerId);
             return $this->success("Successful", ['product' => $product],201);
     }
-
-    private function callRewardApi($partnerId)
-    {
-        $data = [
-            'event' => self::PRODUCT_CREATE_REWARD_EVENT_NAME,
-            'rewardable_type' => self::PRODUCT_CREATE_REWARDABLE_TYPE,
-            'rewardable_id' => $partnerId,
-            'event_data' => ['portal_name' => (new RequestIdentification())->get()['portal_name']]
-        ];
-        $this->apiServerClient->setBaseUrl()->post('pos/v1/reward/action', $data);
-    }
-
 
     /**
      * @param $productId
