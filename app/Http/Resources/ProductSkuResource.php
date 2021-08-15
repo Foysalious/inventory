@@ -16,7 +16,6 @@ class ProductSkuResource extends JsonResource
      */
     public function toArray($request)
     {
-        $sku_id = $this->skus()->pluck('id')->first();
         /** @var $this Sku */
         return [
             'id' => $this->id,

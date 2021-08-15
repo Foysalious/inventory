@@ -59,7 +59,7 @@ class Product extends BaseModel
     {
         $array = $this->toArray();
 
-       return $data = [
+       return [
             'id' => $array['id'],
             'name' => $array['name'],
             'description' => $array['description'],

@@ -8,7 +8,7 @@ if (!function_exists('getValidationErrorMessage')) {
     function getValidationErrorMessage($errors)
     {
         $msg = '';
-        foreach ($errors as $key => $error) {
+        foreach ($errors as $error) {
             $msg .= $error;
         }
         return $msg;

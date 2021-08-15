@@ -40,7 +40,9 @@ if (!function_exists('getPosServiceImageGalleryFolder')) {
 function getPosServiceThumbFolder($with_base_url = false)
 {
     $url = '';
-    if ($with_base_url) $url = config('s3.url');
+    if ($with_base_url) {
+        $url = config('s3.url');
+    }
 
     return $url . 'images/pos/services/thumbs/';
 }
@@ -70,7 +72,9 @@ if (!function_exists('getProductThumbFolder')) {
     function getProductThumbFolder($with_base_url = false)
     {
         $url = '';
-        if ($with_base_url) $url = config('s3.url');
+        if ($with_base_url) {
+            $url = config('s3.url');
+        }
 
         return $url . 'images/pos/services/thumbs/';
     }

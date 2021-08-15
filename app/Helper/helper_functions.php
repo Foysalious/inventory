@@ -12,6 +12,7 @@ $helper_files = [
 
 foreach ($helper_files as $file) {
     $file = dirname(dirname(__DIR__)) . "/" . $file;
-    if (file_exists($file))
+    if (file_exists($file)) {
         require $file;
+    }
 }
