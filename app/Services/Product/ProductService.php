@@ -13,6 +13,8 @@ use App\Models\Category;
 use App\Repositories\CategoryRepository;
 use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
+use App\Services\Usage\Types;
+use App\Services\Usage\UsageService;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -47,7 +49,8 @@ class ProductService extends BaseService
         ProductCombinationService $productCombinationService,
         ProductList $productList,
         protected CategoryRepository $categoryRepository,
-        protected ApiServerClient $apiServerClient
+        protected ApiServerClient $apiServerClient,
+        protected UsageService $usageService
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -125,6 +128,7 @@ class ProductService extends BaseService
             ->setHasVariant($has_variant)
             ->create();
            // $this->callRewardApi($partnerId);
+            $this->usageService->setUserId((int) $partnerId)->setUsageType(Types::INVENTORY_CREATE)->store();
             return $this->success("Successful", [], 201);
     }
 
