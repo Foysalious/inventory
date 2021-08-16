@@ -1,8 +1,13 @@
 <?php namespace App\Services\Product;
 
+use App\Exceptions\AuthorizationException;
 use App\Interfaces\DiscountRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
+use App\Models\Partner;
 use App\Models\Sku;
+use App\Services\AccessManager\AccessManager;
+use App\Services\Channel\Channels;
 use App\Services\Discount\Types;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
 use App\Services\ProductImage\Creator as ProductImageCreator;
@@ -55,7 +60,8 @@ class Creator
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
                                 ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator,
-                                protected SkuBatchCreator $skuBatchCreator, protected ProductUpdateLogCreateRequest $logCreateRequest
+                                protected SkuBatchCreator $skuBatchCreator, protected ProductUpdateLogCreateRequest $logCreateRequest,
+                                protected AccessManager $accessManager, protected PartnerRepositoryInterface $partnerRepository
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -275,6 +281,7 @@ class Creator
             return $product;
         } catch (\Exception $e) {
             DB::rollback();
+            throw $e;
         }
     }
 
@@ -317,11 +324,19 @@ class Creator
         $this->createProductChannel($product->id,$all_channels);
     }
 
+    /**
+     * @throws AuthorizationException
+     */
     private function createProductChannel($product_id, $channels)
     {
         $product_channels = [];
         $channels = array_unique($channels);
         foreach ($channels as $channel) {
+            if ($channel == Channels::WEBSTORE) $this->accessManager
+                ->setPartnerId($this->partnerId)
+                ->setFeature('pos.ecom.product_publish')
+                ->setProductPublishedCount($this->partnerRepository->getPartnerPublishedProductsCount($this->partnerId))
+                ->checkAccess();
             array_push($product_channels, [
                 'channel_id' => $channel,
                 'product_id' => $product_id

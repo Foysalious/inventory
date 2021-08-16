@@ -2,10 +2,13 @@
 
 
 use App\Interfaces\DiscountRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
 use App\Models\Sku;
+use App\Services\AccessManager\AccessManager;
+use App\Services\Channel\Channels;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Discount\Types;
 use App\Services\Product\ChannelUpdateDetailsObjects;
@@ -36,7 +39,9 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         protected ProductStockBatchUpdater $productStockBatchUpdater,
         protected DiscountRepositoryInterface $discountRepository,
         protected DiscountCreator $discountCreator,
-        protected ProductChannelCreator $productChannelCreator)
+        protected ProductChannelCreator $productChannelCreator,
+        protected PartnerRepositoryInterface $partnerRepository,
+        protected AccessManager $accessManager)
     {
     }
 
@@ -175,6 +180,11 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         $product_channels = [];
         $channels = array_unique($channels);
         foreach ($channels as $channel) {
+            if ($channel == Channels::WEBSTORE) $this->accessManager
+                ->setPartnerId($this->product->partner_id)
+                ->setFeature('pos.ecom.product_publish')
+                ->setProductPublishedCount($this->partnerRepository->getPartnerPublishedProductsCount($this->product->partner_id))
+                ->checkAccess();
             array_push($product_channels, [
                 'channel_id' => $channel,
                 'product_id' => $product_id

@@ -196,6 +196,7 @@ class ProductService extends BaseService
     private function getDefaultSubCategory($partner_id, $category_id)
     {
         $category = Category::find($category_id);
+        if (!$category) throw new NotFoundHttpException("Category Not Found");
         if($category->is_published_for_sheba) {
             $sub_category = Category::where('name', 'Sub None Category')->where('parent_id', $category_id)->first();
         } else {

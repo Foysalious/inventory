@@ -28,5 +28,10 @@ class Partner extends BaseModel
         return $this->hasManyDeep(SkuBatch::class, [Product::class, Sku::class]);
     }
 
+    public function productChannels()
+    {
+        return $this->hasManyThrough(ProductChannel::class, Product::class);
+    }
+
 
 }
