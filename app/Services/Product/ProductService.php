@@ -76,7 +76,7 @@ class ProductService extends BaseService
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
             ->setSubCategoryIds($sub_category_ids)
-            ->setUpdatedAfter($request->updated_after)
+            ->setUpdatedAfter(convertTimezone($request->updated_after))
             ->setWebstorePublicationStatus($request->is_published_for_webstore)
             ->setOffset($offset)
             ->setLimit($limit);

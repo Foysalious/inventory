@@ -36,7 +36,7 @@ class WebstoreProductResource extends JsonResource
             'warranty_unit' => $this->warranty_unit,
             'original_price'=> (double) $this->getOriginalPrice(),
             'variations' => $this->combinations(),
-            'created_at' => $this->created_at,
+            'created_at' => convertTimezone($this->created_at),
             'image_gallery' => $this->images()->get() ?? [],
         ];
     }
