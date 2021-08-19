@@ -1,6 +1,7 @@
 <?php namespace App\Providers;
 
 
+use App\Interfaces\ApiRequestRepositoryInterface;
 use App\Interfaces\CategoryRepositoryInterface;
 use App\Interfaces\CollectionProductsRepositoryInterface;
 use App\Interfaces\CombinationRepositoryInterface;
@@ -20,6 +21,7 @@ use App\Interfaces\ProductImageRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\ValueRepositoryInterface;
 use App\Interfaces\ChannelRepositoryInterface;
+use App\Repositories\ApiRequestRepository;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CollectionRepositoryInterface;
 use App\Repositories\CollectionProductsRepository;
@@ -84,6 +86,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(CollectionProductsRepositoryInterface::class, CollectionProductsRepository::class);
         $this->app->singleton(SkuChannelRepositoryInterface::class, SkuChannelRepository::class);
         $this->app->singleton(SkuBatchRepositoryInterface::class, SkuBatchRepository::class);
+        $this->app->singleton(ApiRequestRepositoryInterface::class,ApiRequestRepository::class);
     }
 
 }
