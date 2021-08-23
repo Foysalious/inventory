@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use App\Events\RewardOnProductCreate;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
@@ -9,12 +10,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
+
 Relation::morphMap(['product'=>'App\Models\Product']);
 
 class Product extends BaseModel
 {
     use HasFactory, SoftDeletes, CascadeSoftDeletes;
 
+    public static  $savedEventClass = RewardOnProductCreate::class;
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];

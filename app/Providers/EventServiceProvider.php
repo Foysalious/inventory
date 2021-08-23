@@ -1,15 +1,14 @@
-<?php
-
-namespace App\Providers;
+<?php namespace App\Providers;
 
 use App\Events\ProductStockAdded;
 use App\Events\ProductStockUpdated;
+use App\Events\RewardOnProductCreate as RewardOnProductCreateEvent;
 use App\Listeners\AccountingEntryOnProductStockAdded;
 use App\Listeners\AccountingEntryOnProductStockUpdated;
+use App\Listeners\RewardOnProductCreate as RewardOnProductCreateListener;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Event;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -27,6 +26,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         ProductStockUpdated::class => [
             AccountingEntryOnProductStockUpdated::class
+        ],
+        RewardOnProductCreateEvent::class => [
+            RewardOnProductCreateListener::class
         ]
     ];
 
