@@ -28,7 +28,7 @@ class RewardOnProductCreate extends Job implements ShouldQueue
             'event' => self::PRODUCT_CREATE_REWARD_EVENT_NAME,
             'rewardable_type' => self::PRODUCT_CREATE_REWARDABLE_TYPE,
             'rewardable_id' => $this->model->partner_id,
-            'event_data' => $this->model->apiRequest->portal_name
+            //'event_data' => $this->model->apiRequest->portal_name
         ];
         try{
             $client = new Client();
