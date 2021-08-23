@@ -34,7 +34,7 @@ class ProductResource extends JsonResource
             'warranty_unit' => $this->warranty_unit,
             'options' => $this->options,
             'images' => $this->images,
-            'orginal_price' => $this->getOriginalPrice(),
+            'original_price' => $this->getOriginalPrice(),
             'variations' => $this->combinationsforWebstore(),
         ];
     }
