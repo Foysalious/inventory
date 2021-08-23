@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
-use App\Events\ProductStockAdded;
-use App\Events\ProductStockUpdated;
-use App\Listeners\AccountingEntryOnProductStockAdded;
-use App\Listeners\AccountingEntryOnProductStockUpdated;
+use App\Events\Accounting\ProductStockAdded;
+use App\Events\Accounting\ProductStockUpdated;
+use App\Listeners\Accounting\AccountingEntryOnProductStockAdded;
+use App\Listeners\Accounting\AccountingEntryOnProductStockUpdated;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

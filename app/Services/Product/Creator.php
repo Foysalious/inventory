@@ -278,7 +278,6 @@ class Creator
             if ($this->images)
                 $this->createImageGallery($product);
             DB::commit();
-            return $product;
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;

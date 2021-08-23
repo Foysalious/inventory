@@ -1,4 +1,4 @@
-<?php namespace App\Events;
+<?php namespace App\Events\Accounting;
 
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
@@ -12,16 +12,18 @@ class ProductStockUpdated
 
     protected Product $product;
     protected ProductUpdateRequest $productUpdateRequest;
+    protected ?array $oldStockData;
 
     /**
      * ProductStockUpdated constructor.
      * @param Product $product
      * @param ProductUpdateRequest $request
      */
-    public function __construct(Product $product, ProductUpdateRequest $request)
+    public function __construct(Product $product, ProductUpdateRequest $request, $old_stock_data)
     {
         $this->product = $product;
         $this->productUpdateRequest = $request;
+        $this->oldStockData = $old_stock_data;
     }
 
     /**
@@ -38,5 +40,13 @@ class ProductStockUpdated
     public function getRequest(): ProductUpdateRequest
     {
         return $this->productUpdateRequest;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getOldStockData(): ?array
+    {
+        return $this->oldStockData;
     }
 }

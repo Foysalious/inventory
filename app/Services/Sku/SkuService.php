@@ -1,11 +1,15 @@
 <?php namespace App\Services\Sku;
 
+use App\Events\Accounting\Accounting\Accounting\ProductIndividualStockAdded;
+use App\Events\Accounting\ProductStockAdded;
 use App\Http\Requests\SkuStockAddRequest;
 use App\Http\Requests\SkuStockUpdateRequest;
 use App\Http\Resources\WebstoreProductResource;
 use App\Http\Resources\SkuResource;
+use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuBatchRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
+use App\Models\Product;
 use App\Services\BaseService;
 use App\Services\SkuBatch\SkuBatchDto;
 use Illuminate\Database\Eloquent\Collection;
@@ -13,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use App\Services\SkuBatch\Creator as SkuBatchCreator;
 use App\Services\SkuBatch\UpdaterForOrder as SkuBatchUpdaterForOrder;
+use Illuminate\Support\Facades\App;
 
 class SkuService extends BaseService
 {
@@ -96,11 +101,19 @@ class SkuService extends BaseService
         if(!$sku) {
             return $this->error("Variation not found under this product", 403);
         }
-        $this->skuBatchCreator->create(new SkuBatchDto([
+
+        $batch = true;
+
+        $batch = $this->skuBatchCreator->create(new SkuBatchDto([
             'sku_id' => $request->sku_id,
             'cost' => $request->cost,
             'stock' => $request->stock,
         ]));
+
+        if($batch && $request->has('accounting_info')) {
+            $product = Product::where('id', $product_id)->first();
+            event(new ProductStockAdded($product,$request));
+        }
 
         return $this->success('Successful', null, 200);
     }

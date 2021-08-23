@@ -13,7 +13,7 @@ class Creator
 
     public function create(SkuBatchDto $skuBatchDto)
     {
-        $this->skuBatchRepository->create(($skuBatchDto->toArray()));
+        return $this->skuBatchRepository->create(($skuBatchDto->toArray()));
     }
 
 
