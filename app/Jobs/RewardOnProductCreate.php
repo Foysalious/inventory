@@ -1,10 +1,7 @@
-<?php
+<?php namespace App\Jobs;
 
-namespace App\Jobs;
-
-
-use App\Helper\Miscellaneous\RequestIdentification;
-use App\Services\Product\ApiServerClient;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\Jobs\Job;
@@ -19,7 +16,7 @@ class RewardOnProductCreate extends Job implements ShouldQueue
     private const PRODUCT_CREATE_REWARD_EVENT_NAME = 'pos_inventory_create';
     private const PRODUCT_CREATE_REWARDABLE_TYPE = 'partner';
 
-    public function __construct($model, protected ApiServerClient $apiServerClient)
+    public function __construct($model)
     {
         $this->model = $model;
         $this->queue = 'reward';
@@ -31,9 +28,13 @@ class RewardOnProductCreate extends Job implements ShouldQueue
             'event' => self::PRODUCT_CREATE_REWARD_EVENT_NAME,
             'rewardable_type' => self::PRODUCT_CREATE_REWARDABLE_TYPE,
             'rewardable_id' => $this->model->partner_id,
-            'event_data' => ['portal_name' => (new RequestIdentification())->get()['portal_name']]
+            'event_data' => $this->model->apiRequest->portal_name
         ];
-        $this->apiServerClient->setBaseUrl()->post('pos/v1/reward/action', $data);
+        try{
+            $client = new Client();
+            $client->post(config('sheba.api_url').'/pos/v1/reward/action',$data);
+        }catch (GuzzleException $e){}
+
     }
 
     public function getJobId()
