@@ -90,7 +90,7 @@ class Product extends BaseModel
 
     public function collectionIds()
     {
-        return $this->collection ? $this->collection->pluck('id') : [];
+        return $this->collections ? $this->collections->pluck('id') : [];
     }
 
     public function unit ()
