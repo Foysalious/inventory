@@ -1,6 +1,6 @@
 <?php namespace App\Models;
 
-use App\Events\RewardOnProductCreate;
+use App\Events\ProductCreated;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
@@ -18,7 +18,7 @@ class Product extends BaseModel
 {
     use HasFactory, SoftDeletes, CascadeSoftDeletes;
 
-    public static  $savedEventClass = RewardOnProductCreate::class;
+    public static  $createdEventClass = ProductCreated::class;
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];

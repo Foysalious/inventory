@@ -5,7 +5,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
 
-class RewardOnProductCreate
+class ProductCreated
 {
     use Dispatchable, SerializesModels;
 
