@@ -2,7 +2,7 @@
 
 use App\Events\ProductStockAdded;
 use App\Events\ProductStockUpdated;
-use App\Events\RewardOnProductCreate as RewardOnProductCreateEvent;
+use App\Events\ProductCreated;
 use App\Listeners\AccountingEntryOnProductStockAdded;
 use App\Listeners\AccountingEntryOnProductStockUpdated;
 use App\Listeners\RewardOnProductCreate as RewardOnProductCreateListener;
@@ -27,7 +27,7 @@ class EventServiceProvider extends ServiceProvider
         ProductStockUpdated::class => [
             AccountingEntryOnProductStockUpdated::class
         ],
-        RewardOnProductCreateEvent::class => [
+        ProductCreated::class => [
             RewardOnProductCreateListener::class
         ]
     ];
