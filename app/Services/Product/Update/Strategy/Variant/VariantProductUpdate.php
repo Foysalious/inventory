@@ -2,8 +2,10 @@
 
 
 use App\Interfaces\DiscountRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
+use App\Services\AccessManager\AccessManager;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\ProductChannelCreator;
@@ -28,11 +30,13 @@ abstract class VariantProductUpdate extends ProductUpdate
         protected DiscountRepositoryInterface $discountRepository,
         protected DiscountCreator $discountCreator,
         protected ProductChannelCreator $productChannelCreator,
+        protected PartnerRepositoryInterface $partnerRepository,
+        protected AccessManager $accessManager,
         protected CombinationCreator $combinationCreator,
         protected ProductOptionCreator $productOptionCreator,
         protected ProductOptionValueCreator $productOptionValueCreator)
     {
-        parent::__construct($skuRepository, $skuCreator, $skuStockUpdater, $skuChannelRepository, $productStockBatchUpdater, $discountRepository, $discountCreator, $productChannelCreator);
+        parent::__construct($skuRepository, $skuCreator, $skuStockUpdater, $skuChannelRepository, $productStockBatchUpdater, $discountRepository, $discountCreator, $productChannelCreator, $partnerRepository, $accessManager);
     }
 
     public abstract function update();
