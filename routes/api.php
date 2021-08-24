@@ -13,7 +13,6 @@ use App\Http\Controllers\Webstore\CollectionController as WebstoreCollectionCont
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ChannelController;
-use App\Http\Controllers\WarrantyUnitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
