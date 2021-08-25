@@ -1,17 +1,14 @@
 <?php namespace App\Listeners;
 
 use App\Events\ProductCreated;
+use App\Jobs\Usage\UsageJob;
 use App\Services\Usage\Types;
-use App\Services\Usage\UsageService;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Queue\SerializesModels;
 
 class UsageOnProductCreate
 {
-    /**
-     * Create the event listener.
-     *
-     * @return void
-     */
-    public function __construct(protected UsageService $usageService){}
+    use DispatchesJobs,SerializesModels;
 
     /**
      * Handle the event.
@@ -21,6 +18,6 @@ class UsageOnProductCreate
      */
     public function handle(ProductCreated $event)
     {
-        $this->usageService->setUserId($event->model->partner_id)->setUsageType(Types::INVENTORY_CREATE)->store();
+        $this->dispatch((new UsageJob((int) $event->model->partner_id, Types::INVENTORY_CREATE)));
     }
 }

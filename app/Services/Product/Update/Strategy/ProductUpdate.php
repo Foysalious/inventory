@@ -8,6 +8,7 @@ use App\Interfaces\SkuRepositoryInterface;
 use App\Models\Product;
 use App\Models\Sku;
 use App\Services\AccessManager\AccessManager;
+use App\Services\AccessManager\Features;
 use App\Services\Channel\Channels;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Discount\Types;
@@ -182,7 +183,7 @@ abstract class ProductUpdate implements ProductUpdateStrategy
         foreach ($channels as $channel) {
             if ($channel == Channels::WEBSTORE) $this->accessManager
                 ->setPartnerId($this->product->partner_id)
-                ->setFeature('pos.ecom.product_publish')
+                ->setFeature(Features::PRODUCT_WEBSTORE_PUBLISH)
                 ->setProductPublishedCount($this->partnerRepository->getPartnerPublishedProductsCount($this->product->partner_id))
                 ->checkAccess();
             array_push($product_channels, [
