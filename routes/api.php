@@ -61,8 +61,9 @@ Route::group(['prefix'=>'v1'], function() {
         Route::apiResource('partners.options.values', ValueController::class)->only('store');
         Route::apiResource('partners.values', ValueController::class)->only('update');
         Route::group(['middleware' => 'apiRequestLog'], function() {
-        Route::apiResource('partners.products', ProductController::class, ['only' => ['store']]);
+            Route::post('partners/{partner}/products', [ProductController::class, 'store']);
         });
+        Route::apiResource('partners.products', ProductController::class)->except('store');
         Route::apiResource('options', OptionController::class);
         Route::apiResource('options.values', ValueController::class)->shallow();
         Route::apiResource('partners.categories', CategoryController::class);
