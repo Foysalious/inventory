@@ -102,12 +102,14 @@ class SkuService extends BaseService
             return $this->error("Variation not found under this product", 403);
         }
 
-        $batch = true;
+        $accounting_info = json_decode($request->accounting_info, true);
 
         $batch = $this->skuBatchCreator->create(new SkuBatchDto([
             'sku_id' => $request->sku_id,
             'cost' => $request->cost,
             'stock' => $request->stock,
+            "supplier_id" => $accounting_info['supplier_id'] ?? null,
+            "from_account" => $accounting_info['from_account'] ?? null,
         ]));
 
         if($batch && $request->has('accounting_info')) {

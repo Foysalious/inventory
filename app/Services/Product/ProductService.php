@@ -129,6 +129,7 @@ class ProductService extends BaseService
             ->setAppThumb($request->app_thumb)
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
+            ->setAccountingInfo($request->accounting_info)
             ->create();
 
         if ($product && $request->has('accounting_info')) {
