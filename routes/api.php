@@ -13,7 +13,6 @@ use App\Http\Controllers\Webstore\CollectionController as WebstoreCollectionCont
 use App\Http\Controllers\ValueController;
 use App\Http\Controllers\CollectionController;
 use App\Http\Controllers\ChannelController;
-use App\Http\Controllers\WarrantyUnitController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -61,7 +60,9 @@ Route::group(['prefix'=>'v1'], function() {
         Route::apiResource('partners.options', OptionController::class);
         Route::apiResource('partners.options.values', ValueController::class)->only('store');
         Route::apiResource('partners.values', ValueController::class)->only('update');
-        Route::apiResource('partners.products', ProductController::class);
+        Route::group(['middleware' => 'apiRequestLog'], function() {
+        Route::apiResource('partners.products', ProductController::class, ['only' => ['store']]);
+        });
         Route::apiResource('options', OptionController::class);
         Route::apiResource('options.values', ValueController::class)->shallow();
         Route::apiResource('partners.categories', CategoryController::class);
