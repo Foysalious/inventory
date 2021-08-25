@@ -6,6 +6,7 @@ use App\Events\ProductCreated;
 use App\Listeners\AccountingEntryOnProductStockAdded;
 use App\Listeners\AccountingEntryOnProductStockUpdated;
 use App\Listeners\RewardOnProductCreate as RewardOnProductCreateListener;
+use App\Listeners\UsageOnProductCreate;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -28,7 +29,8 @@ class EventServiceProvider extends ServiceProvider
             AccountingEntryOnProductStockUpdated::class
         ],
         ProductCreated::class => [
-            RewardOnProductCreateListener::class
+            RewardOnProductCreateListener::class,
+            UsageOnProductCreate::class
         ]
     ];
 

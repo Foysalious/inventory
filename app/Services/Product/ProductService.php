@@ -122,7 +122,6 @@ class ProductService extends BaseService
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
             ->create();
-            $this->usageService->setUserId((int) $partnerId)->setUsageType(Types::INVENTORY_CREATE)->store();
             return $this->success("Successful", ['product' => $product], 201);
     }
 
