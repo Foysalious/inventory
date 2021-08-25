@@ -8,6 +8,8 @@ use App\Models\Product;
 use App\Models\Sku;
 use App\Models\SkuChannel;
 use App\Services\BaseService;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 
 class PriceCalculation extends BaseService
 {
@@ -139,4 +141,39 @@ class PriceCalculation extends BaseService
         return $this->getOriginalUnitPrice() - (($this->getOriginalUnitPrice() * $this->discount->amount) / 100);
     }
 
+    public function getWebstoreOriginalPrice()
+    {
+        return  $this->skuChannelRepositoryInterface->builder()->where('channel_id', $this->channel)->wherehas('sku',function ($q){
+            $q->where('product_id',$this->product->id);
+        })->get()->min('price');
+    }
+    public function skuChannelWithMinimumPrice()
+    {
+        $sku_ids = $this->product->skus->pluck('id')->toArray();
+        $q = $this->skuChannelRepositoryInterface->whereIn('sku_id', $sku_ids)->where('channel_id', $this->channel);
+        return $q->where('price', $q->min('price'))->first();
+    }
+    public function getWebstoreDiscountedPrice()
+    {
+        $discount = $this->skuChannelWithMinimumPrice() ? $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first() : null;
+        $discount_amount = $discount ? $discount->amount : 0;
+        $original_price = $this->getWebstoreOriginalPrice();
+        if(!$original_price)
+            dd($original_price);
+        return [$original_price - $discount_amount,round(($discount_amount/$original_price)*100,2)];
+    }
+    public function getProductRatingReview($product)
+    {
+        try {
+            $client = new Client();
+            $request = $client->get(env('POS_ORDER_SERVICE_API_URL').'/api/v1/products/' . $product->id . '/reviews');
+            $response = json_decode($request->getBody()->getContents(), true);
+            $rating = array_column($response['reviews'], 'rating');
+            $count_rating = count($rating);
+            $sum_rating = array_sum($rating);
+            $average_rating = round($sum_rating / $count_rating);
+            return [$average_rating, $count_rating];
+        } catch (GuzzleException $exception) {
+        }
+    }
 }

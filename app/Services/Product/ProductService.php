@@ -121,6 +121,7 @@ class ProductService extends BaseService
             ->setAppThumb($request->app_thumb)
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
+            ->setApiRequest($request->api_request->id)
             ->create();
             return $this->success("Successful", ['product' => $product], 201);
     }

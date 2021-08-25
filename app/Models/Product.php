@@ -1,7 +1,7 @@
 <?php namespace App\Models;
 
 use App\Events\ProductCreated;
-use App\Services\Product\ProductCalculator;
+use App\Services\Product\PriceCalculation;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
@@ -104,22 +104,22 @@ class Product extends BaseModel
 
     public function getOriginalPrice($channel = 2)
     {
-        /** @var  $productCalculator ProductCalculator */
-        $productCalculator = app(ProductCalculator::class);
-        return $productCalculator->setProduct($this)->setChannel($channel)->getOriginalPrice();
+        /** @var  $priceCalculation PriceCalculation */
+        $priceCalculation = app(PriceCalculation::class);
+        return $priceCalculation->setProduct($this)->setChannel($channel)->getWebstoreOriginalPrice();
     }
 
     public function getDiscountedPrice($channel = 2)
     {
-        /** @var  $productCalculator ProductCalculator */
-        $productCalculator = app(ProductCalculator::class);
-        return $productCalculator->setProduct($this)->setChannel($channel)->getDiscountedPrice();
+        /** @var  $priceCalculation PriceCalculation */
+        $priceCalculation = app(PriceCalculation::class);
+        return $priceCalculation->setProduct($this)->setChannel($channel)->getWebstoreDiscountedPrice();
     }
 
 
     public function getRatingandCount()
     {
-        return  app(ProductCalculator::class)->getProductRatingReview($this);
+        return  app(PriceCalculation::class)->getProductRatingReview($this);
     }
 
     public function getOriginalPriceWithVat()

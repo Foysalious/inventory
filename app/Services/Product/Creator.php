@@ -55,6 +55,7 @@ class Creator
     private $hasVariants;
     private ?UploadedFile $app_thumb;
     private ?string $app_thumb_url = null;
+    private $apiRequest;
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
@@ -263,6 +264,11 @@ class Creator
         return $this;
     }
 
+    public function setApiRequest($apiRequest){
+        $this->apiRequest= $apiRequest;
+        return $this;
+    }
+
     /**
      * @return mixed
      */
@@ -466,7 +472,8 @@ class Creator
             'warranty' => $this->warranty ?: 0,
             'warranty_unit' => $this->warrantyUnit ?: WarrantyUnits::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
-            'unit_id' => $this->unitId
+            'unit_id' => $this->unitId,
+            'api_request_id' => $this->apiRequest
         ];
        if ($this->app_thumb_url)  $data = array_merge($data, ['app_thumb' => $this->app_thumb_url ?? null]);
        return $data;
