@@ -7,6 +7,7 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Models\Partner;
 use App\Models\Sku;
 use App\Services\AccessManager\AccessManager;
+use App\Services\AccessManager\Features;
 use App\Services\Channel\Channels;
 use App\Services\Discount\Types;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
@@ -340,7 +341,7 @@ class Creator
         foreach ($channels as $channel) {
             if ($channel == Channels::WEBSTORE) $this->accessManager
                 ->setPartnerId($this->partnerId)
-                ->setFeature('pos.ecom.product_publish')
+                ->setFeature(Features::PRODUCT_WEBSTORE_PUBLISH)
                 ->setProductPublishedCount($this->partnerRepository->getPartnerPublishedProductsCount($this->partnerId))
                 ->checkAccess();
             array_push($product_channels, [
