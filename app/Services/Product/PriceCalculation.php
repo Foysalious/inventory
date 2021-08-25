@@ -15,10 +15,10 @@ class PriceCalculation extends BaseService
 {
     private Product $product;
     private Sku $sku;
-    private Channel $channel;
     private SkuChannelRepositoryInterface $skuChannelRepositoryInterface;
     private SkuChannel $skuChannel;
     private ?Discount $discount = null;
+    private $channel;
 
     /**
      * PriceCalculation constructor.
@@ -50,11 +50,7 @@ class PriceCalculation extends BaseService
         return $this;
     }
 
-    /**
-     * @param Channel $channel
-     * @return PriceCalculation
-     */
-    public function setChannel(Channel $channel): PriceCalculation
+    public function setChannel($channel): PriceCalculation
     {
         $this->channel = $channel;
         return $this;
@@ -176,4 +172,11 @@ class PriceCalculation extends BaseService
         } catch (GuzzleException $exception) {
         }
     }
+    public function getOriginalPrice()
+    {
+        return  $this->skuChannelRepositoryInterface->builder()->where('channel_id', $this->channel)->wherehas('sku',function ($q){
+            $q->where('product_id',$this->product->id);
+        })->get()->min('price');
+    }
+
 }

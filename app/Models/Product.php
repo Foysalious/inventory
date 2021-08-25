@@ -2,6 +2,7 @@
 
 use App\Events\ProductCreated;
 use App\Services\Product\PriceCalculation;
+use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
 use Dyrynda\Database\Support\CascadeSoftDeletes;
@@ -105,8 +106,7 @@ class Product extends BaseModel
     public function getOriginalPrice($channel = 2)
     {
         /** @var  $priceCalculation PriceCalculation */
-        $priceCalculation = app(PriceCalculation::class);
-        return $priceCalculation->setProduct($this)->setChannel($channel)->getWebstoreOriginalPrice();
+        return  app(PriceCalculation::class)->setProduct($this)->setChannel($channel)->getOriginalPrice();
     }
 
     public function getDiscountedPrice($channel = 2)
