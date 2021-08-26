@@ -2,12 +2,8 @@
 
 use App\Exceptions\AuthorizationException;
 use App\Interfaces\DiscountRepositoryInterface;
-use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
-use App\Models\Partner;
 use App\Models\Sku;
-use App\Services\AccessManager\AccessManager;
-use App\Services\AccessManager\Features;
 use App\Services\Channel\Channels;
 use App\Services\Discount\Types;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
@@ -63,7 +59,7 @@ class Creator
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
                                 ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator,
                                 protected SkuBatchCreator $skuBatchCreator, protected ProductUpdateLogCreateRequest $logCreateRequest,
-                                protected AccessManager $accessManager, protected PartnerRepositoryInterface $partnerRepository
+                                protected CheckProductPublishAccess $productPublishAccess
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -338,12 +334,8 @@ class Creator
     {
         $product_channels = [];
         $channels = array_unique($channels);
+        if (in_array(Channels::WEBSTORE, $channels)) $this->productPublishAccess->check($this->partnerId);
         foreach ($channels as $channel) {
-            if ($channel == Channels::WEBSTORE) $this->accessManager
-                ->setPartnerId($this->partnerId)
-                ->setFeature(Features::PRODUCT_WEBSTORE_PUBLISH)
-                ->setProductPublishedCount($this->partnerRepository->getPartnerPublishedProductsCount($this->partnerId))
-                ->checkAccess();
             array_push($product_channels, [
                 'channel_id' => $channel,
                 'product_id' => $product_id
