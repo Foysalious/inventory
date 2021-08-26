@@ -14,6 +14,7 @@ use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
 use App\Services\Usage\Types;
 use App\Services\Usage\UsageService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -71,7 +72,7 @@ class ProductService extends BaseService
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
             ->setSubCategoryIds($sub_category_ids)
-            ->setUpdatedAfter(convertTimezone($request->updated_after))
+            ->setUpdatedAfter(convertTimezone(Carbon::parse($request->updated_after), 'UTC'))
             ->setWebstorePublicationStatus($request->is_published_for_webstore)
             ->setOffset($offset)
             ->setLimit($limit);
