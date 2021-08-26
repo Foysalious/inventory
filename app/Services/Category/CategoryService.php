@@ -60,7 +60,7 @@ class CategoryService extends BaseService
      */
     public function getCategoriesByPartner($partner_id, $request): JsonResponse
     {
-        $updated_after = convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC');
+        $updated_after = $request->has('updated_after') ? convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC') : null;
         $categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id,$updated_after);
         if ($categories->isEmpty()) {
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');

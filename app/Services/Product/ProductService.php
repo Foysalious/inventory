@@ -66,13 +66,14 @@ class ProductService extends BaseService
      */
     public function getProducts($partner_id, Request $request): JsonResponse
     {
+        $updated_after = $request->has('updated_after') ? convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC') : null;
         list($offset, $limit) = calculatePagination($request);
         $category_ids = !is_array($request->category_ids) ? json_decode($request->category_ids,1) : $request->category_ids;
         $sub_category_ids = !is_array($request->sub_category_ids) ? json_decode($request->sub_category_ids,1) : $request->sub_category_ids;
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
             ->setSubCategoryIds($sub_category_ids)
-            ->setUpdatedAfter(convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC'))
+            ->setUpdatedAfter($updated_after)
             ->setWebstorePublicationStatus($request->is_published_for_webstore)
             ->setOffset($offset)
             ->setLimit($limit);
