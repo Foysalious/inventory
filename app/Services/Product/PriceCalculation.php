@@ -49,8 +49,12 @@ class PriceCalculation extends BaseService
         $this->sku = $sku;
         return $this;
     }
-
-    public function setChannel($channel): PriceCalculation
+    public function setChannel(Channel $channel): PriceCalculation
+    {
+        $this->channel = $channel;
+        return $this;
+    }
+    public function setWebstoreChannel($channel): PriceCalculation
     {
         $this->channel = $channel;
         return $this;
