@@ -72,7 +72,7 @@ class ProductService extends BaseService
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
             ->setSubCategoryIds($sub_category_ids)
-            ->setUpdatedAfter(convertTimezone(Carbon::parse($request->updated_after), 'UTC'))
+            ->setUpdatedAfter(convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC'))
             ->setWebstorePublicationStatus($request->is_published_for_webstore)
             ->setOffset($offset)
             ->setLimit($limit);
