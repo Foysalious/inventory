@@ -106,7 +106,7 @@ class Product extends BaseModel
     public function getOriginalPrice($channel = 2)
     {
         /** @var  $priceCalculation PriceCalculation */
-        return  app(PriceCalculation::class)->setProduct($this)->setChannel($channel)->getOriginalPrice();
+        return  app(PriceCalculation::class)->setProduct($this)->setWebstoreChannel($channel)->getOriginalPrice();
     }
 
     public function getDiscountedPrice($channel = 2)
