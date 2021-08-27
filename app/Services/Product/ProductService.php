@@ -4,7 +4,6 @@ use App\Events\Accounting\ProductStockAdded;
 use App\Events\Accounting\ProductStockUpdated;
 use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
-use App\Helper\Miscellaneous\RequestIdentification;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
 use App\Http\Resources\WebstoreProductResource;
@@ -17,6 +16,7 @@ use App\Services\BaseService;
 use App\Services\Product\Constants\Log\FieldType;
 use App\Services\Usage\Types;
 use App\Services\Usage\UsageService;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -25,9 +25,6 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
 {
-    private const PRODUCT_CREATE_REWARD_EVENT_NAME = 'pos_inventory_create';
-    private const PRODUCT_CREATE_REWARDABLE_TYPE = 'partner';
-
     /** @var ProductRepositoryInterface */
     protected ProductRepositoryInterface $productRepositoryInterface;
     /** @var Creator */
@@ -52,7 +49,6 @@ class ProductService extends BaseService
         ProductCombinationService $productCombinationService,
         ProductList $productList,
         protected CategoryRepository $categoryRepository,
-        protected ApiServerClient $apiServerClient,
         protected UsageService $usageService
     )
     {
@@ -73,13 +69,14 @@ class ProductService extends BaseService
      */
     public function getProducts($partner_id, Request $request): JsonResponse
     {
+        $updated_after = $request->has('updated_after') ? convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC') : null;
         list($offset, $limit) = calculatePagination($request);
         $category_ids = !is_array($request->category_ids) ? json_decode($request->category_ids,1) : $request->category_ids;
         $sub_category_ids = !is_array($request->sub_category_ids) ? json_decode($request->sub_category_ids,1) : $request->sub_category_ids;
         $this->productList->setPartnerId($partner_id)
             ->setCategoryIds($category_ids)
             ->setSubCategoryIds($sub_category_ids)
-            ->setUpdatedAfter(convertTimezone($request->updated_after))
+            ->setUpdatedAfter($updated_after)
             ->setWebstorePublicationStatus($request->is_published_for_webstore)
             ->setOffset($offset)
             ->setLimit($limit);
@@ -129,28 +126,14 @@ class ProductService extends BaseService
             ->setAppThumb($request->app_thumb)
             ->setProductRequestObjects($product_create_request_objs)
             ->setHasVariant($has_variant)
-            ->setAccountingInfo($request->accounting_info)
+            ->setApiRequest($request->api_request->id)
             ->create();
-
-        if ($product && $request->has('accounting_info')) {
-            event(new ProductStockAdded($product,$request));
-        }
-       // $this->callRewardApi($partnerId);
-        $this->usageService->setUserId((int) $partnerId)->setUsageType(Types::INVENTORY_CREATE)->store();
-        return $this->success("Successful", [], 201);
+            
+            if ($product && $request->has('accounting_info')) {
+                event(new ProductStockAdded($product,$request));
+            }
+            return $this->success("Successful", ['product' => $product], 201);
     }
-
-    private function callRewardApi($partnerId)
-    {
-        $data = [
-            'event' => self::PRODUCT_CREATE_REWARD_EVENT_NAME,
-            'rewardable_type' => self::PRODUCT_CREATE_REWARDABLE_TYPE,
-            'rewardable_id' => $partnerId,
-            'event_data' => ['portal_name' => (new RequestIdentification())->get()['portal_name']]
-        ];
-        $this->apiServerClient->setBaseUrl()->post('pos/v1/reward/action', $data);
-    }
-
 
     /**
      * @param $productId
@@ -316,5 +299,4 @@ class ProductService extends BaseService
     {
         return $this->categoryRepository->whereIn('id', [$old_field, $new_field])->get('name');
     }
-
 }

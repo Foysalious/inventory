@@ -11,6 +11,7 @@ use App\Interfaces\ProductRepositoryInterface;
 use App\Repositories\CategoryRepository;
 use App\Interfaces\CategoryPartnerRepositoryInterface;
 use App\Services\BaseService;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -59,7 +60,7 @@ class CategoryService extends BaseService
      */
     public function getCategoriesByPartner($partner_id, $request): JsonResponse
     {
-        $updated_after = $request->updated_after;
+        $updated_after = $request->has('updated_after') ? convertTimezone(Carbon::parse($request->updated_after)->shiftTimezone('Asia/Dhaka'), 'UTC') : null;
         $categories = $this->categoryRepositoryInterface->getCategoriesByPartner($partner_id,$updated_after);
         if ($categories->isEmpty()) {
             throw new CategoryNotFoundException('কোন ক্যাটাগরি যোগ করা হয়নি!');

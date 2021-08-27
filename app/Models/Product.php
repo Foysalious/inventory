@@ -1,5 +1,7 @@
 <?php namespace App\Models;
 
+use App\Events\ProductCreated;
+use App\Services\Product\PriceCalculation;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
 use Carbon\Carbon;
@@ -9,12 +11,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+
+
 Relation::morphMap(['product'=>'App\Models\Product']);
 
 class Product extends BaseModel
 {
     use HasFactory, SoftDeletes, CascadeSoftDeletes;
 
+    public static  $createdEventClass = ProductCreated::class;
 
     protected $guarded = ['id'];
     protected $casts = ['vat_percentage' => 'double'];
@@ -90,7 +95,7 @@ class Product extends BaseModel
 
     public function collectionIds()
     {
-        return $this->collection ? $this->collection->pluck('id') : [];
+        return $this->collections ? $this->collections->pluck('id') : [];
     }
 
     public function unit ()
@@ -100,22 +105,21 @@ class Product extends BaseModel
 
     public function getOriginalPrice($channel = 2)
     {
-        /** @var  $productCalculator ProductCalculator */
-        $productCalculator = app(ProductCalculator::class);
-        return $productCalculator->setProduct($this)->setChannel($channel)->getOriginalPrice();
+        /** @var  $priceCalculation PriceCalculation */
+        return  app(PriceCalculation::class)->setProduct($this)->setWebstoreChannel($channel)->getOriginalPrice();
     }
 
     public function getDiscountedPrice($channel = 2)
     {
-        /** @var  $productCalculator ProductCalculator */
-        $productCalculator = app(ProductCalculator::class);
-        return $productCalculator->setProduct($this)->setChannel($channel)->getDiscountedPrice();
+        /** @var  $priceCalculation PriceCalculation */
+        $priceCalculation = app(PriceCalculation::class);
+        return $priceCalculation->setProduct($this)->setWebstoreChannel($channel)->getWebstoreDiscountedPrice();
     }
 
 
     public function getRatingandCount()
     {
-        return  app(ProductCalculator::class)->getProductRatingReview($this);
+        return  app(PriceCalculation::class)->getProductRatingReview($this);
     }
 
     public function getOriginalPriceWithVat()

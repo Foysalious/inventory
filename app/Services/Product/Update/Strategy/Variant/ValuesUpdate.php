@@ -3,12 +3,15 @@
 
 use App\Interfaces\CombinationRepositoryInterface;
 use App\Interfaces\DiscountRepositoryInterface;
+use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductOptionValueRepositoryInterface;
 use App\Interfaces\SkuChannelRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
 use App\Repositories\SkuBatchRepository;
+use App\Services\AccessManager\AccessManager;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Discount\Types;
+use App\Services\Product\CheckProductPublishAccess;
 use App\Services\Product\CombinationCreator;
 use App\Services\Product\CombinationUpdateDetailsObject;
 use App\Services\Product\ProductChannelCreator;
@@ -33,6 +36,7 @@ class ValuesUpdate extends VariantProductUpdate
         protected DiscountRepositoryInterface $discountRepository,
         protected DiscountCreator $discountCreator,
         protected ProductChannelCreator $productChannelCreator,
+        protected CheckProductPublishAccess $productPublishAccess,
         protected CombinationCreator $combinationCreator,
         protected ProductOptionCreator $productOptionCreator,
         protected ProductOptionValueCreator $productOptionValueCreator,
@@ -49,6 +53,7 @@ class ValuesUpdate extends VariantProductUpdate
             $discountRepository,
             $discountCreator,
             $productChannelCreator,
+            $productPublishAccess,
             $combinationCreator,
             $productOptionCreator,
             $productOptionValueCreator);

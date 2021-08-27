@@ -2,11 +2,8 @@
 
 use App\Exceptions\AuthorizationException;
 use App\Interfaces\DiscountRepositoryInterface;
-use App\Interfaces\PartnerRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
-use App\Models\Partner;
 use App\Models\Sku;
-use App\Services\AccessManager\AccessManager;
 use App\Services\Channel\Channels;
 use App\Services\Discount\Types;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
@@ -57,13 +54,14 @@ class Creator
     private $hasVariants;
     private ?UploadedFile $app_thumb;
     private ?string $app_thumb_url = null;
+    private $apiRequest;
 
     public function __construct(ProductRepositoryInterface $productRepositoryInterface,ProductOptionCreator $productOptionCreator,
                                 ProductOptionValueCreator $productOptionValueCreator,CombinationCreator $combinationCreator,
                                 DiscountCreator $discountCreator, ProductImageCreator $productImageCreator,
                                 ProductChannelCreator $productChannelCreator, DiscountRepositoryInterface $discountRepositoryInterface, private SkuCreator $skuCreator,
                                 protected SkuBatchCreator $skuBatchCreator, protected ProductUpdateLogCreateRequest $logCreateRequest,
-                                protected AccessManager $accessManager, protected PartnerRepositoryInterface $partnerRepository
+                                protected CheckProductPublishAccess $productPublishAccess
     )
     {
         $this->productRepositoryInterface = $productRepositoryInterface;
@@ -265,6 +263,11 @@ class Creator
         return $this;
     }
 
+    public function setApiRequest($apiRequest){
+        $this->apiRequest= $apiRequest;
+        return $this;
+    }
+
     /**
      * @param mixed $accounting_info
      */
@@ -340,12 +343,8 @@ class Creator
     {
         $product_channels = [];
         $channels = array_unique($channels);
+        if (in_array(Channels::WEBSTORE, $channels)) $this->productPublishAccess->check($this->partnerId);
         foreach ($channels as $channel) {
-            if ($channel == Channels::WEBSTORE) $this->accessManager
-                ->setPartnerId($this->partnerId)
-                ->setFeature('pos.ecom.product_publish')
-                ->setProductPublishedCount($this->partnerRepository->getPartnerPublishedProductsCount($this->partnerId))
-                ->checkAccess();
             array_push($product_channels, [
                 'channel_id' => $channel,
                 'product_id' => $product_id
@@ -475,7 +474,8 @@ class Creator
             'warranty' => $this->warranty ?: 0,
             'warranty_unit' => $this->warrantyUnit ?: WarrantyUnits::DAY,
             'vat_percentage' => $this->vatPercentage ?: 0,
-            'unit_id' => $this->unitId
+            'unit_id' => $this->unitId,
+            'api_request_id' => $this->apiRequest
         ];
        if ($this->app_thumb_url)  $data = array_merge($data, ['app_thumb' => $this->app_thumb_url ?? null]);
        return $data;
