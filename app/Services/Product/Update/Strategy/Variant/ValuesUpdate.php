@@ -85,12 +85,12 @@ class ValuesUpdate extends VariantProductUpdate
         }
     }
 
-    protected function deleteSkusStockBatch(array $sku_ids)
+    protected function deleteSkusStockBatch(mixed $sku_ids)
     {
         $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
     }
 
-    protected function deleteSkuChannelDiscount(array $skus_channels_to_delete)
+    protected function deleteSkuChannelDiscount(mixed $skus_channels_to_delete)
     {
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
