@@ -290,7 +290,7 @@ class Creator
                 $this->createProductDiscount($product);
             if ($this->images)
                 $this->createImageGallery($product);
-//            DB::commit();
+            DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;

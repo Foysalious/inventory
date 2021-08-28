@@ -13,5 +13,7 @@ interface ProductUpdateStrategy
 
     public function setDeletedValues(?array $deletedValues): ProductUpdateStrategy;
 
+    public function setAccountingInfo(?array $accountingInfo): ProductUpdateStrategy;
+
     public function update();
 }

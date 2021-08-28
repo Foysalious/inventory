@@ -34,18 +34,26 @@ class ProductStockBatchUpdater
     /**
      * @throws UnknownProperties
      */
-    public function createBatchStock(Sku $sku, ProductUpdateDetailsObjects $productDetailObject)
+    public function createBatchStock(Sku $sku, ProductUpdateDetailsObjects $productDetailObject, ?array $accounting_info)
     {
         $this->skuBatchCreator->create(new SkuBatchDto([
             'sku_id' => $sku->id,
             'cost' => $productDetailObject->getCost(),
             'stock' => $productDetailObject->getStock(),
+            'from_account' => $accounting_info['from_account'] ?? null,
+            'supplier_id' => $accounting_info['supplier_id'] ?? null,
         ]));
     }
 
-    public function updateBatchStock($old_sku, mixed $stock)
+    public function updateBatchStock($old_sku, ProductUpdateDetailsObjects $sku)
     {
-        if(!$old_sku) return;
-        $this->skuBatchRepository->where('sku_id', $old_sku)->orderByDesc('created_at')->first()->update(['stock' => $stock]);
+        if(!$old_sku) {
+            return;
+        }
+        $data = [
+            'cost' => $sku->getCost(),
+            'stock' => $sku->getStock(),
+        ];
+        $this->skuBatchRepository->where('sku_id', $old_sku)->orderByDesc('created_at')->first()->update($data);
     }
 }

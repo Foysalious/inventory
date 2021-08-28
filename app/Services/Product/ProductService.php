@@ -128,7 +128,7 @@ class ProductService extends BaseService
             ->setHasVariant($has_variant)
             ->setApiRequest($request->api_request->id)
             ->create();
-            
+
             if ($product && $request->has('accounting_info')) {
                 event(new ProductStockAdded($product,$request));
             }
@@ -167,6 +167,7 @@ class ProductService extends BaseService
             ->setDeletedImages($request->deleted_images)
             ->setProductUpdateRequestObjects($product_update_request_objs)
             ->setHasVariant($has_variant)
+            ->setAccountingInfo($request->accounting_info ?? null)
             ->update();
 
         if($product && $request->has('accounting_info')) {

@@ -52,7 +52,7 @@ class OptionsUpdate extends VariantProductUpdate
             $channels = $this->createSkuChannels($sku, $productDetailObject->getChannelData());
             array_push($all_channels, $channels);
             $this->createCombination($sku->id, $product_option_value_ids);
-            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject);
+            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject, $this->accountingInfo);
         }
         $all_channels = array_merge(... $all_channels);
         $this->createProductChannel($product->id, $all_channels);

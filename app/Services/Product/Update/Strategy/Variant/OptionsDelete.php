@@ -24,6 +24,6 @@ class OptionsDelete extends OptionsUpdate
         $sku = $this->createSku($this->product, $this->updateDataObjects[0]);
         $channels = $this->createSKUChannels($sku, $this->updateDataObjects[0]->getChannelData());
         $this->createProductChannel($this->product->id, $channels);
-        $this->productStockBatchUpdater->createBatchStock($sku, $this->updateDataObjects[0]);
+        $this->productStockBatchUpdater->createBatchStock($sku, $this->updateDataObjects[0],$this->accountingInfo);
     }
 }
