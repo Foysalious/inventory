@@ -37,7 +37,9 @@ if (!function_exists('convertTimezone')) {
      */
     function convertTimezone(?Carbon $datetime, string $timezone = 'Asia/Dhaka'): ?Carbon
     {
-        if (!$datetime) return null;
+        if (!$datetime) {
+            return null;
+        }
         return $datetime->timezone($timezone);
 
     }

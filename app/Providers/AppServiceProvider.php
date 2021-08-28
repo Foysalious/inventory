@@ -27,7 +27,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (config('l5-swagger.swagger_on_dev') == true){
+        if (config('l5-swagger.swagger_on_dev')){
             URL::forceScheme('https');
         }
         JsonResource::withoutWrapping();

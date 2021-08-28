@@ -30,20 +30,9 @@ class RewardOnProductCreate extends Job implements ShouldQueue
             'rewardable_id' => $this->model->partner_id,
             //'event_data' => $this->model->apiRequest->portal_name
         ];
-        try{
-            $client = new Client();
-            $client->post(config('sheba.api_url').'/pos/v1/reward/action',$data);
-        }catch (GuzzleException $e){}
+        $client = new Client();
+        $client->post(config('sheba.api_url').'/pos/v1/reward/action',$data);
 
     }
 
-    public function getJobId()
-    {
-        // TODO: Implement getJobId() method.
-    }
-
-    public function getRawBody()
-    {
-        // TODO: Implement getRawBody() method.
-    }
 }
