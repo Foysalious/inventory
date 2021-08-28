@@ -30,6 +30,7 @@ abstract class ProductUpdate implements ProductUpdateStrategy
     protected array $updateDataObjects;
     protected ?array $deletedValues;
     protected ?array $channels = [];
+    protected ?array $accountingInfo;
 
     public function __construct(
         protected SkuRepositoryInterface $skuRepository,
@@ -80,6 +81,12 @@ abstract class ProductUpdate implements ProductUpdateStrategy
     public function getDeletedValues(): ?array
     {
         return $this->deletedValues;
+    }
+
+    public function setAccountingInfo(?array $accountingInfo): ProductUpdateStrategy
+    {
+        $this->accountingInfo = $accountingInfo;
+        return $this;
     }
 
 

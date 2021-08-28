@@ -38,6 +38,8 @@ class Creator
     protected $price;
     protected $stock;
     protected $channelIds;
+    protected $accounting_info;
+
     /** @var ProductImageCreator */
     protected ProductImageCreator $productImageCreator;
     /** @var DiscountCreator */
@@ -267,6 +269,14 @@ class Creator
     }
 
     /**
+     * @param mixed $accounting_info
+     */
+    public function setAccountingInfo($accounting_info)
+    {
+        $this->accounting_info = json_decode($accounting_info,true);
+        return $this;
+    }
+    /**
      * @return mixed
      */
     public function create()
@@ -281,7 +291,6 @@ class Creator
             if ($this->images)
                 $this->createImageGallery($product);
             DB::commit();
-            return $product;
         } catch (\Exception $e) {
             DB::rollback();
             throw $e;
@@ -478,6 +487,8 @@ class Creator
             "sku_id" => $sku->id,
             "stock" => $product_detail_object->getStock() ?: 0,
             "cost" => $product_detail_object->getCost() ?: 0,
+            "supplier_id" => $this->accounting_info['supplier_id'] ?? null,
+            "from_account" => $this->accounting_info['from_account'] ?? null,
         ]));
     }
 

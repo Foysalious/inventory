@@ -86,7 +86,7 @@ class ChannelUpdateDetailsObjects
     public function build()
     {
         if(!$this->validate())
-            throw new ProductDetailsPropertyValidationError();
+            throw new ProductDetailsPropertyValidationError('Channel data in Product details structure is not correct');
         $this->price = $this->channelDetails->price;
         $this->wholeSalePrice = $this->channelDetails->wholesale_price;
         $this->channelId = $this->channelDetails->channel_id;

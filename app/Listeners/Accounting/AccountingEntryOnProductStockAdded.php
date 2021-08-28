@@ -1,6 +1,6 @@
-<?php namespace App\Listeners;
+<?php namespace App\Listeners\Accounting;
 
-use App\Events\ProductStockAdded;
+use App\Events\Accounting\ProductStockAdded;
 use App\Services\Accounting\StockAddEntry;
 
 class AccountingEntryOnProductStockAdded
@@ -25,6 +25,6 @@ class AccountingEntryOnProductStockAdded
      */
     public function handle(ProductStockAdded $event)
     {
-        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequest())->createEntry();
+        $this->stockEntry->setProduct($event->getProduct())->setData($event->getRequestObject())->createEntry();
     }
 }

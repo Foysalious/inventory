@@ -12,6 +12,7 @@ class Updater
     protected array $updateDataObjects;
     private ?array $deletedValues;
     protected bool $hasVariant;
+    protected ?array $accountingInfo;
 
     /**
      * @param ProductUpdateStrategy $strategy
@@ -63,8 +64,18 @@ class Updater
         return $this;
     }
 
+    /**
+     * @param array|null $accountingInfo
+     * @return Updater
+     */
+    public function setAccountingInfo(?array $accountingInfo)
+    {
+        $this->accountingInfo = $accountingInfo;
+        return $this;
+    }
+
     public function update()
     {
-        $this->strategy->setProduct($this->product)->setHasVariant($this->hasVariant)->setUpdatedDataObjects($this->updateDataObjects)->setDeletedValues($this->deletedValues)->update();
+        $this->strategy->setProduct($this->product)->setHasVariant($this->hasVariant)->setUpdatedDataObjects($this->updateDataObjects)->setDeletedValues($this->deletedValues)->setAccountingInfo($this->accountingInfo)->update();
     }
 }

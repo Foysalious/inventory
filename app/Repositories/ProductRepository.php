@@ -1,10 +1,13 @@
 <?php namespace App\Repositories;
 
 use App\Interfaces\ProductRepositoryInterface;
+use App\Interfaces\SkuBatchRepositoryInterface;
 use App\Models\Product;
 use App\Models\SkuChannel;
 use App\Services\Channel\Channels;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
+use function Symfony\Component\Translation\t;
 
 class ProductRepository extends BaseRepository implements ProductRepositoryInterface
 {
@@ -86,4 +89,29 @@ class ProductRepository extends BaseRepository implements ProductRepositoryInter
         ]);
     }
 
+    public function getStockDataForAccounting(Product $product)
+    {
+        $data = [];
+        $data['total_quantity'] = 0;
+        $data['total_cost'] = 0;
+        /** @var SkuBatchRepository $batch_repo */
+        $batch_repo = App::make(SkuBatchRepositoryInterface::class);
+        $batches = $batch_repo->whereIn('sku_id', $product->skus()->pluck('id'))->orderBy('id', 'desc')->get();
+        $supplier_taken = false;
+        foreach ($batches as $batch) {
+            if (!$supplier_taken) {
+                $data['supplier_id'] = $batch->supplier_id;
+                $data['from_account'] = $batch->from_account;
+                $supplier_taken = true;
+            }
+            $temp['id'] = $product->id;
+            $temp['name'] = $product->name;
+            $temp['quantity'] = $batch->stock;
+            $temp['unit_price'] = $batch->cost;
+            $data['total_quantity'] += $batch->stock;
+            $data['total_cost'] += $batch->stock * $batch->cost ;
+            $data ['returned_stock'] [] = $temp;
+        }
+        return $data;
+    }
 }

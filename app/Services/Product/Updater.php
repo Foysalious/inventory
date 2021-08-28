@@ -40,6 +40,7 @@ class Updater
     protected $discountEndDate;
     protected $images;
     protected $deletedImages;
+    protected ?array $accountingInfo;
 
 
     /**
@@ -217,6 +218,18 @@ class Updater
         return $this;
     }
 
+    /**
+     * @param string|null $accountingInfo
+     * @return Updater
+     */
+    public function setAccountingInfo(?string $accountingInfo)
+    {
+        $this->accountingInfo = json_decode($accountingInfo,true);
+        return $this;
+    }
+    /**
+     * @throws \Exception
+     */
     public function update()
     {
         try {
@@ -231,6 +244,7 @@ class Updater
                 ->setHasVariant($this->hasVariants)
                 ->setUpdatedDataObjects($this->productUpdateRequestObjects)
                 ->setDeletedValues($this->strategyFactory->getDeletedValues())
+                ->setAccountingInfo($this->accountingInfo)
                 ->update();
             $updatedProductResource = new WebstoreProductResource($this->product);
             $this->logCreateRequest->setOldProductDetails($oldProductDetails)
@@ -241,6 +255,7 @@ class Updater
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
+            throw $e;
         }
 
     }

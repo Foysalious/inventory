@@ -85,12 +85,12 @@ class ValuesUpdate extends VariantProductUpdate
         }
     }
 
-    protected function deleteSkusStockBatch(array $sku_ids)
+    protected function deleteSkusStockBatch(mixed $sku_ids)
     {
         $this->skuBatchRepository->whereIn('sku_id', $sku_ids)->delete();
     }
 
-    protected function deleteSkuChannelDiscount(array $skus_channels_to_delete)
+    protected function deleteSkuChannelDiscount(mixed $skus_channels_to_delete)
     {
         $this->discountRepository->whereIn('type_id', $skus_channels_to_delete)->where('type', Types::SKU_CHANNEL)->delete();
     }
@@ -124,7 +124,7 @@ class ValuesUpdate extends VariantProductUpdate
             $sku = $this->createSku($this->product, $productDetailObject);
             $this->createSkuChannels($sku, $sku_channels);
             $this->createCombination($sku->id, $product_option_value_ids);
-            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject);
+            $this->productStockBatchUpdater->createBatchStock($sku, $productDetailObject, $this->accountingInfo);
         }
     }
 
@@ -149,10 +149,8 @@ class ValuesUpdate extends VariantProductUpdate
         foreach ($combination as $option_values) {
             array_push($old_product_option_value_ids, $option_values->getOptionValueId());
         }
-        $stock = $sku->getStock();
         $old_sku = $this->combinationRepository->whereIn('product_option_value_id', $old_product_option_value_ids)->pluck('sku_id')->first();
-        $this->skuRepository->where('id', $old_sku)->update(['stock' => $stock]);
-        $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
+        $this->productStockBatchUpdater->updateBatchStock($old_sku, $sku);
         return $old_sku;
     }
 
@@ -170,9 +168,8 @@ class ValuesUpdate extends VariantProductUpdate
             foreach ($combination as $option_values) {
                 array_push($old_product_option_value_ids, $option_values->getOptionValueId());
             }
-            $stock = $sku->getStock();
             $old_sku = $this->combinationRepository->whereIn('product_option_value_id', $old_product_option_value_ids)->pluck('sku_id')->first();
-            $this->productStockBatchUpdater->updateBatchStock($old_sku, $stock);
+            $this->productStockBatchUpdater->updateBatchStock($old_sku, $sku);
         }
         return [$is_old, $old_sku];
     }

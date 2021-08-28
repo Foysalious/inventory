@@ -1,5 +1,7 @@
 <?php namespace App\Services\Product;
 
+use App\Events\Accounting\ProductStockAdded;
+use App\Events\Accounting\ProductStockUpdated;
 use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
@@ -18,6 +20,7 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class ProductService extends BaseService
@@ -125,6 +128,10 @@ class ProductService extends BaseService
             ->setHasVariant($has_variant)
             ->setApiRequest($request->api_request->id)
             ->create();
+
+            if ($product && $request->has('accounting_info')) {
+                event(new ProductStockAdded($product,$request));
+            }
             return $this->success("Successful", ['product' => $product], 201);
     }
 
@@ -137,9 +144,10 @@ class ProductService extends BaseService
     public function update($productId, ProductUpdateRequest $request, $partner): JsonResponse
     {
         $default_sub_category = $this->getDefaultSubCategory($partner, $request->category_id);
-        $product = $this->productRepositoryInterface->findOrFail($productId);
-        if($product->partner_id != $partner)
+        $product = $this->productRepositoryInterface->where('id', $productId)->where('partner_id', $partner)->with('skus')->first();
+        if(is_null($product))
             return $this->error("This product does not belong this partner", 403);
+        $old_stock_data = $this->productRepositoryInterface->getStockDataForAccounting($product);
         /** @var ProductUpdateRequestObjects $productUpdateRequestObjects */
         $productUpdateRequestObjects = app(ProductUpdateRequestObjects::class);
         /** @var ProductUpdateDetailsObjects[] $product_update_request_objs */
@@ -159,11 +167,12 @@ class ProductService extends BaseService
             ->setDeletedImages($request->deleted_images)
             ->setProductUpdateRequestObjects($product_update_request_objs)
             ->setHasVariant($has_variant)
+            ->setAccountingInfo($request->accounting_info ?? null)
             ->update();
 
-//        if($product && $request->has('accounting_info')) {
-//            event(new ProductStockUpdated($product,$request));
-//        }
+        if($product && $request->has('accounting_info')) {
+            event(new ProductStockUpdated($product,$request,$old_stock_data));
+        }
 
         return $this->success("Successful", [],200);
     }

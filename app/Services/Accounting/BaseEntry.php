@@ -3,6 +3,8 @@
 use App\Helper\Miscellaneous\RequestIdentification;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
+use App\Http\Requests\SkuStockAddRequest;
+use App\Http\Requests\SkuStockUpdateRequest;
 use App\Models\Product;
 use App\Repositories\Accounting\AccountingRepository;
 use App\Services\Accounting\Constants\EntryTypes;
@@ -15,9 +17,9 @@ class BaseEntry
     use ModificationFields;
     protected AccountingRepository $accountingRepository;
     protected Product $product;
-    protected array $productDetails;
     protected array $accountingInfo;
     protected array $data;
+    protected ProductUpdateRequest | SkuStockAddRequest | ProductRequest $requestObject;
 
 
     /**
@@ -35,8 +37,8 @@ class BaseEntry
      */
     public function setData(Request $request)
     {
-        $this->productDetails = (json_decode($request->product_details,true))[0];
         $this->accountingInfo = json_decode($request->accounting_info,true);
+        $this->requestObject = $request;
         return $this;
     }
 
@@ -58,8 +60,8 @@ class BaseEntry
             'debit_account_key'  => $this->product->id,
             'note' =>  $this->accountingInfo['note'] ?? null,
             'source_type'        => EntryTypes::INVENTORY,
-            'total_discount'     => (double) isset($this->accountingInfo['total_discount']) ? $this->accountingInfo['total_discount'] :  null ,
-            'total_vat'          => (double) isset($this->accountingInfo['total_vat']) ? $this->accountingInfo['total_vat'] :  null,
+            'total_discount'     => (double) isset($this->accountingInfo['total_discount']) ? $this->accountingInfo['total_discount'] :  0 ,
+            'total_vat'          => (double) isset($this->accountingInfo['total_vat']) ? $this->accountingInfo['total_vat'] :  0,
             'entry_at' => $this->accountingInfo['date'] ?? $this->product->created_at->format('Y-m-d H:i:s'),
             'customer_id' =>    $this->accountingInfo['supplier_id'],
             'customer_name' => $this->accountingInfo['supplier_name'] ?? null,

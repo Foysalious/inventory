@@ -10,7 +10,7 @@ class Sku extends BaseModel
 
     protected $guarded = ['id'];
     protected $casts = ['stock' => 'double'];
-    protected $cascadeDeletes = ['combinations', 'skuChannels'];
+    protected $cascadeDeletes = ['combinations', 'skuChannels', 'skuBatches'];
 
     public function skuChannels()
     {

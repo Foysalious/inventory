@@ -1,6 +1,8 @@
 <?php namespace App\Interfaces;
 
 
+use App\Models\Product;
+
 interface ProductRepositoryInterface extends BaseRepositoryInterface
 {
     public function getProductsByCategoryId($category_id);
@@ -16,4 +18,5 @@ interface ProductRepositoryInterface extends BaseRepositoryInterface
      */
     public function searchProductFromWebstore(string $searchKey, int $partnerId, $limit = 10, $offset = 0);
     public function getProductsByPartnerQuery(int $partnerId);
+    public function getStockDataForAccounting(Product $product);
 }
