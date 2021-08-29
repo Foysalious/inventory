@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 use App\Events\ProductCreated;
+use App\Services\Channel\Channels;
 use App\Services\Product\PriceCalculation;
 use App\Services\Product\ProductCalculator;
 use App\Services\Product\ProductCombinationService;
@@ -109,11 +110,12 @@ class Product extends BaseModel
         return  app(PriceCalculation::class)->setProduct($this)->setWebstoreChannel($channel)->getOriginalPrice();
     }
 
-    public function getDiscountedPrice($channel = 2)
+    public function getDiscountedPrice()
     {
         /** @var  $priceCalculation PriceCalculation */
         $priceCalculation = app(PriceCalculation::class);
-        return $priceCalculation->setProduct($this)->setWebstoreChannel($channel)->getWebstoreDiscountedPrice();
+        $channel = Channel::find(Channels::WEBSTORE);
+        return $priceCalculation->setProduct($this)->setChannel($channel)->getWebstoreDiscountedPrice();
     }
 
 
