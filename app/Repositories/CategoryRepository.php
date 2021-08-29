@@ -42,8 +42,9 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
             });
         })->where('parent_id', null)->onlyTrashed();
 
-        if($updated_after)
+        if($updated_after) {
             $deleted_categories_query = $deleted_categories_query->where('deleted_at', '>=', $updated_after);
+        }
         return $deleted_categories_query->select('id')->get();
     }
 
