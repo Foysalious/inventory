@@ -25,12 +25,12 @@ class CategoryRepository extends BaseRepository implements CategoryRepositoryInt
                 ->select('categories.id', 'categories.name', 'categories.parent_id', 'categories.thumb as thumb', 'categories.is_published_for_sheba', 'category_partner.is_default');
         })->withCount('products')->where('parent_id', NULL);
 
-        if($updated_after)
+        if($updated_after) {
             $category_query = $category_query->where(function ($q) use ($updated_after) {
                 $q->where('updated_at', '>=', $updated_after);
                 $q->orWhere('created_at', '>=', $updated_after);
             });
-
+        }
         return $category_query->get();
     }
 
