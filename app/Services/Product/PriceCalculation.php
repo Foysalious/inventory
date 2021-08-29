@@ -150,8 +150,8 @@ class PriceCalculation extends BaseService
     }
     public function getWebstoreDiscountedPrice()
     {
-        $discount = $this->skuChannelWithMinimumPrice() ? $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first() : null;
-        $discount_amount = $discount ? $discount->amount : 0;
+        $channel_discount = $this->skuChannelWithMinimumPrice() ? $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first() : null;
+        $discount_amount = $channel_discount ? $channel_discount->amount : 0;
         $original_price = $this->getWebstoreOriginalPrice();
         if(!$original_price)
             dd($original_price);
