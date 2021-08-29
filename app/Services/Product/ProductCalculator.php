@@ -56,6 +56,9 @@ class ProductCalculator
     }
 
 
+    /**
+     * @throws GuzzleException
+     */
     public function getProductRatingReview($product)
     {
         try {
@@ -68,6 +71,7 @@ class ProductCalculator
             $average_rating = round($sum_rating / $count_rating);
             return [$average_rating, $count_rating];
         } catch (GuzzleException $exception) {
+            throw $exception;
         }
     }
 
