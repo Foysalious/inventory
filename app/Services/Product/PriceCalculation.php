@@ -157,6 +157,10 @@ class PriceCalculation extends BaseService
             dd($original_price);
         return [$original_price - $discount_amount,round(($discount_amount/$original_price)*100,2)];
     }
+
+    /**
+     * @throws GuzzleException
+     */
     public function getProductRatingReview($product)
     {
         try {
@@ -169,6 +173,7 @@ class PriceCalculation extends BaseService
             $average_rating = round($sum_rating / $count_rating);
             return [$average_rating, $count_rating];
         } catch (GuzzleException $exception) {
+            throw $exception;
         }
     }
     public function getOriginalPrice()
