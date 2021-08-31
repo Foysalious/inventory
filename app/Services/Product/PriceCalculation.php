@@ -54,11 +54,6 @@ class PriceCalculation extends BaseService
         $this->channel = $channel;
         return $this;
     }
-    public function setWebstoreChannel($channel): PriceCalculation
-    {
-        $this->channel = $channel;
-        return $this;
-    }
 
     /**
      * @param SkuChannel $skuChannel
@@ -155,13 +150,17 @@ class PriceCalculation extends BaseService
     }
     public function getWebstoreDiscountedPrice()
     {
-        $discount = $this->skuChannelWithMinimumPrice() ? $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first() : null;
-        $discount_amount = $discount ? $discount->amount : 0;
+        $channel_discount = $this->skuChannelWithMinimumPrice() ? $this->skuChannelWithMinimumPrice()->validDiscounts()->orderBy('created_at', 'desc')->first() : null;
+        $discount_amount = $channel_discount ? $channel_discount->amount : 0;
         $original_price = $this->getWebstoreOriginalPrice();
         if(!$original_price)
             dd($original_price);
         return [$original_price - $discount_amount,round(($discount_amount/$original_price)*100,2)];
     }
+
+    /**
+     * @throws GuzzleException
+     */
     public function getProductRatingReview($product)
     {
         try {
@@ -174,6 +173,7 @@ class PriceCalculation extends BaseService
             $average_rating = round($sum_rating / $count_rating);
             return [$average_rating, $count_rating];
         } catch (GuzzleException $exception) {
+            throw $exception;
         }
     }
     public function getOriginalPrice()

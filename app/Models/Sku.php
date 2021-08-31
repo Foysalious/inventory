@@ -41,10 +41,7 @@ class Sku extends BaseModel
         if (is_null($last_batch) || is_null($last_batch->stock)) {
             return null;
         }
-        $total_stock = 0;
-        $batches = $this->batch;
-        $total_stock +=  $batches->sum('stock');
-        return $total_stock;
+        return $this->batch->sum('stock');
     }
 
     public function getPurchaseUnitPrice()

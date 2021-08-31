@@ -107,8 +107,7 @@ class ProductList
         $products_query = $this->productRepository->where('partner_id', $this->partnerId)
             ->whereHas('skus', function ($q) {
                 $q->whereHas('batch', function ($q) {
-                    $q->select(DB::raw('SUM(stock) as total_stock'))
-                        ->havingRaw('total_stock > 0');
+                    $q->select(DB::raw('SUM(stock) as total_stock'));
                 });
             })->whereHas('skuChannels', function ($q) {
                 $q->where('channel_id', Channels::WEBSTORE);
