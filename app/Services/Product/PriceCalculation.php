@@ -166,7 +166,7 @@ class PriceCalculation extends BaseService
     {
         try {
             $client = new Client();
-            $request = $client->get(env('POS_ORDER_SERVICE_API_URL').'/api/v1/products/' . $product->id . '/reviews');
+            $request = $client->get('https://pos-order.dev-sheba.xyz/api/v1/products/' . $product->id . '/reviews');
             $response = json_decode($request->getBody()->getContents(), true);
             $rating = array_column($response['reviews'], 'rating');
             $count_rating = count($rating);
