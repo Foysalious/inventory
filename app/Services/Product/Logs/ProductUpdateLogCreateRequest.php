@@ -1,7 +1,7 @@
 <?php namespace App\Services\Product\Logs;
 
 
-use App\Http\Resources\WebstoreProductResource;
+use App\Http\Resources\ProductDetailsResource;
 use App\Services\Product\CombinationService;
 use App\Services\Product\Logs\Creator as ProductUpdateLogsCreator;
 
@@ -86,7 +86,7 @@ class ProductUpdateLogCreateRequest
         list($options,$combinations) = $this->combinationService->getCombinationData($product);
         $product->options = collect($options);
         $product->combinations = collect($combinations);
-        return new WebstoreProductResource($product);
+        return new ProductDetailsResource($product);
     }
 
     private function getUpdatedFieldNames($oldProductDetails, $updatedProductDetails)

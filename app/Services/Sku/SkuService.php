@@ -4,7 +4,7 @@ use App\Events\Accounting\Accounting\Accounting\ProductIndividualStockAdded;
 use App\Events\Accounting\ProductStockAdded;
 use App\Http\Requests\SkuStockAddRequest;
 use App\Http\Requests\SkuStockUpdateRequest;
-use App\Http\Resources\WebstoreProductResource;
+use App\Http\Resources\ProductDetailsResource;
 use App\Http\Resources\SkuResource;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuBatchRepositoryInterface;

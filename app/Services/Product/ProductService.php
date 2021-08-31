@@ -6,7 +6,7 @@ use App\Exceptions\ProductDetailsPropertyValidationError;
 use App\Exceptions\ProductNotFoundException;
 use App\Http\Requests\ProductRequest;
 use App\Http\Requests\ProductUpdateRequest;
-use App\Http\Resources\WebstoreProductResource;
+use App\Http\Resources\ProductDetailsResource;
 use App\Interfaces\ProductOptionRepositoryInterface;
 use App\Interfaces\ProductRepositoryInterface;
 use App\Interfaces\SkuRepositoryInterface;
@@ -17,6 +17,7 @@ use App\Services\Product\Constants\Log\FieldType;
 use App\Services\Usage\Types;
 use App\Services\Usage\UsageService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -98,7 +99,7 @@ class ProductService extends BaseService
             return $this->error("This product does not belongs to this partner", 403);
         $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
         $product->combinations = collect($combinations);
-        $product_resource = new WebstoreProductResource($product);
+        $product_resource = new ProductDetailsResource($product);
         return $this->success('Successful', ['product' => $product_resource], 200);
     }
 
@@ -140,6 +141,7 @@ class ProductService extends BaseService
      * @param ProductUpdateRequest $request
      * @param $partner
      * @return JsonResponse
+     * @throws Exception
      */
     public function update($productId, ProductUpdateRequest $request, $partner): JsonResponse
     {
@@ -209,7 +211,7 @@ class ProductService extends BaseService
             throw new NotFoundHttpException("This product does not belong to this partner");
         $combinations = $this->productCombinationService->setProduct($product)->getCombinationData();
         $product->combinations = collect($combinations);
-        $product = new WebstoreProductResource($product);
+        $product = new ProductDetailsResource($product);
         $logs = [];
         $identifier = [
             FieldType::STOCK => $product->unit ? constants('POS_SERVICE_UNITS')[$product->unit['name_en']]['bn']: 'একক',

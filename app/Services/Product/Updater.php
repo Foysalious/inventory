@@ -1,8 +1,7 @@
 <?php namespace App\Services\Product;
 
 
-use App\Http\Resources\ProductResource;
-use App\Http\Resources\WebstoreProductResource;
+use App\Http\Resources\ProductDetailsResource;
 use App\Interfaces\CombinationRepositoryInterface;
 use App\Interfaces\OptionRepositoryInterface;
 use App\Interfaces\ProductChannelRepositoryInterface;
@@ -14,12 +13,11 @@ use App\Interfaces\ValueRepositoryInterface;
 use App\Models\Product;
 use App\Services\Discount\Creator as DiscountCreator;
 use App\Services\Product\Logs\ProductUpdateLogCreateRequest;
-use App\Services\Product\Update\Strategy\ProductUpdateStrategy;
 use App\Services\Product\Update\Strategy\Updater as ProductUpdater;
 use App\Services\Product\Update\StrategyFactory;
 use App\Services\ProductImage\Creator as ProductImageCreator;
 use App\Services\ProductImage\Updater as ProductImageUpdater;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Exception;
 use Illuminate\Support\Facades\DB;
 
 class Updater
@@ -228,14 +226,14 @@ class Updater
         return $this;
     }
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public function update()
     {
         try {
             DB::beginTransaction();
             $oldProductDetails = clone $this->product;
-            $oldProductResource = new WebstoreProductResource($oldProductDetails);
+            $oldProductResource = new ProductDetailsResource($oldProductDetails);
             $this->productImageUpdater->updateImageList($this->images, $this->deletedImages, $this->product);
             $this->productRepositoryInterface->update($this->product, $this->makeData());
             $strategy = $this->strategyFactory->getStrategy($this->product, $this->productUpdateRequestObjects, $this->hasVariants);
@@ -246,14 +244,14 @@ class Updater
                 ->setDeletedValues($this->strategyFactory->getDeletedValues())
                 ->setAccountingInfo($this->accountingInfo)
                 ->update();
-            $updatedProductResource = new WebstoreProductResource($this->product);
+            $updatedProductResource = new ProductDetailsResource($this->product);
             $this->logCreateRequest->setOldProductDetails($oldProductDetails)
                 ->setOldProductResource($oldProductResource)
                 ->setUpdatedProductDetails($this->product)
                 ->setUpdatedProductDetailsResource($updatedProductResource)
                 ->create();
             DB::commit();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             DB::rollback();
             throw $e;
         }
